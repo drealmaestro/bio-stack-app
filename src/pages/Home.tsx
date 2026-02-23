@@ -1,13 +1,14 @@
 import { useStore } from "../store/useStore";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Play, TrendingUp, Calendar, Coffee, Dumbbell, Quote } from "lucide-react";
 
 import { calculateAge, getDailyQuote } from "../lib/utils";
 
 export function Home() {
-    const { user, templates, logs } = useStore();
+    const { user, templates, logs, startWorkout } = useStore();
+    const navigate = useNavigate();
 
     // Calculate dynamic age
     const age = user?.birthday ? calculateAge(user.birthday) : (user?.age || 47);
@@ -82,11 +83,16 @@ export function Home() {
                         It's {currentDayName}. {targetId === 'REST' ? 'Time to recover.' : 'Time to crush it.'}
                     </p>
                 </div>
-                <Link to="/active">
-                    <Button size="icon" className="rounded-2xl h-14 w-14 bg-primary text-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-                        <Play fill="currentColor" size={24} />
-                    </Button>
-                </Link>
+                <Button
+                    size="icon"
+                    className="rounded-2xl h-14 w-14 bg-primary text-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                    onClick={() => {
+                        if (todayTemplate) startWorkout(todayTemplate.id);
+                        navigate('/active');
+                    }}
+                >
+                    <Play fill="currentColor" size={24} />
+                </Button>
             </div>
 
             {/* Today's Target Card */}
@@ -109,31 +115,27 @@ export function Home() {
                         </CardContent>
                     </Card>
                 ) : todayTemplate ? (
-                    <Link to="/active" onClick={() => {/* Set active template if needed via store, or let user pick on next screen (keeping valid "Quick Start" flow) */ }}>
-                        {/* 
-                            NOTE: In a real app we might auto-select this template in the store. 
-                            For now, clicking this just goes to Active page which prompts selection.
-                            Ideally, we'd pass state or use a store action to `setActiveTemplateId(todayTemplate.id)`.
-                            However, the ActiveWorkout page currently handles selection. 
-                            To make this seamless, we rely on the user picking it from the list or we'd refactor ActiveWorkout.
-                            For now, let's keep it simple: visual guidance. 
-                        */}
-                        <Card className="glass-card border-l-4 border-l-primary group cursor-pointer hover:bg-white/5 transition-colors">
-                            <CardContent className="p-6 flex justify-between items-center">
-                                <div>
-                                    <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Recommended</div>
-                                    <h4 className="text-2xl font-black text-white group-hover:text-primary transition-colors">{todayTemplate.name}</h4>
-                                    <div className="flex gap-4 mt-2 text-sm text-zinc-400">
-                                        <span className="flex items-center gap-1"><Dumbbell size={14} /> {todayTemplate.exercises.length} Exercises</span>
-                                        <span className="flex items-center gap-1"><TrendingUp size={14} /> {todayTemplate.exercises.length * 5} min</span>
-                                    </div>
+                    <Card
+                        className="glass-card border-l-4 border-l-primary group cursor-pointer hover:bg-white/5 transition-colors"
+                        onClick={() => {
+                            startWorkout(todayTemplate.id);
+                            navigate('/active');
+                        }}
+                    >
+                        <CardContent className="p-6 flex justify-between items-center">
+                            <div>
+                                <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Tap to Start</div>
+                                <h4 className="text-2xl font-black text-white group-hover:text-primary transition-colors">{todayTemplate.name}</h4>
+                                <div className="flex gap-4 mt-2 text-sm text-zinc-400">
+                                    <span className="flex items-center gap-1"><Dumbbell size={14} /> {todayTemplate.exercises.length} Exercises</span>
+                                    <span className="flex items-center gap-1"><TrendingUp size={14} /> {todayTemplate.exercises.length * 5} min</span>
                                 </div>
-                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-all">
-                                    <Play fill="currentColor" size={20} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-all">
+                                <Play fill="currentColor" size={20} />
+                            </div>
+                        </CardContent>
+                    </Card>
                 ) : (
                     <div className="p-4 border border-dashed border-zinc-800 rounded-lg text-zinc-500 text-center">
                         Schedule setup incomplete.
