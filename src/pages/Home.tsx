@@ -2,7 +2,7 @@ import { useStore } from "../store/useStore";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
-import { Play, TrendingUp, Trophy, Calendar, Coffee, Dumbbell, Quote } from "lucide-react";
+import { Play, TrendingUp, Calendar, Coffee, Dumbbell, Quote } from "lucide-react";
 
 import { calculateAge, getDailyQuote } from "../lib/utils";
 
@@ -24,11 +24,30 @@ export function Home() {
 
     const workoutsThisWeek = logs.filter(log => new Date(log.timestamp) >= startOfWeek).length;
 
-    // 2. Get last workout name
-    const lastLog = logs[logs.length - 1]; // logs are appended, so last is latest
-    const lastTemplateName = lastLog
-        ? templates.find(t => t.id === lastLog.template_id)?.name
-        : null;
+    // 3.5 Calculate current streak (consecutive days with at least one workout)
+    const streak = (() => {
+        if (!logs.length) return 0;
+        const logDates = new Set(
+            logs.map(l => new Date(l.timestamp).toDateString())
+        );
+        let count = 0;
+        const d = new Date();
+        while (logDates.has(d.toDateString())) {
+            count++;
+            d.setDate(d.getDate() - 1);
+        }
+        // If today has no workout yet, check yesterday as the start
+        if (count === 0) {
+            d.setDate(d.getDate() - 1);
+            while (logDates.has(d.toDateString())) {
+                count++;
+                d.setDate(d.getDate() - 1);
+            }
+        }
+        return count;
+    })();
+
+
 
     // 3. Schedule Logic
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -128,27 +147,25 @@ export function Home() {
                     <Card className="glass-card h-full group hover:bg-white/5 transition-colors">
                         <CardHeader className="p-4 pb-2">
                             <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 group-hover:text-primary transition-colors">
-                                <TrendingUp size={14} /> Weekly Vol
+                                <TrendingUp size={14} /> This Week
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-4 pt-1">
                             <div className="text-3xl font-black text-white">{workoutsThisWeek}</div>
-                            <p className="text-[10px] text-zinc-400">Workouts completed</p>
+                            <p className="text-[10px] text-zinc-400">Sessions done</p>
                         </CardContent>
                     </Card>
                 </Link>
                 <Card className="glass-card">
                     <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                            <Trophy size={14} /> Last Session
+                            🔥 Streak
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 pt-1">
-                        <div className="text-lg font-bold text-white truncate leading-tight">
-                            {lastTemplateName || "No Data"}
-                        </div>
+                        <div className="text-3xl font-black text-primary">{streak}</div>
                         <p className="text-[10px] text-zinc-400">
-                            {lastLog ? new Date(lastLog.timestamp).toLocaleDateString() : "Let's go!"}
+                            {streak === 1 ? "day in a row" : streak > 1 ? "days in a row" : "Start today!"}
                         </p>
                     </CardContent>
                 </Card>

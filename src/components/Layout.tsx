@@ -6,14 +6,13 @@ import { useStore } from '../store/useStore';
 
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
     const { resetStore } = useStore();
 
     const handleReset = () => {
-        if (confirm("Are you sure? This will delete all your data.")) {
-            resetStore(); // We need to ensure this exists or manually clear
-            localStorage.clear();
-            window.location.href = "/";
-        }
+        resetStore();
+        localStorage.clear();
+        window.location.href = "/";
     };
 
     return (
@@ -21,7 +20,7 @@ export function Layout() {
             {/* Header */}
             <header className="glass fixed top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center">
                 <NavLink to="/" className="flex items-center gap-2 group cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-orange-500 flex items-center justify-center group-hover:scale-105 transition-transform">
                         <span className="font-black text-black text-lg">M</span>
                     </div>
                     <h1 className="text-lg font-bold tracking-tight text-white group-hover:text-primary transition-colors">el <span className="text-primary group-hover:text-white transition-colors">Maestro</span></h1>
@@ -33,7 +32,7 @@ export function Layout() {
 
             {/* Mobile Menu Overlay */}
             <div className={cn(
-                "fixed inset-0 bg-black/95 z-[60] backdrop-blur-xl transition-all duration-300 flex flex-col items-center justify-center space-y-8",
+                "fixed inset-0 bg-black/95 z-60 backdrop-blur-xl transition-all duration-300 flex flex-col items-center justify-center space-y-8",
                 isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}>
                 <button
@@ -50,15 +49,39 @@ export function Layout() {
                     <NavLink to="/profile" onClick={() => setIsMenuOpen(false)} className={({ isActive }) => isActive ? "text-primary" : "text-white"}>Profile</NavLink>
                 </nav>
 
-                <div className="absolute bottom-10">
+                <div className="absolute bottom-10 flex flex-col items-center gap-4">
                     <button
-                        onClick={handleReset}
+                        onClick={() => setShowResetConfirm(true)}
                         className="flex items-center gap-2 text-destructive font-medium text-sm border border-destructive/20 px-4 py-2 rounded-full hover:bg-destructive/10"
                     >
                         <Trash2 size={16} /> Reset All Data
                     </button>
                 </div>
             </div>
+
+            {/* Reset Confirmation Dialog */}
+            {showResetConfirm && (
+                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm px-6">
+                    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4 animate-in zoom-in-95 duration-200">
+                        <h3 className="text-lg font-black text-white">Reset All Data?</h3>
+                        <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, and your profile. This cannot be undone.</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowResetConfirm(false)}
+                                className="flex-1 py-2.5 rounded-xl border border-white/10 text-white text-sm font-bold hover:bg-white/5 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleReset}
+                                className="flex-1 py-2.5 rounded-xl bg-destructive text-white text-sm font-bold hover:bg-destructive/80 transition-colors"
+                            >
+                                Reset Everything
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content */}
             <main className="flex-1 pt-20 pb-24 px-4 max-w-lg mx-auto w-full animate-in fade-in duration-500">
@@ -77,7 +100,7 @@ export function Layout() {
                     <NavLink
                         to="/active"
                         className={({ isActive }) => cn(
-                            "flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/20 transition-transform active:scale-95 border-4 border-black",
+                            "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/20 transition-transform active:scale-95 border-4 border-black",
                             isActive ? "scale-110 shadow-primary/40 ring-2 ring-primary ring-offset-2 ring-offset-black" : ""
                         )}
                     >

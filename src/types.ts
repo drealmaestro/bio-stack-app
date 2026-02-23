@@ -68,6 +68,7 @@ export interface ActiveWorkoutState {
     startTime: number; // Timestamp
     completedSets: string[]; // ["0-1", "1-2"]
     setWeights: Record<string, number>; // { "0-1": 60 }
+    setReps: Record<string, number>;    // { "0-1": 10 } - actual reps done
 
     // Rest Timer (Timestamp based)
     restEndTime: number | null; // Timestamp when rest ends

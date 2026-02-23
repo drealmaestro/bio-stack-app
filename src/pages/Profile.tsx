@@ -3,6 +3,7 @@ import { useStore } from "../store/useStore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { useToast } from "../components/ui/toast";
 
 const GOAL_OPTIONS = [
     "Man boobs reduction",
@@ -16,6 +17,7 @@ const EXPERIENCE_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
 export function Profile() {
     const { user, setUser } = useStore();
+    const toast = useToast();
     const [formData, setFormData] = useState({
         name: "",
         birthday: "1978-07-21", // Default to user's birthday
@@ -59,10 +61,10 @@ export function Profile() {
     const handleSave = () => {
         setUser({
             ...formData,
-            age: calculateAge(formData.birthday), // Keep age for backward compat types
+            age: calculateAge(formData.birthday),
             stats: user?.stats || { weight: [], body_fat: [] }
         });
-        alert("Profile Saved!");
+        toast.success("Profile saved!");
     };
 
     return (

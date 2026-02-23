@@ -5,6 +5,7 @@ import { Profile } from './pages/Profile';
 import { WorkoutManager } from './pages/WorkoutManager';
 import { ActiveWorkout } from './pages/ActiveWorkout';
 import { HistoryLog } from './pages/History';
+import { ToastContainer } from './components/ui/toast';
 
 import { useEffect } from 'react';
 import { useStore } from './store/useStore';
@@ -18,6 +19,7 @@ function App() {
 
     return (
         <BrowserRouter>
+            <ToastContainer />
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />

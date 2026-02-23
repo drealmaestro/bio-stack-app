@@ -10,16 +10,17 @@ interface AppState {
     logs: WorkoutLog[];
     exercises: Exercise[];
     activeWorkout: ActiveWorkoutState | null;
+    seeded: boolean; // Tracks whether initial data has been seeded
 
     // Actions
     setUser: (user: UserProfile) => void;
     updateUserStats: (type: 'weight' | 'body_fat', entry: { date: string, value: number }) => void;
 
     addTemplate: (template: WorkoutTemplate) => void;
+    updateTemplate: (template: WorkoutTemplate) => void;
     deleteTemplate: (id: string) => void;
 
-    logWorkout: (log: WorkoutLog) => void;
-    addLog: (log: WorkoutLog) => void; // Alias for logWorkout for consistency
+    addLog: (log: WorkoutLog) => void;
 
     addExercise: (exercise: Exercise) => void;
 
@@ -28,6 +29,7 @@ interface AppState {
     cancelWorkout: () => void;
     toggleSetComplete: (exerciseIdx: number, setNum: number, restSeconds: number) => void;
     updateSetWeight: (exerciseIdx: number, setNum: number, weight: number) => void;
+    updateSetReps: (exerciseIdx: number, setNum: number, reps: number) => void;
 
     // Rest Timer Actions
     addRestTime: (seconds: number) => void;
@@ -45,6 +47,7 @@ export const useStore = create<AppState>()(
             logs: [],
             exercises: [],
             activeWorkout: null,
+            seeded: false,
 
             setUser: (user) => set({ user }),
 
@@ -65,12 +68,12 @@ export const useStore = create<AppState>()(
                 templates: [...state.templates, template]
             })),
 
-            deleteTemplate: (id) => set((state) => ({
-                templates: state.templates.filter(t => t.id !== id)
+            updateTemplate: (template) => set((state) => ({
+                templates: state.templates.map(t => t.id === template.id ? template : t)
             })),
 
-            logWorkout: (log) => set((state) => ({
-                logs: [...state.logs, log]
+            deleteTemplate: (id) => set((state) => ({
+                templates: state.templates.filter(t => t.id !== id)
             })),
 
             addLog: (log) => set((state) => ({
@@ -89,6 +92,7 @@ export const useStore = create<AppState>()(
                     startTime: Date.now(),
                     completedSets: [],
                     setWeights: {},
+                    setReps: {},
                     restEndTime: null,
                     originalRestDuration: 0
                 }
@@ -129,13 +133,27 @@ export const useStore = create<AppState>()(
 
             updateSetWeight: (exerciseIdx, setNum, weight) => set((state) => {
                 if (!state.activeWorkout) return state;
-                const key = `${exerciseIdx}-${setNum}`; // Standardized key format
+                const key = `${exerciseIdx}-${setNum}`;
                 return {
                     activeWorkout: {
                         ...state.activeWorkout,
                         setWeights: {
                             ...state.activeWorkout.setWeights,
                             [key]: weight
+                        }
+                    }
+                };
+            }),
+
+            updateSetReps: (exerciseIdx, setNum, reps) => set((state) => {
+                if (!state.activeWorkout) return state;
+                const key = `${exerciseIdx}-${setNum}`;
+                return {
+                    activeWorkout: {
+                        ...state.activeWorkout,
+                        setReps: {
+                            ...state.activeWorkout.setReps,
+                            [key]: reps
                         }
                     }
                 };
@@ -164,20 +182,22 @@ export const useStore = create<AppState>()(
                 };
             }),
 
-            seed: () => {
-                // For development/iteration, always sync to latest code constants
-                // This ensures protocol updates (rest times, exercises) are reflected immediately
-                set({
+            seed: () => set((state) => {
+                // Only seed once — never overwrite user-created data
+                if (state.seeded) return state;
+                return {
                     exercises: INITIAL_EXERCISES,
-                    templates: INITIAL_TEMPLATES
-                });
-            },
+                    templates: INITIAL_TEMPLATES,
+                    seeded: true
+                };
+            }),
 
             resetStore: () => set({
                 user: null,
                 templates: [],
                 logs: [],
-                activeWorkout: null
+                activeWorkout: null,
+                seeded: false
             })
         }),
         {

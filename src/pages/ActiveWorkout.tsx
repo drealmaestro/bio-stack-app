@@ -7,14 +7,16 @@ import { Play, CheckCircle, Check } from "lucide-react";
 import { nanoid } from "nanoid";
 import type { SetLog } from "../types";
 import { cn } from "../lib/utils";
+import { useToast } from "../components/ui/toast";
 
 export function ActiveWorkout() {
     const {
         templates, exercises, addLog,
         activeWorkout, startWorkout, cancelWorkout,
-        toggleSetComplete, updateSetWeight,
+        toggleSetComplete, updateSetWeight, updateSetReps,
         addRestTime, skipRest
     } = useStore();
+    const toast = useToast();
 
     // Local tick state for UI updates only
     const [now, setNow] = useState(Date.now());
@@ -39,7 +41,6 @@ export function ActiveWorkout() {
         return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
-    // Helper to get exercise details
     const getExerciseName = (id: string) => exercises.find(e => e.id === id)?.name || "Unknown";
 
     const handleFinish = () => {
@@ -47,20 +48,19 @@ export function ActiveWorkout() {
 
         const duration = (Date.now() - activeWorkout.startTime) / 1000;
 
-        // Convert the completed sets map to a flat log
         const completedLog: SetLog[] = [];
         activeTemplate.exercises.forEach((ex, exIdx) => {
             for (let i = 1; i <= ex.target_sets; i++) {
                 const key = `${exIdx}-${i}`;
                 const isCompleted = activeWorkout.completedSets.includes(key);
                 const weight = activeWorkout.setWeights[key] || 0;
+                const reps = activeWorkout.setReps[key] ?? ex.target_reps; // Use actual reps if entered
 
-                // Only log if completed OR if weight was entered
                 if (isCompleted || weight > 0) {
                     completedLog.push({
                         exercise_id: ex.exercise_id,
                         set_number: i,
-                        reps_completed: ex.target_reps, // Assuming target reps for now
+                        reps_completed: reps,
                         weight_kg: weight
                     });
                 }
@@ -76,14 +76,15 @@ export function ActiveWorkout() {
         });
 
         cancelWorkout();
-        alert("Workout Logged! Great job.");
+        toast.success(`Workout logged! ${formatTime(Math.floor(duration))} — great session 💪`);
     };
 
+    // --- TEMPLATE SELECTION SCREEN ---
     if (!activeWorkout || !activeTemplate) {
         return (
             <div className="space-y-6 animate-in zoom-in-95 duration-500">
                 <div className="text-center py-8">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse ring-1 ring-primary/30">
+                    <div className="w-24 h-24 bg-linear-to-br from-primary/20 to-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse ring-1 ring-primary/30">
                         <Play size={48} className="text-primary ml-1" fill="currentColor" />
                     </div>
                     <h2 className="text-3xl font-black text-white tracking-tight mb-2">Ready to Train?</h2>
@@ -111,6 +112,7 @@ export function ActiveWorkout() {
         );
     }
 
+    // --- ACTIVE WORKOUT SCREEN ---
     return (
         <div className="animate-in slide-in-from-bottom-10 duration-500 relative pb-32">
             {/* Header / Timer */}
@@ -138,7 +140,7 @@ export function ActiveWorkout() {
                             </span>
                         </div>
 
-                        {/* Exercise Illustration if available */}
+                        {/* Exercise Image */}
                         {(() => {
                             const ex = exercises.find(e => e.id === exercise.exercise_id);
                             return ex?.image_url ? (
@@ -151,24 +153,25 @@ export function ActiveWorkout() {
 
                         <Card className="glass-card overflow-hidden">
                             <CardContent className="p-0">
-                                {/* Header Row */}
-                                <div className="grid grid-cols-[3rem_1fr_3rem_3rem] gap-2 p-2 bg-white/5 text-[10px] items-center text-zinc-500 font-bold uppercase tracking-widest text-center">
+                                {/* Header Row — now 5 columns: Set | kg | Reps | Target | Done */}
+                                <div className="grid grid-cols-[2.5rem_1fr_1fr_2.5rem_2.5rem] gap-1 p-2 bg-white/5 text-[10px] items-center text-zinc-500 font-bold uppercase tracking-widest text-center">
                                     <div>Set</div>
                                     <div>kg</div>
-                                    <div>Reps</div>
-                                    <div>Done</div>
+                                    <div>Reps Done</div>
+                                    <div>Tgt</div>
+                                    <div>✓</div>
                                 </div>
 
-                                {/* Set Rows */}
                                 {Array.from({ length: exercise.target_sets }).map((_, setIdx) => {
                                     const setNum = setIdx + 1;
-                                    const key = `${index}-${setNum}`; // Changed space to match store logic
+                                    const key = `${index}-${setNum}`;
                                     const isCompleted = activeWorkout.completedSets.includes(key);
                                     const currentWeight = activeWorkout.setWeights[key] || 0;
+                                    const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
 
                                     return (
                                         <div key={setNum} className={cn(
-                                            "grid grid-cols-[3rem_1fr_3rem_3rem] gap-2 p-3 items-center border-t border-white/5 transition-colors",
+                                            "grid grid-cols-[2.5rem_1fr_1fr_2.5rem_2.5rem] gap-1 p-2 items-center border-t border-white/5 transition-colors",
                                             isCompleted ? "bg-primary/5" : ""
                                         )}>
                                             <div className="flex justify-center">
@@ -177,20 +180,34 @@ export function ActiveWorkout() {
                                                 </div>
                                             </div>
 
+                                            {/* Weight */}
                                             <div className="px-1">
                                                 <Input
                                                     type="number"
                                                     placeholder="0"
                                                     value={currentWeight || ''}
-                                                    className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono"
+                                                    className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
                                                     onChange={(e) => updateSetWeight(index, setNum, parseFloat(e.target.value) || 0)}
                                                 />
                                             </div>
 
-                                            <div className="text-center font-bold text-zinc-300">
+                                            {/* Actual Reps Done */}
+                                            <div className="px-1">
+                                                <Input
+                                                    type="number"
+                                                    placeholder={String(exercise.target_reps)}
+                                                    value={currentReps === exercise.target_reps && !(key in (activeWorkout.setReps || {})) ? '' : currentReps}
+                                                    className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
+                                                    onChange={(e) => updateSetReps(index, setNum, parseInt(e.target.value) || exercise.target_reps)}
+                                                />
+                                            </div>
+
+                                            {/* Target reps */}
+                                            <div className="text-center font-bold text-zinc-500 text-xs">
                                                 {exercise.target_reps}
                                             </div>
 
+                                            {/* Done toggle */}
                                             <div className="flex justify-center">
                                                 <button
                                                     onClick={() => toggleSetComplete(index, setNum, exercise.rest_seconds)}
@@ -213,7 +230,8 @@ export function ActiveWorkout() {
                 ))}
             </div>
 
-            <div className="fixed bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black via-black/90 to-transparent z-50">
+            {/* Finish Button */}
+            <div className="fixed bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
                 <Button onClick={handleFinish} className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl shadow-primary/20 bg-primary text-black hover:scale-[1.02] transition-transform active:scale-95">
                     <CheckCircle className="mr-2" size={24} /> FINISH WORKOUT
                 </Button>
@@ -221,7 +239,7 @@ export function ActiveWorkout() {
 
             {/* Rest Timer Overlay */}
             {isResting && (
-                <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
                     <div className="text-zinc-400 font-bold uppercase tracking-widest mb-4">Resting</div>
                     <div className="text-9xl font-black text-primary font-mono tabular-nums mb-8 tracking-tighter">
                         {formatTime(restSecondsRemaining)}
