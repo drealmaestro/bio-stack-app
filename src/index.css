@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-    --color-background: #09090b;
-    --color-foreground: #fafafa;
+    --color-background: #07080f;
+    --color-foreground: #f0f4ff;
 
-    --color-card: #18181b;
-    --color-card-foreground: #fafafa;
+    --color-card: #0d1117;
+    --color-card-foreground: #f0f4ff;
 
-    --color-popover: #18181b;
-    --color-popover-foreground: #fafafa;
+    --color-popover: #0d1117;
+    --color-popover-foreground: #f0f4ff;
 
-    --color-primary: #FFD700;
-    --color-primary-foreground: #09090b;
+    --color-primary: #00D4FF;
+    --color-primary-foreground: #07080f;
 
-    --color-secondary: #27272a;
-    --color-secondary-foreground: #fafafa;
+    --color-secondary: #1a1f2e;
+    --color-secondary-foreground: #f0f4ff;
 
-    --color-muted: #27272a;
-    --color-muted-foreground: #a1a1aa;
+    --color-muted: #1a1f2e;
+    --color-muted-foreground: #8892aa;
 
-    --color-accent: #27272a;
-    --color-accent-foreground: #fafafa;
+    --color-accent: #1a1f2e;
+    --color-accent-foreground: #f0f4ff;
 
     --color-destructive: #7f1d1d;
-    --color-destructive-foreground: #fafafa;
+    --color-destructive-foreground: #f0f4ff;
 
-    --color-border: #27272a;
-    --color-input: #27272a;
-    --color-ring: #FFD700;
+    --color-border: #1e2535;
+    --color-input: #1a1f2e;
+    --color-ring: #00D4FF;
 
     --radius-lg: 0.75rem;
     --radius-md: 0.5rem;
@@ -36,18 +36,19 @@
 
 @layer base {
     body {
-        @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary;
+        @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
         background-image:
-            radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 0% 100%, rgba(255, 215, 0, 0.02) 0%, transparent 50%);
+            radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 55%),
+            radial-gradient(circle at 100% 100%, rgba(0, 212, 255, 0.03) 0%, transparent 40%),
+            radial-gradient(circle at 0% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 40%);
         min-height: 100vh;
     }
 }
 
 @utility glass {
-    @apply bg-zinc-900/60 backdrop-blur-md border border-white/5 shadow-xl;
+    @apply bg-slate-900/60 backdrop-blur-md border border-cyan-500/10 shadow-xl shadow-cyan-500/5;
 }
 
 @utility glass-card {
-    @apply bg-zinc-900/40 backdrop-blur-sm border border-white/5 hover:border-primary/30 transition-all duration-300;
+    @apply bg-slate-900/40 backdrop-blur-sm border border-white/5 hover:border-primary/40 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300;
 }

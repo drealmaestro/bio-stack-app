@@ -293,7 +293,7 @@ export function WorkoutManager() {
                                             const muscle = getExerciseMuscle(ex.exercise_id);
                                             return (
                                                 <div key={ex.exercise_id}
-                                                    className="bg-white/[0.03] border border-white/5 rounded-xl p-3 space-y-2">
+                                                    className="bg-white/3 border border-white/5 rounded-xl p-3 space-y-2">
                                                     {/* Exercise header */}
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-2 min-w-0">
@@ -399,7 +399,7 @@ export function WorkoutManager() {
                                                             disabled={alreadyAdded}
                                                             className={`flex items-center justify-between p-3 rounded-xl text-left transition-all ${alreadyAdded
                                                                 ? "bg-primary/5 border border-primary/20 opacity-60 cursor-not-allowed"
-                                                                : "bg-white/[0.03] border border-white/5 hover:border-primary/30 hover:bg-primary/5 cursor-pointer"
+                                                                : "bg-white/3 border border-white/5 hover:border-primary/30 hover:bg-primary/5 cursor-pointer"
                                                                 }`}
                                                         >
                                                             <div>
