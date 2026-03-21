@@ -4,12 +4,14 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/toast";
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
+    ResponsiveContainer, BarChart, Bar, Cell
 } from "recharts";
 import { Plus, TrendingDown, Scale, Target, User2 } from "lucide-react";
 import { DEFAULT_NUTRITION_GOALS } from "../data/nutrition";
 import { calculateAge, cn } from "../lib/utils";
+import { auth, googleProvider } from "../lib/firebase";
+import { signInWithPopup, signOut, type User } from "firebase/auth";
 
 // C3b: removed inappropriate goal label
 const GOAL_OPTIONS = [
@@ -19,7 +21,7 @@ const GOAL_OPTIONS = [
 const EXPERIENCE_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
 
 export function Profile() {
-    const { user, setUser } = useStore();
+    const { user, setUser, logs, exercises } = useStore();
     const toast = useToast();
 
     const [formData, setFormData] = useState({
@@ -36,6 +38,7 @@ export function Profile() {
     });
     const [newWeight, setNewWeight] = useState("");
     const [showAddWeight, setShowAddWeight] = useState(false);
+    const [fbUser, setFbUser] = useState<User | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -54,6 +57,9 @@ export function Profile() {
                 });
             }
         }
+        
+        const unsubscribe = auth.onAuthStateChanged((u) => setFbUser(u));
+        return () => unsubscribe();
     }, [user]);
 
     const toggleGoal = (goal: string) => setFormData(prev => ({
@@ -101,13 +107,44 @@ export function Profile() {
         setShowAddWeight(!showAddWeight);
     };
 
+    // Calculate Muscle Volume (Sets per Muscle Group)
+    const muscleVolume = logs.reduce((acc, log) => {
+        log.completed_exercises.forEach(set => {
+            const ex = exercises.find(e => e.id === set.exercise_id);
+            if (ex) {
+                acc[ex.target_muscle] = (acc[ex.target_muscle] || 0) + 1;
+            }
+        });
+        return acc;
+    }, {} as Record<string, number>);
+
+    const barChartData = Object.entries(muscleVolume)
+        .map(([name, sets]) => ({ name, sets }))
+        .sort((a, b) => b.sets - a.sets)
+        .slice(0, 5); // display top 5
+
+    // Brand colors for the bar chart
+    const COLORS = ['#00D4FF', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'];
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500 pb-20">
 
             {/* ── Section label ─────────────────── */}
-            <div className="pt-1">
-                <h2 className="text-2xl font-black text-white">Profile</h2>
-                <p className="text-zinc-500 text-sm">Manage your settings & goals</p>
+            <div className="pt-1 flex items-start justify-between">
+                <div>
+                    <h2 className="text-2xl font-black text-white">Profile</h2>
+                    <p className="text-zinc-500 text-sm">Manage your settings & goals</p>
+                </div>
+                {fbUser && !fbUser.isAnonymous ? (
+                    <div className="text-right">
+                        <div className="text-[10px] uppercase font-bold text-zinc-500">Cloud Sync Active</div>
+                        <button onClick={() => signOut(auth)} className="text-xs text-red-400 hover:text-red-300 transition-colors font-semibold">Sign Out</button>
+                    </div>
+                ) : (
+                    <Button onClick={() => signInWithPopup(auth, googleProvider)} size="sm" className="bg-white text-black font-bold h-8 text-xs hover:bg-zinc-200">
+                        Sign in to Sync
+                    </Button>
+                )}
             </div>
 
             {/* ── Weight Tracker ────────────────── */}
@@ -179,11 +216,13 @@ export function Profile() {
                                 <YAxis
                                     tick={{ fill: '#71717a', fontSize: 9 }}
                                     domain={['auto', 'auto']}
+                                    width={30}
                                 />
-                                <Tooltip
+                                <RechartsTooltip
                                     contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, fontSize: 12 }}
                                     labelStyle={{ color: '#a1a1aa' }}
                                     formatter={(v: number | undefined) => [`${v ?? '—'} kg`, 'Weight'] as [string, string]}
+                                    cursor={{ stroke: '#ffffff', strokeWidth: 1, strokeDasharray: '4 4', opacity: 0.1 }}
                                 />
                                 <Line
                                     type="monotone"
@@ -199,6 +238,49 @@ export function Profile() {
                 ) : (
                     <div className="h-24 flex items-center justify-center text-sm text-zinc-600 border border-dashed border-zinc-800 rounded-xl">
                         Log at least 2 weight entries to see your chart
+                    </div>
+                )}
+            </div>
+
+            {/* ── Volume Tracker ────────────────── */}
+            <div className="glass-card p-5 rounded-2xl space-y-4">
+                <div className="flex items-center gap-2">
+                    <Target size={16} className="text-purple-400" />
+                    <h3 className="text-base font-bold text-white">Muscle Volume (Sets)</h3>
+                </div>
+
+                {barChartData.length > 0 ? (
+                    <div className="h-40">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} layout="horizontal">
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                                <XAxis 
+                                    dataKey="name" 
+                                    tick={{ fill: '#71717a', fontSize: 10 }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <YAxis 
+                                    tick={{ fill: '#71717a', fontSize: 10 }} 
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <RechartsTooltip 
+                                    cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                                    contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, fontSize: 12 }}
+                                    formatter={(v: number) => [`${v} Sets`, 'Volume']}
+                                />
+                                <Bar dataKey="sets" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                                    {barChartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                ) : (
+                    <div className="h-24 flex items-center justify-center text-sm text-zinc-600 border border-dashed border-zinc-800 rounded-xl">
+                        Log workouts to see your volume stats
                     </div>
                 )}
             </div>

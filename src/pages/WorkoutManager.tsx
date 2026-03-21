@@ -13,6 +13,7 @@ import { nanoid } from "nanoid";
 import type { WorkoutTemplate, ExerciseSet } from "../types";
 import type { TargetMuscle } from "../types";
 import { Link } from "react-router-dom";
+import { CustomExerciseCreator } from "../components/CustomExerciseCreator";
 
 const MUSCLE_COLORS: Record<TargetMuscle, string> = {
     Chest: "text-orange-400 bg-orange-400/10",
@@ -39,6 +40,7 @@ export function WorkoutManager() {
     const [showPicker, setShowPicker] = useState(false);
     const [pickerSearch, setPickerSearch] = useState("");
     const [pickerMuscle, setPickerMuscle] = useState<TargetMuscle | "All">("All");
+    const [showCustomCreator, setShowCustomCreator] = useState(false);
 
     // ─── Draft state (local copy while editing) ───────────────────────────────
     const [draft, setDraft] = useState<WorkoutTemplate | null>(null);
@@ -421,15 +423,24 @@ export function WorkoutManager() {
                                     {showPicker && (
                                         <div className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
                                             {/* Search */}
-                                            <div className="relative">
-                                                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                                                <input
-                                                    autoFocus
-                                                    value={pickerSearch}
-                                                    onChange={e => setPickerSearch(e.target.value)}
-                                                    placeholder="Search exercises..."
-                                                    className="w-full bg-black/60 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-primary/40 transition-colors"
-                                                />
+                                            <div className="flex items-center gap-2">
+                                                <div className="relative flex-1">
+                                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                                                    <input
+                                                        autoFocus
+                                                        value={pickerSearch}
+                                                        onChange={e => setPickerSearch(e.target.value)}
+                                                        placeholder="Search exercises..."
+                                                        className="w-full bg-black/60 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-primary/40 transition-colors"
+                                                    />
+                                                </div>
+                                                <Button 
+                                                    onClick={() => setShowCustomCreator(true)} 
+                                                    size="sm" 
+                                                    className="shrink-0 h-[38px] px-3 font-bold bg-white/10 text-white hover:bg-white/20 border-0"
+                                                >
+                                                    <Plus size={14} className="mr-1"/> Create
+                                                </Button>
                                             </div>
 
                                             {/* Muscle filter chips */}
@@ -531,6 +542,18 @@ export function WorkoutManager() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Custom Exercise Creator Modal */}
+            {showCustomCreator && (
+                <CustomExerciseCreator 
+                    onClose={() => setShowCustomCreator(false)} 
+                    onCreated={() => {
+                        // Optionally multi-select it or just close modal and search for it.
+                        // We'll close modal and user can simply find it. It's automatically added to `exercises`.
+                        setPickerSearch("");
+                    }}
+                />
             )}
         </div>
     );

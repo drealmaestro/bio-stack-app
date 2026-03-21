@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, enableMultiTabIndexedDbPersistence } from "firebase/firestore";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth, signInAnonymously, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,6 +16,7 @@ export const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const googleProvider = new GoogleAuthProvider();
 
 // Enable offline persistence for Firestore
 enableMultiTabIndexedDbPersistence(db).catch((err) => {
@@ -28,14 +29,18 @@ enableMultiTabIndexedDbPersistence(db).catch((err) => {
   }
 });
 
-// For initial setup, we sign in anonymously by default so offline sync can write to the user's isolated ID.
-export const initAuth = async () => {
-    try {
-        await signInAnonymously(auth);
-    } catch (error) {
-        console.error("Error signing in anonymously:", error);
-    }
+// Auto-fallback to anonymous auth if no user exists so data always saves locally
+export const initAuth = () => {
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Error signing in anonymously:", error);
+            }
+        }
+    });
 };
 
-// Auto-activate auth on load
+// Auto-activate auth listener on load
 initAuth();
