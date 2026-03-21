@@ -7,9 +7,14 @@ import { ActiveWorkout } from './pages/ActiveWorkout';
 import { HistoryLog } from './pages/History';
 import { Nutrition } from './pages/Nutrition';
 import { ToastContainer } from './components/ui/toast';
+import ReloadPrompt from './components/ReloadPrompt';
 
 import { useEffect } from 'react';
 import { useStore } from './store/useStore';
+import { initSync } from './lib/sync';
+
+// Start listening for auth and syncing state immediately
+initSync();
 
 function App() {
     const { seed } = useStore();
@@ -21,6 +26,7 @@ function App() {
     return (
         <BrowserRouter>
             <ToastContainer />
+            <ReloadPrompt />
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
