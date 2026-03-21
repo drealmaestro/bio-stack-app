@@ -7,7 +7,7 @@ import { useToast } from "../components/ui/toast";
 import {
     Plus, ChevronDown, ChevronUp,
     X, Dumbbell, Clock, ArrowUpDown, Search,
-    CheckCircle2, Edit3, Play
+    CheckCircle2, Edit3, Play, Info, AlertTriangle
 } from "lucide-react";
 import { nanoid } from "nanoid";
 import type { WorkoutTemplate, ExerciseSet } from "../types";
@@ -42,6 +42,14 @@ export function WorkoutManager() {
 
     // ─── Draft state (local copy while editing) ───────────────────────────────
     const [draft, setDraft] = useState<WorkoutTemplate | null>(null);
+
+    // H5: discard confirmation state
+    const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+
+    // ─── Form cue panel state ─────────────────────────────────────────────────
+    const [formCueOpen, setFormCueOpen] = useState<string | null>(null);
+
+    const getExerciseData = (id: string) => exercises.find(e => e.id === id);
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
     const getExerciseName = (id: string) =>
@@ -89,6 +97,18 @@ export function WorkoutManager() {
         setEditingId(null);
         setDraft(null);
         setShowPicker(false);
+        setShowDiscardConfirm(false);
+    };
+
+    // H5: request close — check for unsaved changes first
+    const requestCloseEditor = (originalTemplate: WorkoutTemplate | undefined) => {
+        if (!draft || !originalTemplate) { closeEditor(); return; }
+        const hasChanges = JSON.stringify(draft) !== JSON.stringify(originalTemplate);
+        if (hasChanges) {
+            setShowDiscardConfirm(true);
+        } else {
+            closeEditor();
+        }
     };
 
     // ─── Save draft to store ─────────────────────────────────────────────────
@@ -255,7 +275,7 @@ export function WorkoutManager() {
                                                 <Play size={16} fill="currentColor" />
                                             </Link>
                                             <button
-                                                onClick={() => isOpen ? closeEditor() : openEditor(template)}
+                                                onClick={() => isOpen ? requestCloseEditor(template) : openEditor(template)}
                                                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isOpen
                                                     ? "bg-primary/20 text-primary"
                                                     : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
@@ -341,6 +361,46 @@ export function WorkoutManager() {
                                                             );
                                                         })}
                                                     </div>
+
+                                                    {/* Form Guide toggle */}
+                                                    {(() => {
+                                                        const exData = getExerciseData(ex.exercise_id);
+                                                        const isOpen = formCueOpen === ex.exercise_id;
+                                                        if (!exData?.form_cues?.length) return null;
+                                                        return (
+                                                            <div>
+                                                                <button
+                                                                    onClick={() => setFormCueOpen(isOpen ? null : ex.exercise_id)}
+                                                                    className="flex items-center gap-1.5 text-[10px] font-bold text-primary/70 hover:text-primary transition-colors mt-1"
+                                                                >
+                                                                    <Info size={11} />
+                                                                    {isOpen ? "Hide Form Guide" : "View Form Guide"}
+                                                                </button>
+                                                                {isOpen && (
+                                                                    <div className="mt-2 space-y-2 animate-in slide-in-from-top-1 duration-150">
+                                                                        <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 space-y-1.5">
+                                                                            <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">Form Cues</p>
+                                                                            {exData.form_cues.map((cue, i) => (
+                                                                                <div key={i} className="flex items-start gap-1.5 text-[11px] text-zinc-300">
+                                                                                    <span className="text-primary mt-0.5 shrink-0">▸</span>{cue}
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                        {exData.common_mistakes && (
+                                                                            <div className="bg-orange-500/5 border border-orange-500/15 rounded-xl p-3 space-y-1.5">
+                                                                                <p className="text-[9px] font-black uppercase tracking-widest text-orange-400 mb-1 flex items-center gap-1"><AlertTriangle size={9} /> Common Mistakes</p>
+                                                                                {exData.common_mistakes.map((m, i) => (
+                                                                                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-zinc-400">
+                                                                                        <span className="text-orange-400 mt-0.5 shrink-0">✕</span>{m}
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             );
                                         })}
@@ -430,7 +490,7 @@ export function WorkoutManager() {
                                         <Button onClick={saveDraft} className="flex-1">
                                             <CheckCircle2 size={16} className="mr-2" /> Save Changes
                                         </Button>
-                                        <Button variant="outline" onClick={closeEditor}>
+                                        <Button variant="outline" onClick={() => requestCloseEditor(template)}>
                                             Discard
                                         </Button>
                                     </div>
@@ -440,6 +500,38 @@ export function WorkoutManager() {
                     );
                 })}
             </div>
+
+            {/* H5: Discard confirmation dialog */}
+            {showDiscardConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 mx-4 max-w-sm w-full space-y-4 animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-orange-500/15 flex items-center justify-center">
+                                <AlertTriangle size={20} className="text-orange-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-white">Discard Changes?</h3>
+                                <p className="text-xs text-zinc-400 mt-0.5">Your unsaved edits will be lost.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={closeEditor}
+                                variant="outline"
+                                className="flex-1 border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
+                            >
+                                Discard
+                            </Button>
+                            <Button
+                                onClick={() => setShowDiscardConfirm(false)}
+                                className="flex-1 bg-primary text-black"
+                            >
+                                Keep Editing
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -11,13 +11,19 @@ function formatDuration(seconds: number) {
     return `${m}min`;
 }
 
-// Custom tooltip for the chart
-const CustomTooltip = ({ active, payload, label }: any) => {
+// M6: explicit interface instead of `any` — avoids Recharts version type conflicts
+interface TooltipData {
+    active?: boolean;
+    payload?: Array<{ value?: number | string }>;
+    label?: string | number;
+}
+const CustomTooltip = ({ active, payload, label }: TooltipData) => {
     if (active && payload && payload.length) {
+        const value = payload[0]?.value;
         return (
             <div className="bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs">
-                <p className="text-zinc-400 mb-1">{label}</p>
-                <p className="text-primary font-bold">{payload[0].value.toLocaleString()} kg total</p>
+                <p className="text-zinc-400 mb-1">{String(label ?? '')}</p>
+                <p className="text-primary font-bold">{typeof value === 'number' ? value.toLocaleString() : value} kg total</p>
             </div>
         );
     }

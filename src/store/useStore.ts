@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState } from '../types';
+import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState, NutritionLog, NutritionEntry, DailyInsights } from '../types';
 import { INITIAL_EXERCISES } from '../data/exercises';
 import { INITIAL_TEMPLATES } from '../data/templates';
+import { nanoid } from 'nanoid';
 
 interface AppState {
     user: UserProfile | null;
@@ -10,7 +11,13 @@ interface AppState {
     logs: WorkoutLog[];
     exercises: Exercise[];
     activeWorkout: ActiveWorkoutState | null;
-    seeded: boolean; // Tracks whether initial data has been seeded
+    seeded: boolean;
+
+    // Nutrition
+    nutritionLogs: NutritionLog[];
+
+    // Daily Insights
+    dailyInsights: DailyInsights[];
 
     // Actions
     setUser: (user: UserProfile) => void;
@@ -35,19 +42,30 @@ interface AppState {
     addRestTime: (seconds: number) => void;
     skipRest: () => void;
 
+    // Nutrition Actions
+    addNutritionEntry: (date: string, entry: Omit<NutritionEntry, 'id' | 'logged_at'>) => void;
+    deleteNutritionEntry: (date: string, entryId: string) => void;
+    getNutritionLog: (date: string) => NutritionLog | undefined;
+
+    // Daily Insights Actions
+    updateDailyInsights: (insights: DailyInsights) => void;
+    getDailyInsights: (date: string) => DailyInsights | undefined;
+
     seed: () => void;
     resetStore: () => void;
 }
 
 export const useStore = create<AppState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             user: null,
             templates: [],
             logs: [],
             exercises: [],
             activeWorkout: null,
             seeded: false,
+            nutritionLogs: [],
+            dailyInsights: [],
 
             setUser: (user) => set({ user }),
 
@@ -102,7 +120,7 @@ export const useStore = create<AppState>()(
 
             toggleSetComplete: (exerciseIdx, setNum, restSeconds) => set((state) => {
                 if (!state.activeWorkout) return state;
-                const key = `${exerciseIdx}-${setNum}`; // Standardized key format (no spaces)
+                const key = `${exerciseIdx}-${setNum}`;
                 const { completedSets } = state.activeWorkout;
                 const exists = completedSets.includes(key);
 
@@ -114,7 +132,6 @@ export const useStore = create<AppState>()(
                     newCompletedSets = completedSets.filter(k => k !== key);
                 } else {
                     newCompletedSets = [...completedSets, key];
-                    // Trigger Rest Timer if completing a new set and rest > 0
                     if (restSeconds > 0) {
                         newRestEndTime = Date.now() + (restSeconds * 1000);
                         newOriginalRestDuration = restSeconds;
@@ -182,8 +199,58 @@ export const useStore = create<AppState>()(
                 };
             }),
 
+            // --- Nutrition Actions ---
+
+            addNutritionEntry: (date, entryData) => set((state) => {
+                const newEntry: NutritionEntry = {
+                    ...entryData,
+                    id: nanoid(),
+                    logged_at: new Date().toISOString(),
+                };
+                const existing = state.nutritionLogs.find(l => l.date === date);
+                if (existing) {
+                    return {
+                        nutritionLogs: state.nutritionLogs.map(l =>
+                            l.date === date ? { ...l, entries: [...l.entries, newEntry] } : l
+                        )
+                    };
+                }
+                return {
+                    nutritionLogs: [...state.nutritionLogs, { date, entries: [newEntry] }]
+                };
+            }),
+
+            deleteNutritionEntry: (date, entryId) => set((state) => ({
+                nutritionLogs: state.nutritionLogs.map(l =>
+                    l.date === date ? { ...l, entries: l.entries.filter(e => e.id !== entryId) } : l
+                )
+            })),
+
+            getNutritionLog: (date) => {
+                return get().nutritionLogs.find(l => l.date === date);
+            },
+
+            // --- Daily Insights Actions ---
+
+            updateDailyInsights: (insights) => set((state) => {
+                const existing = state.dailyInsights.find(d => d.date === insights.date);
+                if (existing) {
+                    return {
+                        dailyInsights: state.dailyInsights.map(d =>
+                            d.date === insights.date ? insights : d
+                        )
+                    };
+                }
+                return {
+                    dailyInsights: [...state.dailyInsights, insights]
+                };
+            }),
+
+            getDailyInsights: (date) => {
+                return get().dailyInsights.find(d => d.date === date);
+            },
+
             seed: () => set((state) => {
-                // Only seed once — never overwrite user-created data
                 if (state.seeded) return state;
                 return {
                     exercises: INITIAL_EXERCISES,
@@ -197,7 +264,9 @@ export const useStore = create<AppState>()(
                 templates: [],
                 logs: [],
                 activeWorkout: null,
-                seeded: false
+                seeded: false,
+                nutritionLogs: [],
+                dailyInsights: [],
             })
         }),
         {

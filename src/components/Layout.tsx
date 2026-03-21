@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Dumbbell, User, Play, Menu, X, Trash2 } from 'lucide-react';
+import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import { User } from 'lucide-react';
 
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const { resetStore } = useStore();
+    const { resetStore, user } = useStore();
 
     const handleReset = () => {
         resetStore();
@@ -20,14 +21,40 @@ export function Layout() {
             {/* Header */}
             <header className="glass fixed top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center">
                 <NavLink to="/" className="flex items-center gap-2 group cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-orange-500 flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <span className="font-black text-black text-lg">M</span>
+                    <div className="w-8 h-8 rounded-xl bg-linear-to-br from-primary to-orange-400 flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-primary/20">
+                        <span className="font-black text-black text-base">M</span>
                     </div>
-                    <h1 className="text-lg font-bold tracking-tight text-white group-hover:text-primary transition-colors">el <span className="text-primary group-hover:text-white transition-colors">Maestro</span></h1>
+                    <h1 className="text-lg font-black tracking-tight text-white group-hover:text-primary transition-colors">
+                        el <span className="text-primary group-hover:text-white transition-colors">Maestro</span>
+                    </h1>
                 </NavLink>
-                <Button size="icon" variant="ghost" className="text-white" onClick={() => setIsMenuOpen(true)}>
-                    <Menu size={24} />
-                </Button>
+                <div className="flex items-center gap-2">
+                    {/* C1: Profile avatar → direct navigation to profile */}
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }) => cn(
+                            "w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm transition-all",
+                            isActive
+                                ? "bg-primary text-black"
+                                : "bg-primary/20 text-primary hover:bg-primary/30"
+                        )}
+                        title="Profile"
+                    >
+                        {({ isActive: _ia }) => (
+                            user?.name ? (
+                                <span>{user.name[0].toUpperCase()}</span>
+                            ) : (
+                                <User size={14} />
+                            )
+                        )}
+                    </NavLink>
+                    <button
+                        className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white"
+                        onClick={() => setIsMenuOpen(true)}
+                    >
+                        <Menu size={22} />
+                    </button>
+                </div>
             </header>
 
             {/* Mobile Menu Overlay */}
@@ -37,16 +64,28 @@ export function Layout() {
             )}>
                 <button
                     onClick={() => setIsMenuOpen(false)}
-                    className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white"
+                    className="absolute top-5 right-5 p-2 text-zinc-400 hover:text-white"
                 >
-                    <X size={32} />
+                    <X size={28} />
                 </button>
 
-                <nav className="flex flex-col items-center gap-6 text-2xl font-bold">
-                    <NavLink to="/" onClick={() => setIsMenuOpen(false)} className={({ isActive }) => isActive ? "text-primary" : "text-white"}>Home</NavLink>
-                    <NavLink to="/workouts" onClick={() => setIsMenuOpen(false)} className={({ isActive }) => isActive ? "text-primary" : "text-white"}>Workouts</NavLink>
-                    <NavLink to="/history" onClick={() => setIsMenuOpen(false)} className={({ isActive }) => isActive ? "text-primary" : "text-white"}>History</NavLink>
-                    <NavLink to="/profile" onClick={() => setIsMenuOpen(false)} className={({ isActive }) => isActive ? "text-primary" : "text-white"}>Profile</NavLink>
+                <nav className="flex flex-col items-center gap-6 text-2xl font-black">
+                    {[
+                        { to: '/', label: 'Home' },
+                        { to: '/workouts', label: 'Workouts' },
+                        { to: '/nutrition', label: 'Nutrition' },
+                        { to: '/history', label: 'History' },
+                        { to: '/profile', label: 'Profile' },
+                    ].map(({ to, label }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={({ isActive }) => isActive ? 'text-primary' : 'text-white hover:text-primary/80 transition-colors'}
+                        >
+                            {label}
+                        </NavLink>
+                    ))}
                 </nav>
 
                 <div className="absolute bottom-10 flex flex-col items-center gap-4">
@@ -64,7 +103,7 @@ export function Layout() {
                 <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm px-6">
                     <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4 animate-in zoom-in-95 duration-200">
                         <h3 className="text-lg font-black text-white">Reset All Data?</h3>
-                        <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, and your profile. This cannot be undone.</p>
+                        <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, nutrition and your profile. Cannot be undone.</p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowResetConfirm(false)}
@@ -74,7 +113,7 @@ export function Layout() {
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="flex-1 py-2.5 rounded-xl bg-destructive text-white text-sm font-bold hover:bg-destructive/80 transition-colors"
+                                className="flex-1 py-2.5 rounded-xl bg-destructive text-white text-sm font-bold hover:bg-red-700 transition-colors"
                             >
                                 Reset Everything
                             </button>
@@ -84,36 +123,42 @@ export function Layout() {
             )}
 
             {/* Main Content */}
-            <main className="flex-1 pt-20 pb-24 px-4 max-w-lg mx-auto w-full animate-in fade-in duration-500">
+            <main className="flex-1 pt-20 pb-28 px-4 max-w-lg mx-auto w-full">
                 <Outlet />
             </main>
 
-            {/* Bottom Nav */}
-            <nav className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 max-w-lg mx-auto shadow-2xl shadow-black/50">
-                <NavLink to="/" className={navLinkClass}>
+            {/* Bottom Nav — 5 items with floating Play center */}
+            <nav className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-2">
+                {/* M4: increased label from text-[9px] to text-[11px] (WCAG min) */}
+                <NavLink to="/" className={navLinkClass} end>
                     <Home size={20} />
+                    <span className="text-[11px] mt-0.5 font-semibold">Home</span>
                 </NavLink>
                 <NavLink to="/workouts" className={navLinkClass}>
                     <Dumbbell size={20} />
+                    <span className="text-[11px] mt-0.5 font-semibold">Train</span>
                 </NavLink>
+
+                {/* Center floating Play button */}
                 <div className="relative -top-6">
                     <NavLink
                         to="/active"
                         className={({ isActive }) => cn(
-                            "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/20 transition-transform active:scale-95 border-4 border-black",
-                            isActive ? "scale-110 shadow-primary/40 ring-2 ring-primary ring-offset-2 ring-offset-black" : ""
+                            "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
+                            isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"
                         )}
                     >
-                        <Play size={24} fill="currentColor" className="ml-1" />
+                        <Play size={22} fill="currentColor" className="ml-0.5" />
                     </NavLink>
                 </div>
-                <NavLink to="/history" className={navLinkClass}>
-                    <div className="flex flex-col items-center">
-                        <span className="text-lg font-bold leading-none">Log</span>
-                    </div>
+
+                <NavLink to="/nutrition" className={navLinkClass}>
+                    <Salad size={20} />
+                    <span className="text-[11px] mt-0.5 font-semibold">Fuel</span>
                 </NavLink>
-                <NavLink to="/profile" className={navLinkClass}>
-                    <User size={20} />
+                <NavLink to="/history" className={navLinkClass}>
+                    <ScrollText size={20} />
+                    <span className="text-[11px] mt-0.5 font-semibold">Log</span>
                 </NavLink>
             </nav>
         </div>
@@ -121,11 +166,6 @@ export function Layout() {
 }
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "p-3 rounded-xl transition-all duration-300",
-    isActive ? "text-primary bg-white/5" : "text-zinc-500 hover:text-zinc-300"
+    "flex flex-col items-center gap-0 p-2 rounded-xl transition-all duration-200",
+    isActive ? "text-primary" : "text-zinc-500 hover:text-zinc-300"
 );
-
-// Minimal Button for Header
-function Button({ className, variant, size, ...props }: any) {
-    return <button className={cn("p-2 rounded-md hover:bg-white/5 transition-colors", className)} {...props} />
-}

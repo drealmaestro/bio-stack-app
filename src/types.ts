@@ -14,8 +14,10 @@ export interface Exercise {
     name: string;
     target_muscle: TargetMuscle;
     video_url?: string;
-    image_url?: string; // Local SVG/Image path
+    image_url?: string;
     instructions: string;
+    form_cues?: string[];
+    common_mistakes?: string[];
 }
 
 export interface ExerciseSet {
@@ -41,7 +43,7 @@ export interface SetLog {
 export interface WorkoutLog {
     id: string;
     template_id: string;
-    timestamp: string; // ISO DateTime
+    timestamp: string;
     duration_seconds: number;
     completed_exercises: SetLog[];
 }
@@ -53,24 +55,67 @@ export interface StatEntry {
 
 export interface UserProfile {
     name: string;
-    age: number; // Deprecated, derived from birthday
-    birthday?: string; // ISO Date String (YYYY-MM-DD)
+    age: number;
+    birthday?: string;
     goals: string[];
     experience_level: string;
     stats: {
         weight: StatEntry[];
         body_fat: StatEntry[];
     };
+    nutrition_goals?: {
+        calories: number;
+        protein_g: number;
+        carbs_g: number;
+        fat_g: number;
+    };
 }
 
 export interface ActiveWorkoutState {
     templateId: string;
-    startTime: number; // Timestamp
-    completedSets: string[]; // ["0-1", "1-2"]
-    setWeights: Record<string, number>; // { "0-1": 60 }
-    setReps: Record<string, number>;    // { "0-1": 10 } - actual reps done
+    startTime: number;
+    completedSets: string[];
+    setWeights: Record<string, number>;
+    setReps: Record<string, number>;
+    restEndTime: number | null;
+    originalRestDuration: number;
+}
 
-    // Rest Timer (Timestamp based)
-    restEndTime: number | null; // Timestamp when rest ends
-    originalRestDuration: number; // To calculate progress if needed
+// --- Nutrition ---
+
+export interface FoodItem {
+    id: string;
+    name: string;
+    serving_label: string; // e.g. "100g", "1 cup", "1 scoop"
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+}
+
+export interface NutritionEntry {
+    id: string;
+    food_item_id: string;
+    food_name: string;
+    servings: number;
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+    logged_at: string; // ISO DateTime
+}
+
+export interface NutritionLog {
+    date: string; // YYYY-MM-DD
+    entries: NutritionEntry[];
+}
+
+// --- Daily Insights ---
+
+export interface DailyInsights {
+    date: string; // YYYY-MM-DD
+    steps: number;
+    calories_burned: number;
+    heart_rate_avg: number;
+    distance_km: number;
 }

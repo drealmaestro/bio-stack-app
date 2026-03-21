@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStore } from "../store/useStore";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
-import { Play, CheckCircle, Check } from "lucide-react";
+import { ProgressRing } from "../components/ui/progress-ring";
+import { Play, CheckCircle, Check, AlertTriangle } from "lucide-react";
 import { nanoid } from "nanoid";
 import type { SetLog } from "../types";
 import { cn } from "../lib/utils";
@@ -20,6 +21,10 @@ export function ActiveWorkout() {
 
     // Local tick state for UI updates only
     const [now, setNow] = useState(Date.now());
+    // H2: Quit confirmation state
+    const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+    // H3: Store original rest duration so we can compute ring progress
+    const originalRestRef = useRef<number>(0);
 
     useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -34,6 +39,22 @@ export function ActiveWorkout() {
     const restSecondsRemaining = isResting && activeWorkout?.restEndTime
         ? Math.ceil((activeWorkout.restEndTime - now) / 1000)
         : 0;
+
+    // Track original rest duration when rest timer starts
+    useEffect(() => {
+        if (isResting && activeWorkout?.restEndTime) {
+            // Only reset when a new rest period starts or duration increased
+            if (restSecondsRemaining > originalRestRef.current || originalRestRef.current === 0) {
+                originalRestRef.current = restSecondsRemaining;
+            }
+        } else {
+            originalRestRef.current = 0;
+        }
+    }, [isResting, activeWorkout?.restEndTime]);
+
+    const restProgress = originalRestRef.current > 0
+        ? restSecondsRemaining / originalRestRef.current
+        : 1;
 
     const formatTime = (secs: number) => {
         const mins = Math.floor(secs / 60);
@@ -54,7 +75,7 @@ export function ActiveWorkout() {
                 const key = `${exIdx}-${i}`;
                 const isCompleted = activeWorkout.completedSets.includes(key);
                 const weight = activeWorkout.setWeights[key] || 0;
-                const reps = activeWorkout.setReps[key] ?? ex.target_reps; // Use actual reps if entered
+                const reps = activeWorkout.setReps[key] ?? ex.target_reps;
 
                 if (isCompleted || weight > 0) {
                     completedLog.push({
@@ -91,12 +112,13 @@ export function ActiveWorkout() {
                     <p className="text-zinc-400 font-medium">Select a routine to start tracking.</p>
                 </div>
 
+                {/* M1: converted to <button> for keyboard/a11y */}
                 <div className="space-y-3">
                     {templates.map(template => (
-                        <div
+                        <button
                             key={template.id}
                             onClick={() => startWorkout(template.id)}
-                            className="glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer group active:scale-95 transition-all"
+                            className="w-full text-left glass-card p-4 rounded-xl flex justify-between items-center cursor-pointer group active:scale-95 transition-all"
                         >
                             <div>
                                 <div className="font-bold text-lg text-white group-hover:text-primary transition-colors">{template.name}</div>
@@ -105,7 +127,7 @@ export function ActiveWorkout() {
                             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-all">
                                 <Play size={20} fill="currentColor" />
                             </div>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </div>
@@ -123,14 +145,47 @@ export function ActiveWorkout() {
                         {formatTime(elapsedSeconds)}
                     </div>
                 </div>
-                <Button variant="ghost" size="sm" onClick={cancelWorkout} className="text-destructive h-auto py-1 px-3 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-bold uppercase tracking-wider">
-                    Quit
-                </Button>
+
+                {/* H2: Quit → confirmation first */}
+                <div className="flex flex-col items-end gap-2">
+                    {showQuitConfirm ? (
+                        <div className="glass-card rounded-xl p-3 border border-destructive/30 flex flex-col gap-2 items-end">
+                            <div className="flex items-center gap-1.5 text-xs text-zinc-300 font-medium">
+                                <AlertTriangle size={12} className="text-destructive" />
+                                Quit without saving?
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowQuitConfirm(false)}
+                                    className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-zinc-300 hover:bg-white/20 transition-colors"
+                                >
+                                    Keep Going
+                                </button>
+                                <button
+                                    onClick={() => { setShowQuitConfirm(false); cancelWorkout(); }}
+                                    className="text-[11px] font-bold px-3 py-1 rounded-full bg-destructive/80 text-white hover:bg-destructive transition-colors"
+                                >
+                                    Quit
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowQuitConfirm(true)}
+                            className="text-destructive h-auto py-1 px-3 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-bold uppercase tracking-wider"
+                        >
+                            Quit
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <div className="space-y-6">
+                {/* H1: key={exercise.exercise_id} instead of key={index} */}
                 {activeTemplate.exercises.map((exercise, index) => (
-                    <div key={index} className="space-y-3">
+                    <div key={exercise.exercise_id} className="space-y-3">
                         <div className="flex justify-between items-baseline px-1">
                             <h3 className="text-xl font-bold text-white tracking-tight">
                                 {getExerciseName(exercise.exercise_id)}
@@ -153,7 +208,7 @@ export function ActiveWorkout() {
 
                         <Card className="glass-card overflow-hidden">
                             <CardContent className="p-0">
-                                {/* Header Row — now 5 columns: Set | kg | Reps | Target | Done */}
+                                {/* Header Row */}
                                 <div className="grid grid-cols-[2.5rem_1fr_1fr_2.5rem_2.5rem] gap-1 p-2 bg-white/5 text-[10px] items-center text-zinc-500 font-bold uppercase tracking-widest text-center">
                                     <div>Set</div>
                                     <div>kg</div>
@@ -237,15 +292,27 @@ export function ActiveWorkout() {
                 </Button>
             </div>
 
-            {/* Rest Timer Overlay */}
+            {/* H3: Rest Timer Overlay with ProgressRing */}
             {isResting && (
                 <div className="fixed inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
-                    <div className="text-zinc-400 font-bold uppercase tracking-widest mb-4">Resting</div>
-                    <div className="text-9xl font-black text-primary font-mono tabular-nums mb-8 tracking-tighter">
-                        {formatTime(restSecondsRemaining)}
-                    </div>
+                    <div className="text-zinc-400 font-bold uppercase tracking-widest mb-8">Resting</div>
 
-                    <div className="flex gap-4">
+                    <ProgressRing
+                        size={200}
+                        strokeWidth={8}
+                        progress={restProgress}
+                        color="#00D4FF"
+                        trackColor="rgba(255,255,255,0.05)"
+                    >
+                        <div className="flex flex-col items-center">
+                            <span className="text-5xl font-black text-primary font-mono tabular-nums tracking-tighter">
+                                {formatTime(restSecondsRemaining)}
+                            </span>
+                            <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-1">remaining</span>
+                        </div>
+                    </ProgressRing>
+
+                    <div className="flex gap-4 mt-8">
                         <Button
                             variant="outline"
                             onClick={() => addRestTime(30)}

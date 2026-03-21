@@ -5,6 +5,7 @@ import { Profile } from './pages/Profile';
 import { WorkoutManager } from './pages/WorkoutManager';
 import { ActiveWorkout } from './pages/ActiveWorkout';
 import { HistoryLog } from './pages/History';
+import { Nutrition } from './pages/Nutrition';
 import { ToastContainer } from './components/ui/toast';
 
 import { useEffect } from 'react';
@@ -27,6 +28,7 @@ function App() {
                     <Route path="workouts" element={<WorkoutManager />} />
                     <Route path="active" element={<ActiveWorkout />} />
                     <Route path="history" element={<HistoryLog />} />
+                    <Route path="nutrition" element={<Nutrition />} />
                 </Route>
             </Routes>
         </BrowserRouter>
