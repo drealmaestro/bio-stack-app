@@ -251,12 +251,18 @@ export const useStore = create<AppState>()(
             },
 
             seed: () => set((state) => {
-                if (state.seeded) return state;
-                return {
-                    exercises: INITIAL_EXERCISES,
-                    templates: INITIAL_TEMPLATES,
-                    seeded: true
-                };
+                if (!state.seeded) {
+                    return {
+                        exercises: INITIAL_EXERCISES,
+                        templates: INITIAL_TEMPLATES,
+                        seeded: true
+                    };
+                }
+                // Add any initial templates that are missing (e.g. added in a new update)
+                const existingIds = new Set(state.templates.map(t => t.id));
+                const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingIds.has(t.id));
+                if (missingTemplates.length === 0) return state;
+                return { templates: [...state.templates, ...missingTemplates] };
             }),
 
             resetStore: () => set({
