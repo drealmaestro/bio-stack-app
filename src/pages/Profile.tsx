@@ -268,10 +268,10 @@ export function Profile() {
                                 <RechartsTooltip 
                                     cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                                     contentStyle={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, fontSize: 12 }}
-                                    formatter={(v: number) => [`${v} Sets`, 'Volume']}
+                                    formatter={(v: number | undefined) => [`${v ?? 0} Sets`, 'Volume']}
                                 />
                                 <Bar dataKey="sets" radius={[4, 4, 0, 0]} maxBarSize={40}>
-                                    {barChartData.map((entry, index) => (
+                                    {barChartData.map((_entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Bar>

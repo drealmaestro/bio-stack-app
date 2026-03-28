@@ -42,6 +42,8 @@ export default defineConfig({
                 ]
             },
             workbox: {
+                skipWaiting: true,
+                clientsClaim: true,
                 // Ensure all relevant static assets are aggressively cached for offline
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
                 runtimeCaching: [
