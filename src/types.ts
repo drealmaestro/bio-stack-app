@@ -31,6 +31,7 @@ export interface WorkoutTemplate {
     id: string;
     name: string;
     exercises: ExerciseSet[];
+    scheduled_days?: number[]; // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
 }
 
 export interface SetLog {

@@ -44,17 +44,15 @@ export function Home() {
         return count;
     })();
 
-    // C2: Dynamic schedule — find the most suitable template for today
-    // Uses last used template or falls back to first available template
+    // C2: Dynamic schedule — find today's template by scheduled_days
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const currentDayName = days[now.getDay()];
+    const todayDayIndex = now.getDay(); // 0=Sun … 6=Sat
+    const currentDayName = days[todayDayIndex];
     const todayLog = logs.find(l => l.timestamp.startsWith(today));
-    const isRestDay = currentDayName === 'Wednesday' || currentDayName === 'Sunday';
-    // Find the template used most recently, or first available template
-    const lastUsedTemplateId = logs.length > 0 ? logs[0].template_id : null;
+    const isRestDay = todayDayIndex === 0 || todayDayIndex === 3; // Sunday=0, Wednesday=3
     const todayTemplate = isRestDay
         ? null
-        : templates.find(t => t.id === lastUsedTemplateId) || templates[0] || null;
+        : templates.find(t => t.scheduled_days?.includes(todayDayIndex)) ?? null;
     const targetId: string | 'REST' = isRestDay ? 'REST' : (todayTemplate?.id ?? 'NONE');
     const alreadyWorkedOutToday = !!todayLog;
 

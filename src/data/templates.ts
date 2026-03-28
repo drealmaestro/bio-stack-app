@@ -5,6 +5,7 @@ export const INITIAL_TEMPLATES: WorkoutTemplate[] = [
     {
         id: 'tmpl_chest_tri_power',
         name: 'Chest & Triceps Power',
+        scheduled_days: [1],
         exercises: [
             { exercise_id: 'ex_incline_barbell_press', target_sets: 4, target_reps: 8, rest_seconds: 180 }, // 3 min
             { exercise_id: 'ex_flat_db_press', target_sets: 4, target_reps: 10, rest_seconds: 150 }, // 2.5 min
@@ -19,6 +20,7 @@ export const INITIAL_TEMPLATES: WorkoutTemplate[] = [
     {
         id: 'tmpl_back_bi_builder',
         name: 'Back & Biceps Builder',
+        scheduled_days: [2],
         exercises: [
             { exercise_id: 'ex_pull_up', target_sets: 4, target_reps: 8, rest_seconds: 180 }, // 3 min
             { exercise_id: 'ex_row', target_sets: 4, target_reps: 10, rest_seconds: 150 }, // 2.5 min
@@ -33,6 +35,7 @@ export const INITIAL_TEMPLATES: WorkoutTemplate[] = [
     {
         id: 'tmpl_lower_foundation',
         name: 'Lower Body Foundation',
+        scheduled_days: [4],
         exercises: [
             { exercise_id: 'ex_squat', target_sets: 4, target_reps: 8, rest_seconds: 180 }, // 3 min
             { exercise_id: 'ex_rdl', target_sets: 4, target_reps: 10, rest_seconds: 150 }, // 2.5 min
@@ -46,6 +49,7 @@ export const INITIAL_TEMPLATES: WorkoutTemplate[] = [
     {
         id: 'tmpl_shoulder_core',
         name: 'Shoulder & Core',
+        scheduled_days: [5],
         exercises: [
             { exercise_id: 'ex_ohp', target_sets: 4, target_reps: 8, rest_seconds: 180 }, // 3 min
             { exercise_id: 'ex_lateral_raise', target_sets: 4, target_reps: 15, rest_seconds: 90 }, // 90s
@@ -59,6 +63,7 @@ export const INITIAL_TEMPLATES: WorkoutTemplate[] = [
     {
         id: 'tmpl_chest_arms_vol',
         name: 'Chest & Arms Volume',
+        scheduled_days: [6],
         exercises: [
             { exercise_id: 'ex_incline_press', target_sets: 3, target_reps: 12, rest_seconds: 90 }, // Incline DB Press (swapped from barbell)
             { exercise_id: 'ex_pec_deck', target_sets: 3, target_reps: 15, rest_seconds: 60 }, // 60s
