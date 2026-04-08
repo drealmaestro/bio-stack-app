@@ -13,6 +13,7 @@ import { nanoid } from "nanoid";
 import type { WorkoutTemplate, ExerciseSet } from "../types";
 import type { TargetMuscle } from "../types";
 import { Link } from "react-router-dom";
+import { cn } from "../lib/utils";
 import { CustomExerciseCreator } from "../components/CustomExerciseCreator";
 
 const MUSCLE_COLORS: Record<TargetMuscle, string> = {
@@ -28,7 +29,7 @@ const MUSCLE_COLORS: Record<TargetMuscle, string> = {
 };
 
 export function WorkoutManager() {
-    const { templates, exercises, logs, addTemplate, updateTemplate, startWorkout } = useStore();
+    const { templates, exercises, logs, addTemplate, updateTemplate, startWorkout, activeWorkout } = useStore();
     const toast = useToast();
 
     // ─── List-level state ────────────────────────────────────────────────────
@@ -270,9 +271,17 @@ export function WorkoutManager() {
                                         <div className="flex items-center gap-1 ml-2 shrink-0">
                                             <Link
                                                 to="/active"
-                                                onClick={() => startWorkout(template.id)}
-                                                className="w-9 h-9 rounded-xl bg-primary text-black flex items-center justify-center hover:scale-105 transition-transform"
-                                                title="Start workout"
+                                                onClick={(e) => {
+                                                    if (activeWorkout) { e.preventDefault(); return; }
+                                                    startWorkout(template.id);
+                                                }}
+                                                className={cn(
+                                                    "w-9 h-9 rounded-xl flex items-center justify-center transition-transform",
+                                                    activeWorkout
+                                                        ? "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                                                        : "bg-primary text-black hover:scale-105"
+                                                )}
+                                                title={activeWorkout ? "Finish or cancel current session first" : "Start workout"}
                                             >
                                                 <Play size={16} fill="currentColor" />
                                             </Link>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText, Timer, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { User } from 'lucide-react';
@@ -8,7 +8,21 @@ import { User } from 'lucide-react';
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const { resetStore, user } = useStore();
+    const { resetStore, user, activeWorkout, templates } = useStore();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const isSessionLocked = !!activeWorkout;
+    const activeTemplateName = isSessionLocked
+        ? templates.find(t => t.id === activeWorkout.templateId)?.name ?? 'Workout'
+        : '';
+
+    // SESSION LOCK: redirect to /active whenever a workout is in progress
+    useEffect(() => {
+        if (isSessionLocked && location.pathname !== '/active') {
+            navigate('/active', { replace: true });
+        }
+    }, [isSessionLocked, location.pathname, navigate]);
 
     const handleReset = () => {
         resetStore();
@@ -48,12 +62,14 @@ export function Layout() {
                             )
                         )}
                     </NavLink>
-                    <button
-                        className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white"
-                        onClick={() => setIsMenuOpen(true)}
-                    >
-                        <Menu size={22} />
-                    </button>
+                    {!isSessionLocked && (
+                        <button
+                            className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white"
+                            onClick={() => setIsMenuOpen(true)}
+                        >
+                            <Menu size={22} />
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -127,40 +143,60 @@ export function Layout() {
                 <Outlet />
             </main>
 
-            {/* Bottom Nav — 5 items with floating Play center */}
-            <nav className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-2">
-                {/* M4: increased label from text-[9px] to text-[11px] (WCAG min) */}
-                <NavLink to="/" className={navLinkClass} end>
-                    <Home size={20} />
-                    <span className="text-[11px] mt-0.5 font-semibold">Home</span>
-                </NavLink>
-                <NavLink to="/workouts" className={navLinkClass}>
-                    <Dumbbell size={20} />
-                    <span className="text-[11px] mt-0.5 font-semibold">Train</span>
-                </NavLink>
-
-                {/* Center floating Play button */}
-                <div className="relative -top-6">
-                    <NavLink
-                        to="/active"
-                        className={({ isActive }) => cn(
-                            "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
-                            isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"
-                        )}
+            {/* Bottom Nav — swaps to Session Locked bar when workout active */}
+            {isSessionLocked ? (
+                <div className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-between z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-5 border border-primary/30 bg-primary/5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
+                            <Lock size={16} className="text-primary" />
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Session Active</div>
+                            <div className="text-sm font-black text-white leading-tight">{activeTemplateName}</div>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => navigate('/active')}
+                        className="flex items-center gap-2 bg-primary text-black font-bold text-xs px-4 py-2 rounded-full hover:scale-105 transition-transform active:scale-95"
                     >
-                        <Play size={22} fill="currentColor" className="ml-0.5" />
-                    </NavLink>
+                        <Timer size={14} /> Resume
+                    </button>
                 </div>
+            ) : (
+                <nav className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-2">
+                    {/* M4: increased label from text-[9px] to text-[11px] (WCAG min) */}
+                    <NavLink to="/" className={navLinkClass} end>
+                        <Home size={20} />
+                        <span className="text-[11px] mt-0.5 font-semibold">Home</span>
+                    </NavLink>
+                    <NavLink to="/workouts" className={navLinkClass}>
+                        <Dumbbell size={20} />
+                        <span className="text-[11px] mt-0.5 font-semibold">Train</span>
+                    </NavLink>
 
-                <NavLink to="/nutrition" className={navLinkClass}>
-                    <Salad size={20} />
-                    <span className="text-[11px] mt-0.5 font-semibold">Fuel</span>
-                </NavLink>
-                <NavLink to="/history" className={navLinkClass}>
-                    <ScrollText size={20} />
-                    <span className="text-[11px] mt-0.5 font-semibold">Log</span>
-                </NavLink>
-            </nav>
+                    {/* Center floating Play button */}
+                    <div className="relative -top-6">
+                        <NavLink
+                            to="/active"
+                            className={({ isActive }) => cn(
+                                "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
+                                isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"
+                            )}
+                        >
+                            <Play size={22} fill="currentColor" className="ml-0.5" />
+                        </NavLink>
+                    </div>
+
+                    <NavLink to="/nutrition" className={navLinkClass}>
+                        <Salad size={20} />
+                        <span className="text-[11px] mt-0.5 font-semibold">Fuel</span>
+                    </NavLink>
+                    <NavLink to="/history" className={navLinkClass}>
+                        <ScrollText size={20} />
+                        <span className="text-[11px] mt-0.5 font-semibold">Log</span>
+                    </NavLink>
+                </nav>
+            )}
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
-import { Play, CheckCircle, Check, AlertTriangle } from "lucide-react";
+import { Play, CheckCircle, Check, ShieldAlert } from "lucide-react";
 import { nanoid } from "nanoid";
 import type { SetLog } from "../types";
 import { cn } from "../lib/utils";
@@ -21,8 +21,10 @@ export function ActiveWorkout() {
 
     // Local tick state for UI updates only
     const [now, setNow] = useState(Date.now());
-    // H2: Quit confirmation state
-    const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+    // H2: Cancel session confirmation state
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    // Finish workout confirmation state
+    const [showFinishConfirm, setShowFinishConfirm] = useState(false);
     // H3: Store original rest duration so we can compute ring progress
     const originalRestRef = useRef<number>(0);
 
@@ -30,6 +32,16 @@ export function ActiveWorkout() {
         const interval = setInterval(() => setNow(Date.now()), 1000);
         return () => clearInterval(interval);
     }, []);
+
+    // Warn before closing tab/browser during active session
+    useEffect(() => {
+        if (!activeWorkout) return;
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [activeWorkout]);
 
     const activeTemplate = activeWorkout ? templates.find(t => t.id === activeWorkout.templateId) : null;
     const elapsedSeconds = activeWorkout ? Math.floor((now - activeWorkout.startTime) / 1000) : 0;
@@ -146,40 +158,14 @@ export function ActiveWorkout() {
                     </div>
                 </div>
 
-                {/* H2: Quit → confirmation first */}
-                <div className="flex flex-col items-end gap-2">
-                    {showQuitConfirm ? (
-                        <div className="glass-card rounded-xl p-3 border border-destructive/30 flex flex-col gap-2 items-end">
-                            <div className="flex items-center gap-1.5 text-xs text-zinc-300 font-medium">
-                                <AlertTriangle size={12} className="text-destructive" />
-                                Quit without saving?
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setShowQuitConfirm(false)}
-                                    className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-zinc-300 hover:bg-white/20 transition-colors"
-                                >
-                                    Keep Going
-                                </button>
-                                <button
-                                    onClick={() => { setShowQuitConfirm(false); cancelWorkout(); }}
-                                    className="text-[11px] font-bold px-3 py-1 rounded-full bg-destructive/80 text-white hover:bg-destructive transition-colors"
-                                >
-                                    Quit
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setShowQuitConfirm(true)}
-                            className="text-destructive h-auto py-1 px-3 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-bold uppercase tracking-wider"
-                        >
-                            Quit
-                        </Button>
-                    )}
-                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowCancelConfirm(true)}
+                    className="text-destructive h-auto py-1 px-3 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-bold uppercase tracking-wider"
+                >
+                    Cancel
+                </Button>
             </div>
 
             <div className="space-y-6">
@@ -240,9 +226,11 @@ export function ActiveWorkout() {
                                                 <Input
                                                     type="number"
                                                     placeholder="0"
+                                                    min={0}
+                                                    step={0.5}
                                                     value={currentWeight || ''}
                                                     className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
-                                                    onChange={(e) => updateSetWeight(index, setNum, parseFloat(e.target.value) || 0)}
+                                                    onChange={(e) => updateSetWeight(index, setNum, Math.max(0, parseFloat(e.target.value) || 0))}
                                                 />
                                             </div>
 
@@ -251,9 +239,11 @@ export function ActiveWorkout() {
                                                 <Input
                                                     type="number"
                                                     placeholder={String(exercise.target_reps)}
+                                                    min={0}
+                                                    max={999}
                                                     value={currentReps === exercise.target_reps && !(key in (activeWorkout.setReps || {})) ? '' : currentReps}
                                                     className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
-                                                    onChange={(e) => updateSetReps(index, setNum, parseInt(e.target.value) || exercise.target_reps)}
+                                                    onChange={(e) => updateSetReps(index, setNum, Math.max(0, parseInt(e.target.value) || exercise.target_reps))}
                                                 />
                                             </div>
 
@@ -287,10 +277,89 @@ export function ActiveWorkout() {
 
             {/* Finish Button */}
             <div className="fixed bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
-                <Button onClick={handleFinish} className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl shadow-primary/20 bg-primary text-black hover:scale-[1.02] transition-transform active:scale-95">
+                <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl shadow-primary/20 bg-primary text-black hover:scale-[1.02] transition-transform active:scale-95">
                     <CheckCircle className="mr-2" size={24} /> FINISH WORKOUT
                 </Button>
             </div>
+
+            {/* Cancel Today's Protocol — full modal warning */}
+            {showCancelConfirm && (
+                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
+                    <div className="bg-zinc-900 border border-destructive/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-destructive/15 flex items-center justify-center">
+                                <ShieldAlert size={24} className="text-destructive" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-white">Cancel Today's Protocol?</h3>
+                                <p className="text-xs text-zinc-400 mt-0.5">All progress in this session will be lost.</p>
+                            </div>
+                        </div>
+                        <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-3">
+                            <p className="text-xs text-zinc-300 leading-relaxed">
+                                You've been training for <span className="text-white font-bold">{formatTime(elapsedSeconds)}</span> with{' '}
+                                <span className="text-white font-bold">{activeWorkout.completedSets.length}</span> sets completed.
+                                This data will not be saved.
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowCancelConfirm(false)}
+                                className="flex-1 py-3 rounded-xl bg-primary text-black text-sm font-black hover:bg-primary/90 transition-colors"
+                            >
+                                Keep Training
+                            </button>
+                            <button
+                                onClick={() => { setShowCancelConfirm(false); cancelWorkout(); }}
+                                className="flex-1 py-3 rounded-xl border border-destructive/40 text-destructive text-sm font-bold hover:bg-destructive/10 transition-colors"
+                            >
+                                Cancel Session
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Finish Workout Confirmation */}
+            {showFinishConfirm && (
+                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
+                    <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">
+                                <CheckCircle size={24} className="text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-white">Finish Workout?</h3>
+                                <p className="text-xs text-zinc-400 mt-0.5">Save this session to your history.</p>
+                            </div>
+                        </div>
+                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 space-y-1">
+                            <div className="flex justify-between text-xs">
+                                <span className="text-zinc-400">Duration</span>
+                                <span className="text-white font-bold">{formatTime(elapsedSeconds)}</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                                <span className="text-zinc-400">Sets Completed</span>
+                                <span className="text-white font-bold">{activeWorkout.completedSets.length}</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowFinishConfirm(false)}
+                                className="flex-1 py-3 rounded-xl border border-white/10 text-zinc-300 text-sm font-bold hover:bg-white/5 transition-colors"
+                            >
+                                Keep Going
+                            </button>
+                            <button
+                                onClick={() => { setShowFinishConfirm(false); handleFinish(); }}
+                                className="flex-1 py-3 rounded-xl bg-primary text-black text-sm font-black hover:bg-primary/90 transition-colors"
+                            >
+                                Finish & Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* H3: Rest Timer Overlay with ProgressRing */}
             {isResting && (

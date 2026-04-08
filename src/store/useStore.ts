@@ -269,6 +269,7 @@ export const useStore = create<AppState>()(
                 user: null,
                 templates: [],
                 logs: [],
+                exercises: [],
                 activeWorkout: null,
                 seeded: false,
                 nutritionLogs: [],

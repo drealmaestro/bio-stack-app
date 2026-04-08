@@ -8,7 +8,7 @@ import { calculateAge, getDailyQuote, cn } from "../lib/utils";
 import { StatCard } from "../components/ui/stat-card";
 
 export function Home() {
-    const { user, templates, logs, startWorkout, getDailyInsights } = useStore();
+    const { user, templates, logs, startWorkout, activeWorkout, getDailyInsights } = useStore();
     const navigate = useNavigate();
 
     const age = user?.birthday ? calculateAge(user.birthday) : (user?.age || 47);
@@ -17,14 +17,7 @@ export function Home() {
     const today = new Date().toISOString().split('T')[0];
     const todayInsights = getDailyInsights(today);
 
-    // Seed placeholder insights if none exist yet
-    const insights = todayInsights ?? {
-        date: today,
-        steps: 6842,
-        calories_burned: 512,
-        heart_rate_avg: 71,
-        distance_km: 4.9,
-    };
+    const insights = todayInsights ?? null;
 
     // Workouts this week
     const now = new Date();
@@ -92,6 +85,7 @@ export function Home() {
                 <button
                     className="rounded-2xl h-14 w-14 bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/25 hover:scale-105 transition-transform flex items-center justify-center"
                     onClick={() => {
+                        if (activeWorkout) { navigate("/active"); return; }
                         if (todayTemplate) startWorkout(todayTemplate.id);
                         navigate("/active");
                     }}
@@ -106,35 +100,41 @@ export function Home() {
                     <h3 className="text-base font-bold text-white">Daily Activity</h3>
                     <span className="text-xs text-zinc-500">Today</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <StatCard
-                        icon={<Footprints size={18} />}
-                        value={insights.steps.toLocaleString()}
-                        label="Steps"
-                        color="text-primary"
-                    />
-                    <StatCard
-                        icon={<Flame size={18} />}
-                        value={insights.calories_burned}
-                        unit="kcal"
-                        label="Burned"
-                        color="text-orange-400"
-                    />
-                    <StatCard
-                        icon={<HeartPulse size={18} />}
-                        value={insights.heart_rate_avg}
-                        unit="bpm"
-                        label="Avg HR"
-                        color="text-rose-400"
-                    />
-                    <StatCard
-                        icon={<MapPin size={18} />}
-                        value={insights.distance_km.toFixed(1)}
-                        unit="km"
-                        label="Distance"
-                        color="text-violet-400"
-                    />
-                </div>
+                {insights ? (
+                    <div className="grid grid-cols-2 gap-3">
+                        <StatCard
+                            icon={<Footprints size={18} />}
+                            value={insights.steps.toLocaleString()}
+                            label="Steps"
+                            color="text-primary"
+                        />
+                        <StatCard
+                            icon={<Flame size={18} />}
+                            value={insights.calories_burned}
+                            unit="kcal"
+                            label="Burned"
+                            color="text-orange-400"
+                        />
+                        <StatCard
+                            icon={<HeartPulse size={18} />}
+                            value={insights.heart_rate_avg}
+                            unit="bpm"
+                            label="Avg HR"
+                            color="text-rose-400"
+                        />
+                        <StatCard
+                            icon={<MapPin size={18} />}
+                            value={insights.distance_km.toFixed(1)}
+                            unit="km"
+                            label="Distance"
+                            color="text-violet-400"
+                        />
+                    </div>
+                ) : (
+                    <div className="glass-card p-4 rounded-2xl text-center text-sm text-zinc-500">
+                        No activity data yet today. Connect a wearable to track automatically.
+                    </div>
+                )}
             </div>
 
             {/* ── Today's Protocol ─────────────────────────────── */}
@@ -158,7 +158,7 @@ export function Home() {
                     // M1: converted from div to button for keyboard/a11y
                     <button
                         className="w-full text-left glass-card p-5 rounded-2xl flex justify-between items-center border-l-4 border-l-primary bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors group"
-                        onClick={() => { startWorkout(todayTemplate.id); navigate("/active"); }}
+                        onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
                     >
                         <div>
                             <div className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Tap to Start</div>
@@ -222,7 +222,7 @@ export function Home() {
                         <button
                             key={t.id}
                             className="glass-card px-4 py-3 rounded-xl flex justify-between items-center hover:bg-white/5 transition-colors group w-full text-left"
-                            onClick={() => { startWorkout(t.id); navigate("/active"); }}
+                            onClick={() => { if (!activeWorkout) startWorkout(t.id); navigate("/active"); }}
                         >
                             <div className="font-semibold text-sm text-zinc-300 group-hover:text-white transition-colors">
                                 {t.name}
