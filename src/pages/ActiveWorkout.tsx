@@ -1,23 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useStore } from "../store/useStore";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
-import { Play, CheckCircle, Check, ShieldAlert } from "lucide-react";
+import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp } from "lucide-react";
 import { nanoid } from "nanoid";
 import type { SetLog } from "../types";
 import { cn } from "../lib/utils";
-import { useToast } from "../components/ui/toast";
-
 export function ActiveWorkout() {
     const {
-        templates, exercises, addLog,
+        templates, exercises, logs, addLog,
         activeWorkout, startWorkout, cancelWorkout,
         toggleSetComplete, updateSetWeight, updateSetReps,
         addRestTime, skipRest
     } = useStore();
-    const toast = useToast();
 
     // Local tick state for UI updates only
     const [now, setNow] = useState(Date.now());
@@ -25,6 +22,9 @@ export function ActiveWorkout() {
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     // Finish workout confirmation state
     const [showFinishConfirm, setShowFinishConfirm] = useState(false);
+    // Post-workout summary state
+    const [showSummary, setShowSummary] = useState(false);
+    const [summaryData, setSummaryData] = useState<{ duration: string; sets: number; volume: number; prs: string[] } | null>(null);
     // H3: Store original rest duration so we can compute ring progress
     const originalRestRef = useRef<number>(0);
 
@@ -76,6 +76,36 @@ export function ActiveWorkout() {
 
     const getExerciseName = (id: string) => exercises.find(e => e.id === id)?.name || "Unknown";
 
+    // LAST SESSION CARRY-FORWARD: lookup previous data for this template
+    const lastSessionData = useMemo(() => {
+        if (!activeWorkout) return null;
+        const previousLogs = logs
+            .filter(l => l.template_id === activeWorkout.templateId)
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        if (!previousLogs.length) return null;
+        const lastLog = previousLogs[0];
+        // Build a map: exercise_id -> { setNumber -> { weight, reps } }
+        const map: Record<string, Record<number, { weight: number; reps: number }>> = {};
+        lastLog.completed_exercises.forEach(set => {
+            if (!map[set.exercise_id]) map[set.exercise_id] = {};
+            map[set.exercise_id][set.set_number] = { weight: set.weight_kg, reps: set.reps_completed };
+        });
+        return map;
+    }, [activeWorkout?.templateId, logs]);
+
+    // PR map: best weight per exercise across all history
+    const prMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        logs.forEach(log => {
+            log.completed_exercises.forEach(set => {
+                if (!map[set.exercise_id] || set.weight_kg > map[set.exercise_id]) {
+                    map[set.exercise_id] = set.weight_kg;
+                }
+            });
+        });
+        return map;
+    }, [logs]);
+
     const handleFinish = () => {
         if (!activeWorkout || !activeTemplate) return;
 
@@ -100,6 +130,19 @@ export function ActiveWorkout() {
             }
         });
 
+        // Detect new PRs
+        const newPRs: string[] = [];
+        completedLog.forEach(set => {
+            const prevBest = prMap[set.exercise_id] ?? 0;
+            if (set.weight_kg > prevBest && set.weight_kg > 0) {
+                const name = getExerciseName(set.exercise_id);
+                const prLabel = `${name}: ${set.weight_kg}kg x ${set.reps_completed}`;
+                if (!newPRs.includes(prLabel)) newPRs.push(prLabel);
+            }
+        });
+
+        const totalVolume = completedLog.reduce((sum, s) => sum + (s.weight_kg * s.reps_completed), 0);
+
         addLog({
             id: nanoid(),
             template_id: activeWorkout.templateId,
@@ -108,9 +151,69 @@ export function ActiveWorkout() {
             completed_exercises: completedLog
         });
 
+        // Show summary before clearing workout
+        setSummaryData({
+            duration: formatTime(Math.floor(duration)),
+            sets: completedLog.length,
+            volume: Math.round(totalVolume),
+            prs: newPRs,
+        });
+        setShowSummary(true);
         cancelWorkout();
-        toast.success(`Workout logged! ${formatTime(Math.floor(duration))} — great session 💪`);
     };
+
+    // --- POST-WORKOUT SUMMARY SCREEN ---
+    if (showSummary && summaryData) {
+        return (
+            <div className="animate-in zoom-in-95 duration-500 flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-6 ring-2 ring-primary/30">
+                    <Trophy size={40} className="text-primary" />
+                </div>
+                <h2 className="text-3xl font-black text-white mb-1">Workout Complete!</h2>
+                <p className="text-zinc-400 mb-8">Great session. Here's how you did.</p>
+
+                <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
+                    <div className="glass-card p-4 rounded-2xl text-center">
+                        <Clock size={18} className="mx-auto text-primary mb-1" />
+                        <div className="text-xl font-black text-white">{summaryData.duration}</div>
+                        <div className="text-xs text-zinc-400">Duration</div>
+                    </div>
+                    <div className="glass-card p-4 rounded-2xl text-center">
+                        <Check size={18} className="mx-auto text-primary mb-1" />
+                        <div className="text-xl font-black text-white">{summaryData.sets}</div>
+                        <div className="text-xs text-zinc-400">Sets</div>
+                    </div>
+                    <div className="glass-card p-4 rounded-2xl text-center">
+                        <TrendingUp size={18} className="mx-auto text-primary mb-1" />
+                        <div className="text-xl font-black text-white">
+                            {summaryData.volume >= 1000 ? `${(summaryData.volume / 1000).toFixed(1)}t` : `${summaryData.volume}kg`}
+                        </div>
+                        <div className="text-xs text-zinc-400">Volume</div>
+                    </div>
+                </div>
+
+                {summaryData.prs.length > 0 && (
+                    <div className="w-full max-w-sm glass-card p-4 rounded-2xl border border-primary/30 bg-primary/5 mb-6">
+                        <div className="text-xs font-bold text-primary uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
+                            <Trophy size={12} /> New Personal Records
+                        </div>
+                        {summaryData.prs.map((pr, i) => (
+                            <div key={i} className="text-sm text-white font-bold py-1">
+                                {pr}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <Button
+                    onClick={() => { setShowSummary(false); setSummaryData(null); }}
+                    className="w-full max-w-sm h-14 rounded-2xl font-black text-lg bg-primary text-black"
+                >
+                    Done
+                </Button>
+            </div>
+        );
+    }
 
     // --- TEMPLATE SELECTION SCREEN ---
     if (!activeWorkout || !activeTemplate) {
@@ -124,7 +227,6 @@ export function ActiveWorkout() {
                     <p className="text-zinc-400 font-medium">Select a routine to start tracking.</p>
                 </div>
 
-                {/* M1: converted to <button> for keyboard/a11y */}
                 <div className="space-y-3">
                     {templates.map(template => (
                         <button
@@ -134,7 +236,7 @@ export function ActiveWorkout() {
                         >
                             <div>
                                 <div className="font-bold text-lg text-white group-hover:text-primary transition-colors">{template.name}</div>
-                                <div className="text-xs text-zinc-500 font-medium">{template.exercises.length} Exercises</div>
+                                <div className="text-xs text-zinc-400 font-medium">{template.exercises.length} Exercises</div>
                             </div>
                             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-all">
                                 <Play size={20} fill="currentColor" />
@@ -169,11 +271,12 @@ export function ActiveWorkout() {
             </div>
 
             <div className="space-y-6">
-                {/* H1: key={exercise.exercise_id} instead of key={index} */}
-                {activeTemplate.exercises.map((exercise, index) => (
-                    <div key={exercise.exercise_id} className="space-y-3">
+                {activeTemplate.exercises.map((exercise, index) => {
+                    const lastExData = lastSessionData?.[exercise.exercise_id];
+                    return (
+                    <div key={exercise.exercise_id} className="space-y-2">
                         <div className="flex justify-between items-baseline px-1">
-                            <h3 className="text-xl font-bold text-white tracking-tight">
+                            <h3 className="text-lg font-bold text-white tracking-tight">
                                 {getExerciseName(exercise.exercise_id)}
                             </h3>
                             <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
@@ -181,89 +284,85 @@ export function ActiveWorkout() {
                             </span>
                         </div>
 
-                        {/* Exercise Image */}
-                        {(() => {
-                            const ex = exercises.find(e => e.id === exercise.exercise_id);
-                            return ex?.image_url ? (
-                                <div className="w-full h-48 bg-black/40 rounded-xl overflow-hidden mb-2 border border-white/5 relative group">
-                                    <img src={ex.image_url} alt={ex.name} className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
-                                    <div className="absolute bottom-2 right-2 text-[10px] text-zinc-600 font-mono">BIO-STACK // VISUAL</div>
-                                </div>
-                            ) : null;
-                        })()}
-
                         <Card className="glass-card overflow-hidden">
                             <CardContent className="p-0">
-                                {/* Header Row */}
-                                <div className="grid grid-cols-[2.5rem_1fr_1fr_2.5rem_2.5rem] gap-1 p-2 bg-white/5 text-[10px] items-center text-zinc-500 font-bold uppercase tracking-widest text-center">
+                                {/* Header Row — wider columns for bigger touch targets */}
+                                <div className="grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-2 bg-white/5 text-xs items-center text-zinc-400 font-bold uppercase tracking-widest text-center">
                                     <div>Set</div>
                                     <div>kg</div>
-                                    <div>Reps Done</div>
-                                    <div>Tgt</div>
-                                    <div>✓</div>
+                                    <div>Reps</div>
+                                    <div>Done</div>
                                 </div>
 
                                 {Array.from({ length: exercise.target_sets }).map((_, setIdx) => {
                                     const setNum = setIdx + 1;
                                     const key = `${index}-${setNum}`;
                                     const isCompleted = activeWorkout.completedSets.includes(key);
+                                    const lastSet = lastExData?.[setNum];
                                     const currentWeight = activeWorkout.setWeights[key] || 0;
                                     const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
+                                    const weightPlaceholder = lastSet ? String(lastSet.weight) : '0';
 
                                     return (
                                         <div key={setNum} className={cn(
-                                            "grid grid-cols-[2.5rem_1fr_1fr_2.5rem_2.5rem] gap-1 p-2 items-center border-t border-white/5 transition-colors",
+                                            "grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-1.5 items-center border-t border-white/5 transition-colors",
                                             isCompleted ? "bg-primary/5" : ""
                                         )}>
-                                            <div className="flex justify-center">
-                                                <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-400">
+                                            {/* Set number + last session hint */}
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-400">
                                                     {setNum}
                                                 </div>
+                                                {lastSet && (
+                                                    <span className="text-[9px] text-zinc-600 mt-0.5 leading-none">
+                                                        {lastSet.weight}x{lastSet.reps}
+                                                    </span>
+                                                )}
                                             </div>
 
-                                            {/* Weight */}
-                                            <div className="px-1">
+                                            {/* Weight — 48px touch target */}
+                                            <div>
                                                 <Input
                                                     type="number"
-                                                    placeholder="0"
+                                                    inputMode="decimal"
+                                                    placeholder={weightPlaceholder}
                                                     min={0}
                                                     step={0.5}
                                                     value={currentWeight || ''}
-                                                    className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
+                                                    className="h-12 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-base font-bold rounded-xl"
                                                     onChange={(e) => updateSetWeight(index, setNum, Math.max(0, parseFloat(e.target.value) || 0))}
                                                 />
                                             </div>
 
-                                            {/* Actual Reps Done */}
-                                            <div className="px-1">
+                                            {/* Reps — 48px touch target */}
+                                            <div>
                                                 <Input
                                                     type="number"
+                                                    inputMode="numeric"
                                                     placeholder={String(exercise.target_reps)}
                                                     min={0}
                                                     max={999}
                                                     value={currentReps === exercise.target_reps && !(key in (activeWorkout.setReps || {})) ? '' : currentReps}
-                                                    className="h-8 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-sm"
+                                                    className="h-12 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-base font-bold rounded-xl"
                                                     onChange={(e) => updateSetReps(index, setNum, Math.max(0, parseInt(e.target.value) || exercise.target_reps))}
                                                 />
                                             </div>
 
-                                            {/* Target reps */}
-                                            <div className="text-center font-bold text-zinc-500 text-xs">
-                                                {exercise.target_reps}
-                                            </div>
-
-                                            {/* Done toggle */}
+                                            {/* Done toggle — 48px touch target + haptic */}
                                             <div className="flex justify-center">
                                                 <button
-                                                    onClick={() => toggleSetComplete(index, setNum, exercise.rest_seconds)}
+                                                    onClick={() => {
+                                                        toggleSetComplete(index, setNum, exercise.rest_seconds);
+                                                        if (!isCompleted) navigator.vibrate?.(50);
+                                                    }}
                                                     className={cn(
-                                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300",
+                                                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
                                                         isCompleted
-                                                            ? "bg-primary text-black shadow-[0_0_10px_rgba(255,215,0,0.4)] scale-110"
+                                                            ? "bg-primary text-black shadow-[0_0_12px_rgba(0,212,255,0.4)] scale-105"
                                                             : "bg-white/10 text-zinc-600 hover:bg-white/20"
                                                     )}
                                                 >
-                                                    <Check size={16} strokeWidth={4} />
+                                                    <Check size={20} strokeWidth={3} />
                                                 </button>
                                             </div>
                                         </div>
@@ -272,7 +371,8 @@ export function ActiveWorkout() {
                             </CardContent>
                         </Card>
                     </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Finish Button */}

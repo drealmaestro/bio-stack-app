@@ -28,7 +28,7 @@ export function MacroBar({ label, current, goal, unit = 'g', color, className }:
                     style={{ width: `${pct}%` }}
                 />
             </div>
-            <div className="text-[10px] text-muted-foreground">{Math.round(remaining)}{unit} remaining</div>
+            <div className="text-xs text-muted-foreground">{Math.round(remaining)}{unit} remaining</div>
         </div>
     );
 }

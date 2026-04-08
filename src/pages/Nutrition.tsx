@@ -231,7 +231,7 @@ export function Nutrition() {
                                 <div className="flex items-center gap-3">
                                     <div className="text-right">
                                         <div className="text-sm font-black text-primary">{entry.calories}</div>
-                                        <div className="text-[10px] text-muted-foreground">kcal</div>
+                                        <div className="text-xs text-muted-foreground">kcal</div>
                                     </div>
                                     <button
                                         onClick={() => deleteNutritionEntry(today, entry.id)}
@@ -296,7 +296,7 @@ export function Nutrition() {
                                     >+</button>
                                     <div className="ml-auto text-right">
                                         <div className="text-primary font-black">{Math.round(selectedFood.calories * servings)} kcal</div>
-                                        <div className="text-[10px] text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground">
                                             P {Math.round(selectedFood.protein_g * servings)}g · C {Math.round(selectedFood.carbs_g * servings)}g · F {Math.round(selectedFood.fat_g * servings)}g
                                         </div>
                                     </div>
@@ -326,7 +326,7 @@ export function Nutrition() {
                                         </div>
                                         <div className="text-right">
                                             <div className="text-sm font-black text-primary">{food.calories} kcal</div>
-                                            <div className="text-[10px] text-muted-foreground">
+                                            <div className="text-xs text-muted-foreground">
                                                 P{Math.round(food.protein_g)} C{Math.round(food.carbs_g)} F{Math.round(food.fat_g)}
                                             </div>
                                         </div>

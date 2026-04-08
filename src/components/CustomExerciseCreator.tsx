@@ -59,7 +59,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                 {/* Body */}
                 <div className="p-4 space-y-4 overflow-y-auto">
                     <div>
-                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Exercise Name</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Exercise Name</label>
                         <Input
                             autoFocus
                             value={name}
@@ -70,7 +70,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                     </div>
 
                     <div>
-                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Target Muscle</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Target Muscle</label>
                         <div className="grid grid-cols-3 gap-2 mt-1">
                             {MUSCLE_OPTIONS.map((m) => (
                                 <button
@@ -89,7 +89,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                     </div>
 
                     <div>
-                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Instructions / Notes (Optional)</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Instructions / Notes (Optional)</label>
                         <textarea
                             value={instructions}
                             onChange={(e) => setInstructions(e.target.value)}

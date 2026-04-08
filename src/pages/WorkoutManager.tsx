@@ -244,12 +244,12 @@ export function WorkoutManager() {
                                             </h3>
                                             <div className="flex flex-wrap gap-1.5 mt-1.5">
                                                 {muscleGroups.slice(0, 4).map(m => (
-                                                    <span key={m} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[m as TargetMuscle]}`}>
+                                                    <span key={m} className={`text-xs font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[m as TargetMuscle]}`}>
                                                         {m}
                                                     </span>
                                                 ))}
                                                 {muscleGroups.length > 4 && (
-                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-500">
+                                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-500">
                                                         +{muscleGroups.length - 4}
                                                     </span>
                                                 )}
@@ -328,7 +328,7 @@ export function WorkoutManager() {
                                                     {/* Exercise header */}
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-2 min-w-0">
-                                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
                                                                 {muscle}
                                                             </span>
                                                             <span className="font-bold text-sm text-white truncate">
@@ -382,7 +382,7 @@ export function WorkoutManager() {
                                                             <div>
                                                                 <button
                                                                     onClick={() => setFormCueOpen(isOpen ? null : ex.exercise_id)}
-                                                                    className="flex items-center gap-1.5 text-[10px] font-bold text-primary/70 hover:text-primary transition-colors mt-1"
+                                                                    className="flex items-center gap-1.5 text-xs font-bold text-primary/70 hover:text-primary transition-colors mt-1"
                                                                 >
                                                                     <Info size={11} />
                                                                     {isOpen ? "Hide Form Guide" : "View Form Guide"}
@@ -458,7 +458,7 @@ export function WorkoutManager() {
                                                     <button
                                                         key={m}
                                                         onClick={() => setPickerMuscle(m)}
-                                                        className={`shrink-0 text-[10px] font-bold px-3 py-1 rounded-full border transition-colors ${pickerMuscle === m
+                                                        className={`shrink-0 text-xs font-bold px-3 py-1 rounded-full border transition-colors ${pickerMuscle === m
                                                             ? "bg-primary text-black border-primary"
                                                             : "border-white/10 text-zinc-400 hover:border-white/20"
                                                             }`}
@@ -484,7 +484,7 @@ export function WorkoutManager() {
                                                         >
                                                             <div>
                                                                 <div className="text-sm font-bold text-white">{e.name}</div>
-                                                                <div className="text-[10px] text-zinc-500 mt-0.5 line-clamp-1">{e.instructions}</div>
+                                                                <div className="text-xs text-zinc-500 mt-0.5 line-clamp-1">{e.instructions}</div>
                                                             </div>
                                                             <div className="flex items-center gap-2 ml-2 shrink-0">
                                                                 <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[e.target_muscle]}`}>

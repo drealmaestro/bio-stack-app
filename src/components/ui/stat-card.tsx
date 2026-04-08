@@ -26,7 +26,7 @@ export function StatCard({ icon, value, unit, label, color = 'text-primary', onC
                 <span className={cn('text-2xl font-black', color)}>{value}</span>
                 {unit && <span className="text-xs text-muted-foreground ml-0.5">{unit}</span>}
             </div>
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">{label}</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">{label}</span>
         </div>
     );
 }

@@ -151,7 +151,7 @@ export function Layout() {
                             <Lock size={16} className="text-primary" />
                         </div>
                         <div>
-                            <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Session Active</div>
+                            <div className="text-xs font-bold uppercase tracking-widest text-primary">Session Active</div>
                             <div className="text-sm font-black text-white leading-tight">{activeTemplateName}</div>
                         </div>
                     </div>

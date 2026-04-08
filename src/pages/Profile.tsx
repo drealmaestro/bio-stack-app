@@ -137,7 +137,7 @@ export function Profile() {
                 </div>
                 {fbUser && !fbUser.isAnonymous ? (
                     <div className="text-right">
-                        <div className="text-[10px] uppercase font-bold text-zinc-500">Cloud Sync Active</div>
+                        <div className="text-xs uppercase font-bold text-zinc-500">Cloud Sync Active</div>
                         <button onClick={() => signOut(auth)} className="text-xs text-red-400 hover:text-red-300 transition-colors font-semibold">Sign Out</button>
                     </div>
                 ) : (
@@ -169,7 +169,7 @@ export function Profile() {
                             {latestWeight ? `${latestWeight}` : "—"}
                             <span className="text-sm font-normal text-zinc-500 ml-1">kg</span>
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Current</div>
+                        <div className="text-xs text-zinc-500 uppercase tracking-widest">Current</div>
                     </div>
                     {weightDelta !== null && (
                         <div>
@@ -177,7 +177,7 @@ export function Profile() {
                                 {parseFloat(weightDelta) > 0 ? "+" : ""}{weightDelta}
                                 <span className="text-sm font-normal text-zinc-500 ml-1">kg</span>
                             </div>
-                            <div className="text-[10px] text-zinc-500 uppercase tracking-widest flex items-center gap-1">
+                            <div className="text-xs text-zinc-500 uppercase tracking-widest flex items-center gap-1">
                                 <TrendingDown size={10} /> 30-day change
                             </div>
                         </div>

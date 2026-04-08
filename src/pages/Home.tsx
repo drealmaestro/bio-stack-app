@@ -161,7 +161,7 @@ export function Home() {
                         onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
                     >
                         <div>
-                            <div className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Tap to Start</div>
+                            <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Tap to Start</div>
                             <h4 className="text-xl font-black text-white group-hover:text-primary transition-colors">
                                 {todayTemplate.name}
                             </h4>
@@ -185,17 +185,17 @@ export function Home() {
             <div className="grid grid-cols-2 gap-3">
                 <Link to="/history">
                     <div className="glass-card p-4 rounded-2xl space-y-1 hover:bg-white/5 transition-colors group">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1 group-hover:text-primary transition-colors">
+                        <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1 group-hover:text-primary transition-colors">
                             <TrendingUp size={12} /> This Week
                         </div>
                         <div className="text-3xl font-black text-white">{workoutsThisWeek}</div>
-                        <div className="text-[10px] text-zinc-500">sessions done</div>
+                        <div className="text-xs text-zinc-500">sessions done</div>
                     </div>
                 </Link>
                 <div className="glass-card p-4 rounded-2xl space-y-1">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">🔥 Streak</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-zinc-500">🔥 Streak</div>
                     <div className={cn("text-3xl font-black", streak > 0 ? "text-orange-400" : "text-zinc-600")}>{streak}</div>
-                    <div className="text-[10px] text-zinc-500">
+                    <div className="text-xs text-zinc-500">
                         {streak === 1 ? "day in a row" : streak > 1 ? "days in a row" : "Start today!"}
                     </div>
                 </div>
@@ -228,7 +228,7 @@ export function Home() {
                                 {t.name}
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-zinc-600">{t.exercises.length} Ex</span>
+                                <span className="text-xs text-zinc-600">{t.exercises.length} Ex</span>
                                 <ChevronRight size={14} className="text-zinc-700 group-hover:text-primary transition-colors" />
                             </div>
                         </button>

@@ -101,7 +101,7 @@ export function HistoryLog() {
                         <Card className="glass-card">
                             <CardContent className="p-3 text-center">
                                 <div className="text-2xl font-black text-primary">{logs.length}</div>
-                                <div className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Sessions</div>
+                                <div className="text-xs text-zinc-500 uppercase tracking-wider mt-0.5">Sessions</div>
                             </CardContent>
                         </Card>
                         <Card className="glass-card">
@@ -111,13 +111,13 @@ export function HistoryLog() {
                                         ? `${(totalVolume / 1000).toFixed(1)}t`
                                         : `${Math.round(totalVolume)}kg`}
                                 </div>
-                                <div className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Total Vol</div>
+                                <div className="text-xs text-zinc-500 uppercase tracking-wider mt-0.5">Total Vol</div>
                             </CardContent>
                         </Card>
                         <Card className="glass-card">
                             <CardContent className="p-3 text-center">
                                 <div className="text-2xl font-black text-white">{avgDuration}m</div>
-                                <div className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Avg Time</div>
+                                <div className="text-xs text-zinc-500 uppercase tracking-wider mt-0.5">Avg Time</div>
                             </CardContent>
                         </Card>
                     </div>
@@ -167,7 +167,7 @@ export function HistoryLog() {
                                     <div key={exId} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                                         <div>
                                             <div className="text-sm font-bold text-white">{getExerciseName(exId)}</div>
-                                            <div className="text-[10px] text-zinc-500">
+                                            <div className="text-xs text-zinc-500">
                                                 {new Date(pr.date).toLocaleDateString()}
                                             </div>
                                         </div>
