@@ -1,9 +1,28 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && isValidUserDoc(request.resource.data);
+    }
+
+    function isValidUserDoc(d) {
+      return d.keys().hasOnly([
+          'user', 'templates', 'logs', 'exercises',
+          'nutritionLogs', 'dailyInsights',
+          'seeded', 'schemaVersion', 'updatedAt'
+        ])
+        && (!('templates' in d) || (d.templates is list && d.templates.size() < 500))
+        && (!('logs' in d) || (d.logs is list && d.logs.size() < 10000))
+        && (!('exercises' in d) || (d.exercises is list && d.exercises.size() < 2000))
+        && (!('nutritionLogs' in d) || (d.nutritionLogs is list && d.nutritionLogs.size() < 5000))
+        && (!('dailyInsights' in d) || (d.dailyInsights is list && d.dailyInsights.size() < 5000))
+        && (!('seeded' in d) || d.seeded is bool)
+        && (!('schemaVersion' in d) || d.schemaVersion is int);
     }
   }
 }

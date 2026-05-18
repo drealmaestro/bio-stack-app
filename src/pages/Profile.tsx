@@ -10,8 +10,8 @@ import {
 import { Plus, TrendingDown, Scale, Target, User2 } from "lucide-react";
 import { DEFAULT_NUTRITION_GOALS } from "../data/nutrition";
 import { calculateAge, cn } from "../lib/utils";
-import { auth, googleProvider } from "../lib/firebase";
-import { signInWithPopup, signOut, type User } from "firebase/auth";
+import { auth, linkAnonymousToGoogle } from "../lib/firebase";
+import { signOut, type User } from "firebase/auth";
 
 // C3b: removed inappropriate goal label
 const GOAL_OPTIONS = [
@@ -141,7 +141,21 @@ export function Profile() {
                         <button onClick={() => signOut(auth)} className="text-xs text-red-400 hover:text-red-300 transition-colors font-semibold">Sign Out</button>
                     </div>
                 ) : (
-                    <Button onClick={() => signInWithPopup(auth, googleProvider)} size="sm" className="bg-white text-black font-bold h-8 text-xs hover:bg-zinc-200">
+                    <Button
+                        onClick={async () => {
+                            try {
+                                const { linked, fellBack } = await linkAnonymousToGoogle();
+                                if (linked) toast.success("Account upgraded — data preserved");
+                                else if (fellBack) toast.info("Signed into existing Google account");
+                                else toast.success("Signed in");
+                            } catch (e) {
+                                console.error(e);
+                                toast.error("Sign-in failed");
+                            }
+                        }}
+                        size="sm"
+                        className="bg-white text-black font-bold h-8 text-xs hover:bg-zinc-200"
+                    >
                         Sign in to Sync
                     </Button>
                 )}
