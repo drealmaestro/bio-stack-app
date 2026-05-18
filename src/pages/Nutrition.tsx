@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { ProgressRing } from '../components/ui/progress-ring';
 import { MacroBar } from '../components/ui/macro-bar';
-import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { COMMON_FOODS, DEFAULT_NUTRITION_GOALS } from '../data/nutrition';
 import type { FoodItem } from '../types';
@@ -113,63 +112,63 @@ export function Nutrition() {
             </div>
 
             {/* Calorie Ring Hero */}
-            <Card className="glass-card overflow-hidden">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex-1 space-y-4">
-                            <div>
-                                <div className="text-4xl font-black text-white">{Math.round(totals.calories)}</div>
-                                <div className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">kcal eaten</div>
+            <div className="glass-card overflow-hidden rounded-3xl border border-white/5 bg-linear-to-br from-primary/10 via-zinc-900/80 to-zinc-950 p-6 shadow-2xl shadow-black/40">
+                <div className="flex items-center justify-between gap-6">
+                    <div className="flex-1 space-y-6">
+                        <div>
+                            <div className="text-5xl font-black text-white tracking-tighter">{Math.round(totals.calories)}</div>
+                            <div className="text-xs font-bold text-primary uppercase tracking-widest mt-1">kcal eaten</div>
+                        </div>
+                        <div className="space-y-2 text-sm font-medium">
+                            <div className="flex justify-between text-zinc-400 items-center">
+                                <span>Goal</span>
+                                <span className="text-white font-bold bg-white/10 px-2 py-0.5 rounded-md">{goals.calories} kcal</span>
                             </div>
-                            <div className="space-y-1 text-sm">
-                                <div className="flex justify-between text-muted-foreground">
-                                    <span>Goal</span>
-                                    <span className="text-white font-bold">{goals.calories} kcal</span>
-                                </div>
-                                <div className="flex justify-between text-muted-foreground">
-                                    <span>Remaining</span>
-                                    <span className={`font-bold ${remaining === 0 ? 'text-warning' : 'text-success'}`}>
-                                        {remaining} kcal
-                                    </span>
-                                </div>
+                            <div className="flex justify-between text-zinc-400 items-center">
+                                <span>Remaining</span>
+                                <span className={`font-bold px-2 py-0.5 rounded-md ${remaining === 0 ? 'bg-warning/20 text-warning' : 'bg-success/20 text-success'}`}>
+                                    {remaining} kcal
+                                </span>
                             </div>
                         </div>
+                    </div>
+                    <div className="shrink-0 relative drop-shadow-[0_0_15px_rgba(0,212,255,0.3)]">
                         <ProgressRing
-                            size={130}
-                            strokeWidth={12}
+                            size={140}
+                            strokeWidth={14}
                             progress={caloriePct}
                             color="#00D4FF"
                             label={`${Math.round(caloriePct * 100)}%`}
                             sublabel="of goal"
                         />
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Macros */}
-            <Card className="glass-card">
-                <CardContent className="p-5 space-y-5">
-                    <div className="section-label">Macros</div>
+            <div>
+                <div className="section-label mb-3">Macros</div>
+                <div className="glass-card p-6 rounded-3xl space-y-6 bg-black/40 border border-white/5 shadow-inner">
                     <MacroBar
                         label="Protein"
                         current={totals.protein_g}
                         goal={goals.protein_g}
-                        color="bg-[#a78bfa]"
+                        color="bg-protein"
                     />
                     <MacroBar
                         label="Carbs"
                         current={totals.carbs_g}
                         goal={goals.carbs_g}
-                        color="bg-[#60a5fa]"
+                        color="bg-carbs"
                     />
                     <MacroBar
                         label="Fat"
                         current={totals.fat_g}
                         goal={goals.fat_g}
-                        color="bg-[#fb923c]"
+                        color="bg-fat"
                     />
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Macro Pill Summary */}
             <div className="flex gap-2">
@@ -211,33 +210,38 @@ export function Nutrition() {
                         <p className="text-sm text-muted-foreground">Tap to log your first meal</p>
                     </div>
                 ) : (
-                    <div className="space-y-2">
-                        {todayLog.entries.map(entry => (
+                    <div className="space-y-3">
+                        {todayLog!.entries.map(entry => (
                             <div
                                 key={entry.id}
-                                className="glass-card p-4 flex justify-between items-center"
+                                className="group glass-card p-4 rounded-2xl flex justify-between items-center hover:bg-white/5 transition-colors border border-white/5 bg-black/20"
                             >
-                                <div>
-                                    <div className="font-bold text-white text-sm">{entry.food_name}</div>
-                                    <div className="text-xs text-muted-foreground mt-0.5">
-                                        {entry.servings > 1 ? `${entry.servings}x · ` : ''}
-                                        <span className="text-protein">P {entry.protein_g}g</span>
-                                        {' · '}
-                                        <span className="text-carbs">C {entry.carbs_g}g</span>
-                                        {' · '}
-                                        <span className="text-fat">F {entry.fat_g}g</span>
+                                <div className="flex gap-4 items-center">
+                                    <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                        <Flame size={20} />
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-white text-base">{entry.food_name}</div>
+                                        <div className="text-xs font-medium text-zinc-500 mt-1">
+                                            {entry.servings > 1 ? <span className="text-white bg-white/10 px-1.5 py-0.5 rounded-md mr-1.5">{entry.servings}x</span> : ''}
+                                            <span className="text-protein">P {entry.protein_g}g</span>
+                                            <span className="mx-1.5 opacity-30">•</span>
+                                            <span className="text-carbs">C {entry.carbs_g}g</span>
+                                            <span className="mx-1.5 opacity-30">•</span>
+                                            <span className="text-fat">F {entry.fat_g}g</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-4">
                                     <div className="text-right">
-                                        <div className="text-sm font-black text-primary">{entry.calories}</div>
-                                        <div className="text-xs text-muted-foreground">kcal</div>
+                                        <div className="text-lg font-black text-white">{entry.calories}</div>
+                                        <div className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mt-0.5">kcal</div>
                                     </div>
                                     <button
                                         onClick={() => deleteNutritionEntry(today, entry.id)}
-                                        className="text-zinc-600 hover:text-destructive transition-colors p-1"
+                                        className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white shrink-0"
                                     >
-                                        <Trash2 size={14} />
+                                        <Trash2 size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -248,9 +252,9 @@ export function Nutrition() {
 
             {/* Add Food Modal — H4: focus trap via modalRef */}
             {showAddModal && (
-                <div className="fixed inset-0 z-50 flex items-end bg-black/70 backdrop-blur-sm"
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
                     onClick={(e) => { if (e.target === e.currentTarget) setShowAddModal(false); }}>
-                    <div ref={modalRef} className="w-full max-w-lg mx-auto bg-zinc-900 border border-white/10 rounded-t-3xl p-5 space-y-4 animate-in slide-in-from-bottom duration-300 pb-10">
+                    <div ref={modalRef} className="w-full max-w-lg mx-auto bg-zinc-950 border border-white/10 rounded-t-4xl p-6 space-y-5 animate-in slide-in-from-bottom-[100%] duration-500 pb-safe shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
                         <div className="flex justify-between items-center">
                             <h3 className="text-lg font-black text-white">Add Food</h3>
                             <button onClick={() => setShowAddModal(false)} className="text-zinc-400 hover:text-white">

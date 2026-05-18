@@ -371,19 +371,22 @@ export function Profile() {
             {/* ── Goals ─────────────────────────── */}
             <div className="glass-card p-5 rounded-2xl space-y-3">
                 <h3 className="text-base font-bold text-white">Focus Areas</h3>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap gap-2">
                     {GOAL_OPTIONS.map(goal => (
                         <button
                             key={goal}
                             onClick={() => toggleGoal(goal)}
                             className={cn(
-                                "w-full text-left py-3 px-4 rounded-xl text-sm font-semibold border transition-all",
+                                "flex items-center gap-1.5 py-2 px-4 rounded-full text-sm font-semibold border transition-all duration-300",
                                 formData.goals.includes(goal)
-                                    ? "bg-primary/10 border-primary/50 text-primary"
-                                    : "border-white/8 text-zinc-400 hover:border-white/15"
+                                    ? "bg-primary/20 border-primary shadow-[0_0_15px_-3px_rgba(0,212,255,0.4)] text-primary scale-105"
+                                    : "bg-white/5 border-white/10 text-zinc-400 hover:border-white/20 hover:bg-white/10"
                             )}
                         >
-                            {formData.goals.includes(goal) ? "✓ " : "+ "}{goal}
+                            <div className={cn("transition-all duration-300 overflow-hidden flex items-center justify-center", formData.goals.includes(goal) ? "w-3 scale-100 opacity-100" : "w-0 scale-0 opacity-0")}>
+                                {formData.goals.includes(goal) && "✓"}
+                            </div>
+                            <span>{goal}</span>
                         </button>
                     ))}
                 </div>
@@ -392,7 +395,7 @@ export function Profile() {
             {/* ── Save ──────────────────────────── */}
             <Button
                 onClick={handleSave}
-                className="w-full py-6 text-base font-black bg-gradient-to-r from-primary to-orange-400 text-black hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+                className="w-full py-6 text-base font-black bg-linear-to-r from-primary to-orange-400 text-black hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
             >
                 Save Profile
             </Button>

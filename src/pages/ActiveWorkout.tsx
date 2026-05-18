@@ -6,8 +6,38 @@ import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
 import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp } from "lucide-react";
 import { nanoid } from "nanoid";
+import confetti from "canvas-confetti";
 import type { SetLog } from "../types";
 import { cn } from "../lib/utils";
+
+// Helper component for counting animation
+function AnimatedNumber({ value, formatter }: { value: number, formatter?: (val: number) => string | number }) {
+    const [display, setDisplay] = useState(0);
+    
+    useEffect(() => {
+        let startTime: number;
+        const duration = 1500;
+        
+        const animate = (time: number) => {
+            if (!startTime) startTime = time;
+            const progress = Math.min((time - startTime) / duration, 1);
+            // Ease out quart
+            const easeOut = 1 - Math.pow(1 - progress, 4);
+            setDisplay(value * easeOut);
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                setDisplay(value);
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }, [value]);
+    
+    return <>{formatter ? formatter(display) : Math.round(display)}</>;
+}
+
 export function ActiveWorkout() {
     const {
         templates, exercises, logs, addLog,
@@ -24,7 +54,7 @@ export function ActiveWorkout() {
     const [showFinishConfirm, setShowFinishConfirm] = useState(false);
     // Post-workout summary state
     const [showSummary, setShowSummary] = useState(false);
-    const [summaryData, setSummaryData] = useState<{ duration: string; sets: number; volume: number; prs: string[] } | null>(null);
+    const [summaryData, setSummaryData] = useState<{ durationSecs: number; sets: number; volume: number; prs: string[] } | null>(null);
     // H3: Store original rest duration so we can compute ring progress
     const originalRestRef = useRef<number>(0);
 
@@ -153,13 +183,29 @@ export function ActiveWorkout() {
 
         // Show summary before clearing workout
         setSummaryData({
-            duration: formatTime(Math.floor(duration)),
+            durationSecs: duration,
             sets: completedLog.length,
             volume: Math.round(totalVolume),
             prs: newPRs,
         });
         setShowSummary(true);
         cancelWorkout();
+        
+        // Trigger confetti
+        setTimeout(() => {
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+            
+            const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+            
+            const interval = setInterval(function() {
+                const particleCount = 50;
+                // since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+            
+            setTimeout(() => clearInterval(interval), 1500);
+        }, 300);
     };
 
     // --- POST-WORKOUT SUMMARY SCREEN ---
@@ -175,18 +221,28 @@ export function ActiveWorkout() {
                 <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
                     <div className="glass-card p-4 rounded-2xl text-center">
                         <Clock size={18} className="mx-auto text-primary mb-1" />
-                        <div className="text-xl font-black text-white">{summaryData.duration}</div>
+                        <div className="text-xl font-black text-white">
+                            <AnimatedNumber 
+                                value={summaryData.durationSecs} 
+                                formatter={(val) => formatTime(Math.floor(val))} 
+                            />
+                        </div>
                         <div className="text-xs text-zinc-400">Duration</div>
                     </div>
                     <div className="glass-card p-4 rounded-2xl text-center">
                         <Check size={18} className="mx-auto text-primary mb-1" />
-                        <div className="text-xl font-black text-white">{summaryData.sets}</div>
+                        <div className="text-xl font-black text-white">
+                            <AnimatedNumber value={summaryData.sets} />
+                        </div>
                         <div className="text-xs text-zinc-400">Sets</div>
                     </div>
                     <div className="glass-card p-4 rounded-2xl text-center">
                         <TrendingUp size={18} className="mx-auto text-primary mb-1" />
                         <div className="text-xl font-black text-white">
-                            {summaryData.volume >= 1000 ? `${(summaryData.volume / 1000).toFixed(1)}t` : `${summaryData.volume}kg`}
+                            <AnimatedNumber 
+                                value={summaryData.volume} 
+                                formatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(1)}t` : `${Math.round(val)}kg`} 
+                            />
                         </div>
                         <div className="text-xs text-zinc-400">Volume</div>
                     </div>
@@ -376,7 +432,7 @@ export function ActiveWorkout() {
             </div>
 
             {/* Finish Button */}
-            <div className="fixed bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
+            <div className="absolute bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
                 <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl shadow-primary/20 bg-primary text-black hover:scale-[1.02] transition-transform active:scale-95">
                     <CheckCircle className="mr-2" size={24} /> FINISH WORKOUT
                 </Button>
@@ -384,7 +440,7 @@ export function ActiveWorkout() {
 
             {/* Cancel Today's Protocol — full modal warning */}
             {showCancelConfirm && (
-                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
+                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
                     <div className="bg-zinc-900 border border-destructive/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-destructive/15 flex items-center justify-center">
@@ -422,7 +478,7 @@ export function ActiveWorkout() {
 
             {/* Finish Workout Confirmation */}
             {showFinishConfirm && (
-                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
+                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
                     <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">
@@ -463,7 +519,7 @@ export function ActiveWorkout() {
 
             {/* H3: Rest Timer Overlay with ProgressRing */}
             {isResting && (
-                <div className="fixed inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+                <div className="absolute inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
                     <div className="text-zinc-400 font-bold uppercase tracking-widest mb-8">Resting</div>
 
                     <ProgressRing

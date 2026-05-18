@@ -24,16 +24,26 @@ export function Layout() {
         }
     }, [isSessionLocked, location.pathname, navigate]);
 
+    const [scrolled, setScrolled] = useState(false);
+
     const handleReset = () => {
         resetStore();
         localStorage.clear();
         window.location.href = "/";
     };
 
+    const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+        setScrolled(e.currentTarget.scrollTop > 20);
+    };
+
     return (
-        <div className="flex flex-col min-h-screen relative overflow-hidden">
+        <div className="min-h-screen bg-zinc-950 flex md:items-center justify-center md:p-6 lg:p-12">
+            <div className="w-full max-w-[400px] bg-background flex flex-col min-h-screen md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-20px_rgba(0,212,255,0.15)] md:ring-1 ring-white/10 mx-auto">
             {/* Header */}
-            <header className="glass fixed top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center">
+            <header className={cn(
+                "absolute top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center transition-all duration-300",
+                scrolled ? "bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20" : "bg-transparent"
+            )}>
                 <NavLink to="/" className="flex items-center gap-2 group cursor-pointer">
                     <div className="w-8 h-8 rounded-xl bg-linear-to-br from-primary to-orange-400 flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-primary/20">
                         <span className="font-black text-black text-base">M</span>
@@ -75,12 +85,12 @@ export function Layout() {
 
             {/* Mobile Menu Overlay */}
             <div className={cn(
-                "fixed inset-0 bg-black/95 z-60 backdrop-blur-xl transition-all duration-300 flex flex-col items-center justify-center space-y-8",
+                "absolute inset-0 bg-black/95 z-60 backdrop-blur-xl transition-all duration-300 flex flex-col items-center justify-center space-y-8",
                 isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}>
                 <button
                     onClick={() => setIsMenuOpen(false)}
-                    className="absolute top-5 right-5 p-2 text-zinc-400 hover:text-white"
+                    className="absolute top-6 right-6 p-2 text-zinc-400 hover:text-white"
                 >
                     <X size={28} />
                 </button>
@@ -116,7 +126,7 @@ export function Layout() {
 
             {/* Reset Confirmation Dialog */}
             {showResetConfirm && (
-                <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm px-6">
+                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm px-6">
                     <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4 animate-in zoom-in-95 duration-200">
                         <h3 className="text-lg font-black text-white">Reset All Data?</h3>
                         <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, nutrition and your profile. Cannot be undone.</p>
@@ -139,69 +149,100 @@ export function Layout() {
             )}
 
             {/* Main Content */}
-            <main className="flex-1 pt-20 pb-28 px-4 max-w-lg mx-auto w-full">
+            <main key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-28 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
                 <Outlet />
             </main>
 
             {/* Bottom Nav — swaps to Session Locked bar when workout active */}
-            {isSessionLocked ? (
-                <div className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-between z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-5 border border-primary/30 bg-primary/5">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
-                            <Lock size={16} className="text-primary" />
+            {location.pathname !== '/active' && (
+                isSessionLocked ? (
+                    <div className="glass absolute bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-between z-50 shadow-2xl shadow-black/50 px-5 border border-primary/30 bg-primary/5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
+                                <Lock size={16} className="text-primary" />
+                            </div>
+                            <div>
+                                <div className="text-xs font-bold uppercase tracking-widest text-primary">Session Active</div>
+                                <div className="text-sm font-black text-white leading-tight">{activeTemplateName}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-primary">Session Active</div>
-                            <div className="text-sm font-black text-white leading-tight">{activeTemplateName}</div>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => navigate('/active')}
-                        className="flex items-center gap-2 bg-primary text-black font-bold text-xs px-4 py-2 rounded-full hover:scale-105 transition-transform active:scale-95"
-                    >
-                        <Timer size={14} /> Resume
-                    </button>
-                </div>
-            ) : (
-                <nav className="glass fixed bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 max-w-lg mx-auto shadow-2xl shadow-black/50 px-2">
-                    {/* M4: increased label from text-[9px] to text-[11px] (WCAG min) */}
-                    <NavLink to="/" className={navLinkClass} end>
-                        <Home size={20} />
-                        <span className="text-[11px] mt-0.5 font-semibold">Home</span>
-                    </NavLink>
-                    <NavLink to="/workouts" className={navLinkClass}>
-                        <Dumbbell size={20} />
-                        <span className="text-[11px] mt-0.5 font-semibold">Train</span>
-                    </NavLink>
-
-                    {/* Center floating Play button */}
-                    <div className="relative -top-6">
-                        <NavLink
-                            to="/active"
-                            className={({ isActive }) => cn(
-                                "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
-                                isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"
-                            )}
+                        <button
+                            onClick={() => navigate('/active')}
+                            className="flex items-center gap-2 bg-primary text-black font-bold text-xs px-4 py-2 rounded-full hover:scale-105 transition-transform active:scale-95"
                         >
-                            <Play size={22} fill="currentColor" className="ml-0.5" />
-                        </NavLink>
+                            <Timer size={14} /> Resume
+                        </button>
                     </div>
-
-                    <NavLink to="/nutrition" className={navLinkClass}>
-                        <Salad size={20} />
-                        <span className="text-[11px] mt-0.5 font-semibold">Fuel</span>
-                    </NavLink>
-                    <NavLink to="/history" className={navLinkClass}>
-                        <ScrollText size={20} />
-                        <span className="text-[11px] mt-0.5 font-semibold">Log</span>
-                    </NavLink>
-                </nav>
+                ) : (
+                    <nav className="glass absolute bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 shadow-2xl shadow-black/50 px-2">
+                        {/* M4: increased label from text-[9px] to text-[11px] (WCAG min) */}
+                        <NavLink to="/" className={navLinkClass} end>
+                            {({ isActive }) => (
+                                <>
+                                    <div className="relative flex flex-col items-center">
+                                        <Home size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-2 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    </div>
+                                    <span className="text-[11px] mt-1 font-semibold">Home</span>
+                                </>
+                            )}
+                        </NavLink>
+                        <NavLink to="/workouts" className={navLinkClass}>
+                            {({ isActive }) => (
+                                <>
+                                    <div className="relative flex flex-col items-center">
+                                        <Dumbbell size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-2 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    </div>
+                                    <span className="text-[11px] mt-1 font-semibold">Train</span>
+                                </>
+                            )}
+                        </NavLink>
+    
+                        {/* Center floating Play button */}
+                        <div className="relative -top-6">
+                            <NavLink
+                                to="/active"
+                                className={({ isActive }) => cn(
+                                    "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
+                                    isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"
+                                )}
+                            >
+                                <Play size={22} fill="currentColor" className="ml-0.5" />
+                            </NavLink>
+                        </div>
+    
+                        <NavLink to="/nutrition" className={navLinkClass}>
+                            {({ isActive }) => (
+                                <>
+                                    <div className="relative flex flex-col items-center">
+                                        <Salad size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-2 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    </div>
+                                    <span className="text-[11px] mt-1 font-semibold">Fuel</span>
+                                </>
+                            )}
+                        </NavLink>
+                        <NavLink to="/history" className={navLinkClass}>
+                            {({ isActive }) => (
+                                <>
+                                    <div className="relative flex flex-col items-center">
+                                        <ScrollText size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-2 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    </div>
+                                    <span className="text-[11px] mt-1 font-semibold">Log</span>
+                                </>
+                            )}
+                        </NavLink>
+                    </nav>
+                )
             )}
+            </div>
         </div>
     );
 }
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "flex flex-col items-center gap-0 p-2 rounded-xl transition-all duration-200",
-    isActive ? "text-primary" : "text-zinc-500 hover:text-zinc-300"
+    "flex flex-col items-center gap-0 p-2 rounded-xl transition-all duration-300 tap-active relative group",
+    isActive ? "text-primary scale-105" : "text-zinc-500 hover:text-zinc-300"
 );
