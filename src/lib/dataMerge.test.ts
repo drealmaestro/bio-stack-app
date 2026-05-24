@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergePersistedData, type PersistedDataSlice } from './dataMerge';
+import { mergePersistedData, reconcileLegacyAndSubcollections, type PersistedDataSlice } from './dataMerge';
 
 const emptySlice: PersistedDataSlice = {
     user: null,
@@ -98,4 +98,43 @@ describe('mergePersistedData', () => {
         expect(merged.nutritionLogs[0]?.entries.map((entry) => entry.id)).toEqual(['food-1', 'food-2']);
     });
 });
+
+describe('reconcileLegacyAndSubcollections', () => {
+    it('returns null when both legacy and subcollection are null', () => {
+        const reconciled = reconcileLegacyAndSubcollections(null, null);
+        expect(reconciled).toBeNull();
+    });
+
+    it('returns legacy if subcollection is null', () => {
+        const legacy: PersistedDataSlice = {
+            ...emptySlice,
+            user: { name: 'Legacy User', age: 30, goals: [], experience_level: 'Beginner', stats: { weight: [], body_fat: [] } },
+        };
+        const reconciled = reconcileLegacyAndSubcollections(null, legacy);
+        expect(reconciled?.user?.name).toBe('Legacy User');
+    });
+
+    it('returns subcollection if legacy is null', () => {
+        const sub: PersistedDataSlice = {
+            ...emptySlice,
+            user: { name: 'Sub User', age: 25, goals: [], experience_level: 'Advanced', stats: { weight: [], body_fat: [] } },
+        };
+        const reconciled = reconcileLegacyAndSubcollections(sub, null);
+        expect(reconciled?.user?.name).toBe('Sub User');
+    });
+
+    it('converges and merges both when both contain data', () => {
+        const sub: PersistedDataSlice = {
+            ...emptySlice,
+            templates: [{ id: 't-1', name: 'Push', exercises: [] }],
+        };
+        const legacy: PersistedDataSlice = {
+            ...emptySlice,
+            templates: [{ id: 't-2', name: 'Pull', exercises: [] }],
+        };
+        const reconciled = reconcileLegacyAndSubcollections(sub, legacy);
+        expect(reconciled?.templates.map(t => t.id)).toEqual(['t-1', 't-2']);
+    });
+});
+
 

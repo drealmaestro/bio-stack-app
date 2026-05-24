@@ -53,3 +53,16 @@ export function mergePersistedData(
     };
 }
 
+export function reconcileLegacyAndSubcollections(
+    subcollection: PersistedDataSlice | null,
+    legacy: PersistedDataSlice | null
+): PersistedDataSlice | null {
+    if (!subcollection && !legacy) return null;
+    if (!subcollection) return legacy;
+    if (!legacy) return subcollection;
+
+    // Both exist. Merge them to converge.
+    return mergePersistedData(subcollection, legacy);
+}
+
+

@@ -13,6 +13,7 @@ import { useStore } from '../store/useStore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { UserDocSchema, CURRENT_SCHEMA_VERSION, type UserDoc } from './schemas';
 import { useToastStore } from '../components/ui/toast';
+import { reconcileLegacyAndSubcollections, type PersistedDataSlice } from './dataMerge';
 
 let unsubscribeSnapshot: (() => void) | null = null;
 let isHydrating = false;
@@ -92,7 +93,10 @@ async function readSubcollections(uid: string): Promise<UserDoc | null> {
     return hasAnyData ? parsed.data : null;
 }
 
-async function writeSubcollections(uid: string, payload = buildPayload()) {
+async function writeSubcollections(
+    uid: string,
+    payload: PersistedDataSlice & { schemaVersion?: number; updatedAt?: any } = buildPayload()
+) {
     const batch = writeBatch(db);
 
     batch.set(doc(db, 'users', uid, 'meta', 'profile'), {
@@ -136,6 +140,19 @@ async function writeSubcollections(uid: string, payload = buildPayload()) {
     await batch.commit();
 }
 
+function toPersistedDataSlice(data: UserDoc | null): PersistedDataSlice | null {
+    if (!data) return null;
+    return {
+        user: data.user ?? null,
+        templates: data.templates ?? [],
+        logs: data.logs ?? [],
+        exercises: data.exercises ?? [],
+        nutritionLogs: data.nutritionLogs ?? [],
+        dailyInsights: data.dailyInsights ?? [],
+        seeded: data.seeded ?? false,
+    };
+}
+
 export function initSync() {
     if (unsubscribeAuth || unsubscribeStore) {
         return cleanupSync;
@@ -147,22 +164,50 @@ export function initSync() {
             const userDocRef = doc(db, 'users', user.uid);
 
             try {
-                // 1. If Firestore has no doc yet, seed it from current local state.
-                const snap = await getDoc(userDocRef);
-                if (!snap.exists()) {
-                    const migrated = await readSubcollections(user.uid);
-                    if (migrated) {
-                        hydrateStore(migrated);
-                        await setDoc(userDocRef, buildPayload());
-                    } else {
-                        await setDoc(userDocRef, buildPayload());
-                        await writeSubcollections(user.uid);
-                    }
+                // 1. Read both subcollections and legacy document in parallel
+                const [subcollectionData, legacyDocSnap] = await Promise.all([
+                    readSubcollections(user.uid),
+                    getDoc(userDocRef),
+                ]);
+
+                const legacyData = legacyDocSnap.exists()
+                    ? (legacyDocSnap.data() as UserDoc)
+                    : null;
+
+                const reconciled = reconcileLegacyAndSubcollections(
+                    toPersistedDataSlice(subcollectionData),
+                    toPersistedDataSlice(legacyData)
+                );
+
+                if (reconciled) {
+                    hydrateStore({
+                        ...reconciled,
+                        schemaVersion: Math.max(
+                            subcollectionData?.schemaVersion ?? 0,
+                            legacyData?.schemaVersion ?? 0,
+                            CURRENT_SCHEMA_VERSION
+                        ),
+                    });
+
+                    // Ensure both sources are perfectly synchronized with the reconciled converged state
+                    const payload = {
+                        ...reconciled,
+                        schemaVersion: CURRENT_SCHEMA_VERSION,
+                    };
+                    await Promise.all([
+                        setDoc(userDocRef, { ...payload, updatedAt: serverTimestamp() }, { merge: true }),
+                        writeSubcollections(user.uid, payload),
+                    ]);
                 } else {
-                    await writeSubcollections(user.uid);
+                    // Brand new user (both null). Seed Firestore from current local state.
+                    const initialPayload = buildPayload();
+                    await Promise.all([
+                        setDoc(userDocRef, initialPayload),
+                        writeSubcollections(user.uid, initialPayload),
+                    ]);
                 }
             } catch (err) {
-                console.error('Firestore initial seed error:', err);
+                console.error('Firestore initial seed/reconciliation error:', err);
             }
 
             // 2. Subscribe to remote changes (with validation).
@@ -220,10 +265,26 @@ export function initSync() {
         debounceTimer = setTimeout(() => {
             const userDocRef = doc(db, 'users', user.uid);
             const payload = buildPayload();
-            Promise.all([
+
+            // Detect deleted templates to perform active tombstones deletion in subcollections
+            const deletedTemplates = prevState.templates.filter(
+                (prev) => !state.templates.some((curr) => curr.id === prev.id)
+            );
+
+            const syncTasks: Promise<any>[] = [
                 setDoc(userDocRef, payload, { merge: true }),
                 writeSubcollections(user.uid, payload),
-            ])
+            ];
+
+            if (deletedTemplates.length > 0) {
+                const batch = writeBatch(db);
+                deletedTemplates.forEach((template) => {
+                    batch.delete(doc(db, 'users', user.uid, 'templates', template.id));
+                });
+                syncTasks.push(batch.commit());
+            }
+
+            Promise.all(syncTasks)
                 .then(() => {
                     if (consecutiveWriteFailures > 0) {
                         useToastStore.getState().addToast('Sync recovered', 'success');
