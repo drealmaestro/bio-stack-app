@@ -69,7 +69,11 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: () => void }) 
         >
             {ICONS[toast.type]}
             <p className="text-sm font-semibold text-white flex-1">{toast.message}</p>
-            <button onClick={onRemove} className="text-zinc-500 hover:text-white transition-colors ml-1">
+            <button
+                onClick={onRemove}
+                className="text-zinc-500 hover:text-white transition-colors ml-1"
+                aria-label="Dismiss notification"
+            >
                 <X size={14} />
             </button>
         </div>

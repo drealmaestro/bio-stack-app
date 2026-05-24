@@ -1,13 +1,29 @@
-import { doc, setDoc, onSnapshot, getDoc, serverTimestamp } from 'firebase/firestore';
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    onSnapshot,
+    serverTimestamp,
+    setDoc,
+    writeBatch,
+} from 'firebase/firestore';
 import { db, auth } from './firebase';
 import { useStore } from '../store/useStore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { UserDocSchema, CURRENT_SCHEMA_VERSION } from './schemas';
+import { UserDocSchema, CURRENT_SCHEMA_VERSION, type UserDoc } from './schemas';
 import { useToastStore } from '../components/ui/toast';
 
 let unsubscribeSnapshot: (() => void) | null = null;
 let isHydrating = false;
 let consecutiveWriteFailures = 0;
+let syncPaused = false;
+let unsubscribeAuth: (() => void) | null = null;
+let unsubscribeStore: (() => void) | null = null;
+
+export function setSyncPaused(paused: boolean) {
+    syncPaused = paused;
+}
 
 function buildPayload() {
     const s = useStore.getState();
@@ -24,8 +40,109 @@ function buildPayload() {
     };
 }
 
+function hydrateStore(data: UserDoc) {
+    isHydrating = true;
+    useStore.setState({
+        user: data.user ?? null,
+        templates: data.templates ?? [],
+        logs: data.logs ?? [],
+        exercises: data.exercises ?? [],
+        nutritionLogs: data.nutritionLogs ?? [],
+        dailyInsights: data.dailyInsights ?? [],
+        seeded: data.seeded ?? false,
+    });
+    setTimeout(() => { isHydrating = false; }, 100);
+}
+
+async function readSubcollections(uid: string): Promise<UserDoc | null> {
+    const [profileSnap, templatesSnap, logsSnap, exercisesSnap, nutritionSnap, insightsSnap] = await Promise.all([
+        getDoc(doc(db, 'users', uid, 'meta', 'profile')),
+        getDocs(collection(db, 'users', uid, 'templates')),
+        getDocs(collection(db, 'users', uid, 'workoutLogs')),
+        getDocs(collection(db, 'users', uid, 'exercises')),
+        getDocs(collection(db, 'users', uid, 'nutritionLogs')),
+        getDocs(collection(db, 'users', uid, 'dailyInsights')),
+    ]);
+
+    const candidate = {
+        user: profileSnap.exists() ? profileSnap.data().user ?? null : null,
+        templates: templatesSnap.docs.map((item) => item.data()),
+        logs: logsSnap.docs.map((item) => item.data()),
+        exercises: exercisesSnap.docs.map((item) => item.data()),
+        nutritionLogs: nutritionSnap.docs.map((item) => item.data()),
+        dailyInsights: insightsSnap.docs.map((item) => item.data()),
+        seeded: profileSnap.exists() ? profileSnap.data().seeded ?? false : false,
+        schemaVersion: profileSnap.exists() ? profileSnap.data().schemaVersion : CURRENT_SCHEMA_VERSION,
+    };
+
+    const parsed = UserDocSchema.safeParse(candidate);
+    if (!parsed.success) {
+        console.error('Subcollection data failed schema validation:', parsed.error);
+        return null;
+    }
+
+    const hasAnyData =
+        parsed.data.user ||
+        parsed.data.templates?.length ||
+        parsed.data.logs?.length ||
+        parsed.data.exercises?.length ||
+        parsed.data.nutritionLogs?.length ||
+        parsed.data.dailyInsights?.length;
+
+    return hasAnyData ? parsed.data : null;
+}
+
+async function writeSubcollections(uid: string, payload = buildPayload()) {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, 'users', uid, 'meta', 'profile'), {
+        user: payload.user,
+        seeded: payload.seeded,
+        schemaVersion: payload.schemaVersion,
+        updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    payload.templates.forEach((template) => {
+        batch.set(doc(db, 'users', uid, 'templates', template.id), {
+            ...template,
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    });
+    payload.logs.forEach((log) => {
+        batch.set(doc(db, 'users', uid, 'workoutLogs', log.id), {
+            ...log,
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    });
+    payload.exercises.forEach((exercise) => {
+        batch.set(doc(db, 'users', uid, 'exercises', exercise.id), {
+            ...exercise,
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    });
+    payload.nutritionLogs.forEach((log) => {
+        batch.set(doc(db, 'users', uid, 'nutritionLogs', log.date), {
+            ...log,
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    });
+    payload.dailyInsights.forEach((insight) => {
+        batch.set(doc(db, 'users', uid, 'dailyInsights', insight.date), {
+            ...insight,
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    });
+
+    await batch.commit();
+}
+
 export function initSync() {
-    onAuthStateChanged(auth, async (user) => {
+    if (unsubscribeAuth || unsubscribeStore) {
+        return cleanupSync;
+    }
+
+    unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+        if (syncPaused) return;
         if (user) {
             const userDocRef = doc(db, 'users', user.uid);
 
@@ -33,7 +150,16 @@ export function initSync() {
                 // 1. If Firestore has no doc yet, seed it from current local state.
                 const snap = await getDoc(userDocRef);
                 if (!snap.exists()) {
-                    await setDoc(userDocRef, buildPayload());
+                    const migrated = await readSubcollections(user.uid);
+                    if (migrated) {
+                        hydrateStore(migrated);
+                        await setDoc(userDocRef, buildPayload());
+                    } else {
+                        await setDoc(userDocRef, buildPayload());
+                        await writeSubcollections(user.uid);
+                    }
+                } else {
+                    await writeSubcollections(user.uid);
                 }
             } catch (err) {
                 console.error('Firestore initial seed error:', err);
@@ -59,17 +185,7 @@ export function initSync() {
                     }
 
                     const data = parsed.data;
-                    isHydrating = true;
-                    useStore.setState({
-                        user: data.user ?? null,
-                        templates: data.templates ?? [],
-                        logs: data.logs ?? [],
-                        exercises: data.exercises ?? [],
-                        nutritionLogs: data.nutritionLogs ?? [],
-                        dailyInsights: data.dailyInsights ?? [],
-                        seeded: data.seeded ?? false,
-                    });
-                    setTimeout(() => { isHydrating = false; }, 100);
+                    hydrateStore(data);
                 },
                 (error) => {
                     console.error('Firestore subscription error:', error);
@@ -83,7 +199,8 @@ export function initSync() {
 
     // 3. Listen to local Zustand changes and push to Firestore (debounced).
     let debounceTimer: ReturnType<typeof setTimeout>;
-    useStore.subscribe((state, prevState) => {
+    unsubscribeStore = useStore.subscribe((state, prevState) => {
+        if (syncPaused) return;
         if (isHydrating) return;
 
         const user = auth.currentUser;
@@ -102,7 +219,11 @@ export function initSync() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             const userDocRef = doc(db, 'users', user.uid);
-            setDoc(userDocRef, buildPayload(), { merge: true })
+            const payload = buildPayload();
+            Promise.all([
+                setDoc(userDocRef, payload, { merge: true }),
+                writeSubcollections(user.uid, payload),
+            ])
                 .then(() => {
                     if (consecutiveWriteFailures > 0) {
                         useToastStore.getState().addToast('Sync recovered', 'success');
@@ -122,4 +243,15 @@ export function initSync() {
                 });
         }, 1000);
     });
+
+    return cleanupSync;
+}
+
+function cleanupSync() {
+    unsubscribeSnapshot?.();
+    unsubscribeSnapshot = null;
+    unsubscribeAuth?.();
+    unsubscribeAuth = null;
+    unsubscribeStore?.();
+    unsubscribeStore = null;
 }

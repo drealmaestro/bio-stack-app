@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Download, RefreshCw } from 'lucide-react';
+import { useStore } from '../store/useStore';
 
 export default function ReloadPrompt() {
     const [countdown, setCountdown] = useState(3);
+    const activeWorkout = useStore((state) => state.activeWorkout);
 
     const {
         offlineReady: [offlineReady, setOfflineReady],
@@ -20,6 +22,7 @@ export default function ReloadPrompt() {
 
     useEffect(() => {
         if (!needRefresh) return;
+        if (activeWorkout) return;
 
         setCountdown(3);
         const interval = setInterval(() => {
@@ -34,7 +37,7 @@ export default function ReloadPrompt() {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [needRefresh]);
+    }, [needRefresh, activeWorkout, updateServiceWorker]);
 
     const close = () => {
         setOfflineReady(false);
@@ -50,17 +53,19 @@ export default function ReloadPrompt() {
                 <div className="text-sm font-bold">
                     {offlineReady
                         ? 'App is ready to work offline'
-                        : `Updating in ${countdown}s…`}
+                        : activeWorkout
+                            ? 'Update ready after workout'
+                            : `Updating in ${countdown}s...`}
                 </div>
             </div>
             <div className="flex gap-2">
                 {needRefresh && (
                     <button
                         onClick={() => updateServiceWorker(true)}
-                        className="text-xs font-black bg-black text-primary px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
-                    >
-                        Now
-                    </button>
+                            className="text-xs font-black bg-black text-primary px-3 py-1.5 rounded-lg active:scale-95 transition-transform"
+                        >
+                            {activeWorkout ? 'Update' : 'Now'}
+                        </button>
                 )}
                 <button
                     onClick={close}

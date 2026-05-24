@@ -4,6 +4,7 @@ import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText, Timer, Lock }
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { User } from 'lucide-react';
+import { Dialog } from './ui/dialog';
 
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,7 +29,7 @@ export function Layout() {
 
     const handleReset = () => {
         resetStore();
-        localStorage.clear();
+        localStorage.removeItem('bio-stack-storage');
         window.location.href = "/";
     };
 
@@ -63,6 +64,7 @@ export function Layout() {
                                 : "bg-primary/20 text-primary hover:bg-primary/30"
                         )}
                         title="Profile"
+                        aria-label="Open profile"
                     >
                         {({ isActive: _ia }) => (
                             user?.name ? (
@@ -76,6 +78,7 @@ export function Layout() {
                         <button
                             className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white"
                             onClick={() => setIsMenuOpen(true)}
+                            aria-label="Open menu"
                         >
                             <Menu size={22} />
                         </button>
@@ -91,6 +94,7 @@ export function Layout() {
                 <button
                     onClick={() => setIsMenuOpen(false)}
                     className="absolute top-6 right-6 p-2 text-zinc-400 hover:text-white"
+                    aria-label="Close menu"
                 >
                     <X size={28} />
                 </button>
@@ -125,9 +129,12 @@ export function Layout() {
             </div>
 
             {/* Reset Confirmation Dialog */}
-            {showResetConfirm && (
-                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm px-6">
-                    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4 animate-in zoom-in-95 duration-200">
+            <Dialog
+                open={showResetConfirm}
+                title="Reset all data"
+                onClose={() => setShowResetConfirm(false)}
+                className="absolute"
+            >
                         <h3 className="text-lg font-black text-white">Reset All Data?</h3>
                         <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, nutrition and your profile. Cannot be undone.</p>
                         <div className="flex gap-3">
@@ -144,9 +151,7 @@ export function Layout() {
                                 Reset Everything
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
+            </Dialog>
 
             {/* Main Content */}
             <main key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-28 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
@@ -169,6 +174,7 @@ export function Layout() {
                         <button
                             onClick={() => navigate('/active')}
                             className="flex items-center gap-2 bg-primary text-black font-bold text-xs px-4 py-2 rounded-full hover:scale-105 transition-transform active:scale-95"
+                            aria-label="Resume active workout"
                         >
                             <Timer size={14} /> Resume
                         </button>
@@ -203,6 +209,7 @@ export function Layout() {
                         <div className="relative -top-6">
                             <NavLink
                                 to="/active"
+                                aria-label="Start workout"
                                 className={({ isActive }) => cn(
                                     "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-primary to-orange-400 text-black shadow-lg shadow-primary/30 transition-all active:scale-95 border-4 border-[#07080f]",
                                     isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-[#07080f]" : "hover:scale-105"

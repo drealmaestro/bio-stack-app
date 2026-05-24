@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/toast";
+import { Dialog } from "./ui/dialog";
 import { X, Dumbbell } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useStore } from "../store/useStore";
@@ -44,14 +45,23 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-zinc-950 border border-white/10 rounded-2xl w-full max-w-sm flex flex-col max-h-[90vh] overflow-hidden">
+        <Dialog
+            open
+            title="Create exercise"
+            onClose={onClose}
+            className="z-[60] p-4"
+            panelClassName="bg-zinc-950 border-white/10 rounded-2xl w-full max-w-sm flex flex-col max-h-[90vh] overflow-hidden p-0 space-y-0"
+        >
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b border-white/5 bg-white/5">
                     <h3 className="font-black text-white flex items-center gap-2">
                         <Dumbbell size={18} className="text-primary" /> Create Exercise
                     </h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
+                    <button
+                        onClick={onClose}
+                        className="p-1 rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+                        aria-label="Close create exercise"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -104,7 +114,6 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                     <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
                     <Button onClick={handleSave} className="flex-1">Save Exercise</Button>
                 </div>
-            </div>
-        </div>
+        </Dialog>
     );
 }

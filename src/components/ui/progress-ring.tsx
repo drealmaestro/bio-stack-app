@@ -25,7 +25,15 @@ export function ProgressRing({
     const offset = circumference * (1 - clampedProgress);
 
     return (
-        <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+        <div
+            className="relative flex items-center justify-center"
+            style={{ width: size, height: size }}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(clampedProgress * 100)}
+            aria-label={label ? `${label} ${sublabel ?? ''}`.trim() : 'Progress'}
+        >
             <svg
                 width={size}
                 height={size}

@@ -11,7 +11,8 @@ import { Plus, TrendingDown, Scale, Target, User2 } from "lucide-react";
 import { DEFAULT_NUTRITION_GOALS } from "../data/nutrition";
 import { calculateAge, cn } from "../lib/utils";
 import { auth, linkAnonymousToGoogle } from "../lib/firebase";
-import { signOut, type User } from "firebase/auth";
+import { type User } from "firebase/auth";
+import { signOutAndResetLocalData } from "../lib/accountBoundary";
 
 // C3b: removed inappropriate goal label
 const GOAL_OPTIONS = [
@@ -138,7 +139,15 @@ export function Profile() {
                 {fbUser && !fbUser.isAnonymous ? (
                     <div className="text-right">
                         <div className="text-xs uppercase font-bold text-zinc-500">Cloud Sync Active</div>
-                        <button onClick={() => signOut(auth)} className="text-xs text-red-400 hover:text-red-300 transition-colors font-semibold">Sign Out</button>
+                        <button
+                            onClick={async () => {
+                                await signOutAndResetLocalData();
+                                toast.info("Signed out — local data cleared");
+                            }}
+                            className="text-xs text-red-400 hover:text-red-300 transition-colors font-semibold"
+                        >
+                            Sign Out
+                        </button>
                     </div>
                 ) : (
                     <Button

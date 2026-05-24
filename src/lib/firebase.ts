@@ -13,6 +13,8 @@ import {
     signInWithCredential,
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
+import { useStore } from '../store/useStore';
+import { mergePersistedData, type PersistedDataSlice } from './dataMerge';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -36,10 +38,42 @@ export const db = initializeFirestore(app, {
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
+let authInitialized = false;
+let anonymousAuthSuspended = false;
+let unsubscribeAuth: (() => void) | null = null;
+
+function getPersistedSlice(): PersistedDataSlice {
+    const state = useStore.getState();
+    return {
+        user: state.user,
+        templates: state.templates,
+        logs: state.logs,
+        exercises: state.exercises,
+        nutritionLogs: state.nutritionLogs,
+        dailyInsights: state.dailyInsights,
+        seeded: state.seeded,
+    };
+}
+
+function applyPersistedSlice(slice: PersistedDataSlice) {
+    useStore.setState({
+        user: slice.user,
+        templates: slice.templates,
+        logs: slice.logs,
+        exercises: slice.exercises,
+        nutritionLogs: slice.nutritionLogs,
+        dailyInsights: slice.dailyInsights,
+        seeded: slice.seeded,
+    });
+}
+
 // Auto-fallback to anonymous auth so writes always have an owner.
 export const initAuth = () => {
-    auth.onAuthStateChanged(async (user) => {
-        if (!user) {
+    if (authInitialized) return () => unsubscribeAuth?.();
+    authInitialized = true;
+
+    unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+        if (!user && !anonymousAuthSuspended) {
             try {
                 await signInAnonymously(auth);
             } catch (error) {
@@ -47,9 +81,21 @@ export const initAuth = () => {
             }
         }
     });
+
+    return () => {
+        unsubscribeAuth?.();
+        unsubscribeAuth = null;
+        authInitialized = false;
+    };
 };
 
-initAuth();
+export function setAnonymousAuthSuspended(suspended: boolean) {
+    anonymousAuthSuspended = suspended;
+}
+
+export async function signInAnonymousNow() {
+    await signInAnonymously(auth);
+}
 
 /**
  * Upgrade the current anonymous user to a Google account WITHOUT losing data.
@@ -70,6 +116,7 @@ initAuth();
  */
 export async function linkAnonymousToGoogle(): Promise<{ linked: boolean; fellBack: boolean }> {
     const current = auth.currentUser;
+    const anonymousSlice = getPersistedSlice();
 
     if (current?.isAnonymous) {
         try {
@@ -83,6 +130,8 @@ export async function linkAnonymousToGoogle(): Promise<{ linked: boolean; fellBa
                 const credential = GoogleAuthProvider.credentialFromError(err);
                 if (credential) {
                     await signInWithCredential(auth, credential);
+                    const merged = mergePersistedData(getPersistedSlice(), anonymousSlice);
+                    applyPersistedSlice(merged);
                     return { linked: false, fellBack: true };
                 }
             }

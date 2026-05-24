@@ -4,6 +4,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
+import { Dialog } from "../components/ui/dialog";
 import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp } from "lucide-react";
 import { nanoid } from "nanoid";
 import confetti from "canvas-confetti";
@@ -284,7 +285,14 @@ export function ActiveWorkout() {
                 </div>
 
                 <div className="space-y-3">
-                    {templates.map(template => (
+                    {templates.length === 0 ? (
+                        <div className="glass-card p-6 rounded-2xl text-center border border-dashed border-white/10">
+                            <p className="text-sm text-zinc-400 mb-4">No routines available yet.</p>
+                            <Button className="bg-primary text-black font-black" onClick={() => window.location.assign('/workouts')}>
+                                Create Routine
+                            </Button>
+                        </div>
+                    ) : templates.map(template => (
                         <button
                             key={template.id}
                             onClick={() => startWorkout(template.id)}
@@ -381,6 +389,7 @@ export function ActiveWorkout() {
                                                 <Input
                                                     type="number"
                                                     inputMode="decimal"
+                                                    aria-label={`${getExerciseName(exercise.exercise_id)} set ${setNum} weight in kilograms`}
                                                     placeholder={weightPlaceholder}
                                                     min={0}
                                                     step={0.5}
@@ -395,6 +404,7 @@ export function ActiveWorkout() {
                                                 <Input
                                                     type="number"
                                                     inputMode="numeric"
+                                                    aria-label={`${getExerciseName(exercise.exercise_id)} set ${setNum} reps`}
                                                     placeholder={String(exercise.target_reps)}
                                                     min={0}
                                                     max={999}
@@ -407,6 +417,7 @@ export function ActiveWorkout() {
                                             {/* Done toggle — 48px touch target + haptic */}
                                             <div className="flex justify-center">
                                                 <button
+                                                    aria-label={`${isCompleted ? 'Mark incomplete' : 'Mark complete'} ${getExerciseName(exercise.exercise_id)} set ${setNum}`}
                                                     onClick={() => {
                                                         toggleSetComplete(index, setNum, exercise.rest_seconds);
                                                         if (!isCompleted) navigator.vibrate?.(50);
@@ -439,9 +450,13 @@ export function ActiveWorkout() {
             </div>
 
             {/* Cancel Today's Protocol — full modal warning */}
-            {showCancelConfirm && (
-                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
-                    <div className="bg-zinc-900 border border-destructive/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
+            <Dialog
+                open={showCancelConfirm}
+                title="Cancel today's protocol"
+                onClose={() => setShowCancelConfirm(false)}
+                className="absolute bg-black/85"
+                panelClassName="border-destructive/30 space-y-5"
+            >
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-destructive/15 flex items-center justify-center">
                                 <ShieldAlert size={24} className="text-destructive" />
@@ -472,14 +487,16 @@ export function ActiveWorkout() {
                                 Cancel Session
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
+            </Dialog>
 
             {/* Finish Workout Confirmation */}
-            {showFinishConfirm && (
-                <div className="absolute inset-0 z-70 flex items-center justify-center bg-black/85 backdrop-blur-sm px-6 animate-in fade-in duration-200">
-                    <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-6 w-full max-w-sm space-y-5 animate-in zoom-in-95 duration-200">
+            <Dialog
+                open={showFinishConfirm}
+                title="Finish workout"
+                onClose={() => setShowFinishConfirm(false)}
+                className="absolute bg-black/85"
+                panelClassName="border-primary/30 space-y-5"
+            >
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">
                                 <CheckCircle size={24} className="text-primary" />
@@ -513,13 +530,15 @@ export function ActiveWorkout() {
                                 Finish & Save
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
+            </Dialog>
 
             {/* H3: Rest Timer Overlay with ProgressRing */}
             {isResting && (
-                <div className="absolute inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="absolute inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
+                >
                     <div className="text-zinc-400 font-bold uppercase tracking-widest mb-8">Resting</div>
 
                     <ProgressRing

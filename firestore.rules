@@ -10,6 +10,88 @@ service cloud.firestore {
         && isValidUserDoc(request.resource.data);
     }
 
+    match /users/{userId}/meta/profile {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly(['user', 'seeded', 'schemaVersion', 'updatedAt'])
+        && (!('seeded' in request.resource.data) || request.resource.data.seeded is bool)
+        && (!('schemaVersion' in request.resource.data) || request.resource.data.schemaVersion is int);
+    }
+
+    match /users/{userId}/templates/{templateId} {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly(['id', 'name', 'exercises', 'scheduled_days', 'updatedAt'])
+        && request.resource.data.id == templateId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 120
+        && request.resource.data.exercises is list
+        && request.resource.data.exercises.size() < 100;
+    }
+
+    match /users/{userId}/workoutLogs/{logId} {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly(['id', 'template_id', 'timestamp', 'duration_seconds', 'completed_exercises', 'updatedAt'])
+        && request.resource.data.id == logId
+        && request.resource.data.template_id is string
+        && request.resource.data.timestamp is string
+        && request.resource.data.duration_seconds is number
+        && request.resource.data.duration_seconds >= 0
+        && request.resource.data.completed_exercises is list
+        && request.resource.data.completed_exercises.size() < 300;
+    }
+
+    match /users/{userId}/exercises/{exerciseId} {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly([
+          'id', 'name', 'target_muscle', 'video_url', 'image_url',
+          'instructions', 'form_cues', 'common_mistakes', 'updatedAt'
+        ])
+        && request.resource.data.id == exerciseId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 120
+        && request.resource.data.target_muscle in [
+          'Triceps', 'Biceps', 'Chest', 'Legs', 'Back',
+          'Shoulders', 'Core', 'Forearms', 'Other'
+        ]
+        && request.resource.data.instructions is string
+        && request.resource.data.instructions.size() < 2000;
+    }
+
+    match /users/{userId}/nutritionLogs/{dateId} {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly(['date', 'entries', 'updatedAt'])
+        && request.resource.data.date == dateId
+        && request.resource.data.entries is list
+        && request.resource.data.entries.size() < 200;
+    }
+
+    match /users/{userId}/dailyInsights/{dateId} {
+      allow read: if ownsUserDoc(userId);
+      allow write: if ownsUserDoc(userId)
+        && request.resource.data.keys().hasOnly([
+          'date', 'steps', 'calories_burned', 'heart_rate_avg', 'distance_km', 'updatedAt'
+        ])
+        && request.resource.data.date == dateId
+        && request.resource.data.steps is number
+        && request.resource.data.steps >= 0
+        && request.resource.data.calories_burned is number
+        && request.resource.data.calories_burned >= 0
+        && request.resource.data.heart_rate_avg is number
+        && request.resource.data.heart_rate_avg >= 0
+        && request.resource.data.distance_km is number
+        && request.resource.data.distance_km >= 0;
+    }
+
+    function ownsUserDoc(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
     function isValidUserDoc(d) {
       return d.keys().hasOnly([
           'user', 'templates', 'logs', 'exercises',

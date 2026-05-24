@@ -204,7 +204,14 @@ export function Home() {
                     </Link>
                 </div>
                 <div className="grid gap-2">
-                    {templates.map(t => (
+                    {templates.length === 0 ? (
+                        <div className="glass-card p-5 rounded-2xl text-center border border-dashed border-white/10">
+                            <p className="text-sm text-zinc-400 mb-3">No routines yet.</p>
+                            <Link to="/workouts" className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/15 px-3 py-1.5 rounded-full">
+                                Create Routine <ChevronRight size={12} />
+                            </Link>
+                        </div>
+                    ) : templates.map(t => (
                         <button
                             key={t.id}
                             className="glass-card px-4 py-3 rounded-xl flex justify-between items-center hover:bg-white/5 transition-colors group w-full text-left"

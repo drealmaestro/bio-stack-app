@@ -221,6 +221,15 @@ export function WorkoutManager() {
 
             {/* Template list */}
             <div className="grid gap-3">
+                {templates.length === 0 && !isCreating && (
+                    <div className="glass-card p-8 rounded-2xl text-center border border-dashed border-white/10">
+                        <Dumbbell size={32} className="mx-auto mb-3 text-zinc-700" />
+                        <p className="text-sm text-zinc-400 mb-4">No routines yet. Create your first plan.</p>
+                        <Button onClick={() => setIsCreating(true)} className="bg-primary text-black font-black">
+                            <Plus size={16} className="mr-2" /> New Routine
+                        </Button>
+                    </div>
+                )}
                 {templates.map(template => {
                     const isOpen = editingId === template.id;
                     const sessionCount = totalVolume(template.id);
@@ -339,16 +348,19 @@ export function WorkoutManager() {
                                                             <button
                                                                 onClick={() => moveExercise(idx, "up")}
                                                                 disabled={idx === 0}
-                                                                className="w-6 h-6 rounded flex items-center justify-center text-zinc-600 hover:text-white disabled:opacity-20 transition-colors"
+                                                                aria-label={`Move ${getExerciseName(ex.exercise_id)} up`}
+                                                                className="w-11 h-11 rounded flex items-center justify-center text-zinc-600 hover:text-white disabled:opacity-20 transition-colors"
                                                             ><ChevronUp size={14} /></button>
                                                             <button
                                                                 onClick={() => moveExercise(idx, "down")}
                                                                 disabled={idx === draft.exercises.length - 1}
-                                                                className="w-6 h-6 rounded flex items-center justify-center text-zinc-600 hover:text-white disabled:opacity-20 transition-colors"
+                                                                aria-label={`Move ${getExerciseName(ex.exercise_id)} down`}
+                                                                className="w-11 h-11 rounded flex items-center justify-center text-zinc-600 hover:text-white disabled:opacity-20 transition-colors"
                                                             ><ChevronDown size={14} /></button>
                                                             <button
                                                                 onClick={() => removeExerciseFromDraft(ex.exercise_id)}
-                                                                className="w-6 h-6 rounded flex items-center justify-center text-zinc-700 hover:text-red-500 transition-colors"
+                                                                aria-label={`Remove ${getExerciseName(ex.exercise_id)}`}
+                                                                className="w-11 h-11 rounded flex items-center justify-center text-zinc-700 hover:text-red-500 transition-colors"
                                                             ><X size={14} /></button>
                                                         </div>
                                                     </div>
@@ -362,6 +374,7 @@ export function WorkoutManager() {
                                                                     <div className="text-[9px] text-zinc-600 uppercase tracking-wider mb-1">{labels[field]}</div>
                                                                     <input
                                                                         type="number"
+                                                                        aria-label={`${getExerciseName(ex.exercise_id)} ${labels[field]}`}
                                                                         value={ex[field]}
                                                                         min={field === "rest_seconds" ? 0 : 1}
                                                                         max={field === "target_sets" ? 10 : field === "target_reps" ? 50 : 300}

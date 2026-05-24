@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { ProgressRing } from '../components/ui/progress-ring';
 import { MacroBar } from '../components/ui/macro-bar';
 import { Button } from '../components/ui/button';
+import { Dialog } from '../components/ui/dialog';
 import { COMMON_FOODS, DEFAULT_NUTRITION_GOALS } from '../data/nutrition';
 import type { FoodItem } from '../types';
 import { Plus, X, Flame, Search, Trash2 } from 'lucide-react';
@@ -36,29 +37,6 @@ export function Nutrition() {
         }, msUntilMidnight());
         return () => clearTimeout(timer);
     }, [today]);
-
-    // H4: focus trap for modal
-    const modalRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        if (!showAddModal) return;
-        const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusable || focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key !== 'Tab') return;
-            if (e.shiftKey) {
-                if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-            } else {
-                if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        first.focus();
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [showAddModal]);
 
     const todayLog = useMemo(() =>
         nutritionLogs.find(l => l.date === today),
@@ -238,8 +216,9 @@ export function Nutrition() {
                                         <div className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mt-0.5">kcal</div>
                                     </div>
                                     <button
+                                        aria-label={`Delete ${entry.food_name}`}
                                         onClick={() => deleteNutritionEntry(today, entry.id)}
-                                        className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white shrink-0"
+                                        className="w-11 h-11 rounded-full bg-destructive/10 text-destructive flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white shrink-0"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -250,14 +229,20 @@ export function Nutrition() {
                 )}
             </div>
 
-            {/* Add Food Modal — H4: focus trap via modalRef */}
-            {showAddModal && (
-                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
-                    onClick={(e) => { if (e.target === e.currentTarget) setShowAddModal(false); }}>
-                    <div ref={modalRef} className="w-full max-w-lg mx-auto bg-zinc-950 border border-white/10 rounded-t-4xl p-6 space-y-5 animate-in slide-in-from-bottom-[100%] duration-500 pb-safe shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+            <Dialog
+                open={showAddModal}
+                title="Add food"
+                onClose={() => setShowAddModal(false)}
+                className="z-50 items-end bg-black/80 backdrop-blur-md px-0"
+                panelClassName="w-full max-w-lg mx-auto bg-zinc-950 border-white/10 rounded-t-4xl rounded-b-none p-6 space-y-5 animate-in slide-in-from-bottom-[100%] duration-500 pb-safe shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+            >
                         <div className="flex justify-between items-center">
                             <h3 className="text-lg font-black text-white">Add Food</h3>
-                            <button onClick={() => setShowAddModal(false)} className="text-zinc-400 hover:text-white">
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                className="text-zinc-400 hover:text-white"
+                                aria-label="Close add food"
+                            >
                                 <X size={20} />
                             </button>
                         </div>
@@ -267,6 +252,7 @@ export function Nutrition() {
                             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                             <input
                                 type="text"
+                                aria-label="Search foods"
                                 placeholder="Search foods..."
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
@@ -337,10 +323,13 @@ export function Nutrition() {
                                     </div>
                                 </button>
                             ))}
+                            {filtered.length === 0 && (
+                                <div className="text-center text-zinc-500 text-sm py-6 border border-dashed border-white/10 rounded-xl">
+                                    No foods found. Try a different search.
+                                </div>
+                            )}
                         </div>
-                    </div>
-                </div>
-            )}
+            </Dialog>
         </div>
     );
 }
