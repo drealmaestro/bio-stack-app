@@ -454,7 +454,6 @@ export function ActiveWorkout() {
                 open={showCancelConfirm}
                 title="Cancel today's protocol"
                 onClose={() => setShowCancelConfirm(false)}
-                className="absolute bg-black/85"
                 panelClassName="border-destructive/30 space-y-5"
             >
                         <div className="flex items-center gap-3">
@@ -494,7 +493,6 @@ export function ActiveWorkout() {
                 open={showFinishConfirm}
                 title="Finish workout"
                 onClose={() => setShowFinishConfirm(false)}
-                className="absolute bg-black/85"
                 panelClassName="border-primary/30 space-y-5"
             >
                         <div className="flex items-center gap-3">
@@ -537,7 +535,7 @@ export function ActiveWorkout() {
                 <div
                     role="status"
                     aria-live="polite"
-                    className="absolute inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
+                    className="fixed inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
                 >
                     <div className="text-zinc-400 font-bold uppercase tracking-widest mb-8">Resting</div>
 
