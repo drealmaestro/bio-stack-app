@@ -7,6 +7,7 @@ import { Dialog } from '../components/ui/dialog';
 import { COMMON_FOODS, DEFAULT_NUTRITION_GOALS } from '../data/nutrition';
 import type { FoodItem } from '../types';
 import { Plus, X, Flame, Search, Trash2 } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 function todayLabel() {
     return new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -79,54 +80,56 @@ export function Nutrition() {
         setSearchQuery('');
         setShowAddModal(false);
     };
-
     return (
         <div className="space-y-6 animate-in fade-in duration-500 pb-20">
 
             {/* Header */}
-            <div>
-                <div className="section-label mb-1">Nutrition</div>
-                <h2 className="text-2xl font-black text-white">{todayLabel()}</h2>
+            <div className="px-1">
+                <span className="text-xs font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">Nutrition</span>
+                <h2 className="text-2xl font-extrabold text-white">{todayLabel()}</h2>
             </div>
 
-            {/* Calorie Ring Hero */}
-            <div className="glass-card overflow-hidden rounded-3xl border border-white/5 bg-linear-to-br from-primary/10 via-zinc-900/80 to-zinc-950 p-6 shadow-2xl shadow-black/40">
-                <div className="flex items-center justify-between gap-6">
-                    <div className="flex-1 space-y-6">
-                        <div>
-                            <div className="text-5xl font-black text-white tracking-tighter">{Math.round(totals.calories)}</div>
-                            <div className="text-xs font-bold text-primary uppercase tracking-widest mt-1">kcal eaten</div>
+            {/* Calorie Card Hero */}
+            <div className="bg-card border border-white/5 rounded-3xl p-6 shadow-md flex justify-between items-center gap-6">
+                <div className="flex-1 space-y-5">
+                    <div>
+                        <div className="text-4xl font-extrabold text-white tracking-tight leading-none">
+                            {Math.round(totals.calories)}
+                            <span className="text-xs font-bold text-zinc-500 ml-1">kcal</span>
                         </div>
-                        <div className="space-y-2 text-sm font-medium">
-                            <div className="flex justify-between text-zinc-400 items-center">
-                                <span>Goal</span>
-                                <span className="text-white font-bold bg-white/10 px-2 py-0.5 rounded-md">{goals.calories} kcal</span>
-                            </div>
-                            <div className="flex justify-between text-zinc-400 items-center">
-                                <span>Remaining</span>
-                                <span className={`font-bold px-2 py-0.5 rounded-md ${remaining === 0 ? 'bg-warning/20 text-warning' : 'bg-success/20 text-success'}`}>
-                                    {remaining} kcal
-                                </span>
-                            </div>
+                        <div className="text-xs font-black text-[#ff9f0a] uppercase tracking-widest mt-1.5">Calories eaten</div>
+                    </div>
+                    <div className="space-y-2 text-xs font-semibold text-zinc-400">
+                        <div className="flex justify-between items-center">
+                            <span>Daily target</span>
+                            <span className="text-white font-extrabold">{goals.calories} kcal</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span>Remaining</span>
+                            <span className={cn("font-extrabold", remaining === 0 ? "text-[#ff793f]" : "text-[#3ccf94]")}>
+                                {remaining} kcal
+                            </span>
                         </div>
                     </div>
-                    <div className="shrink-0 relative drop-shadow-[0_0_15px_rgba(0,212,255,0.3)]">
-                        <ProgressRing
-                            size={140}
-                            strokeWidth={14}
-                            progress={caloriePct}
-                            color="#00D4FF"
-                            label={`${Math.round(caloriePct * 100)}%`}
-                            sublabel="of goal"
-                        />
-                    </div>
+                </div>
+                <div className="shrink-0 relative drop-shadow-[0_0_12px_rgba(255,159,10,0.15)]">
+                    <ProgressRing
+                        size={120}
+                        strokeWidth={11}
+                        progress={caloriePct}
+                        color="#ff9f0a"
+                        label={`${Math.round(caloriePct * 100)}%`}
+                        sublabel="logged"
+                    />
                 </div>
             </div>
 
-            {/* Macros */}
-            <div>
-                <div className="section-label mb-3">Macros</div>
-                <div className="glass-card p-6 rounded-3xl space-y-6 bg-black/40 border border-white/5 shadow-inner">
+            {/* Macros Card */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                    <h3 className="text-sm font-extrabold text-zinc-500 uppercase tracking-widest">Nutrient target</h3>
+                </div>
+                <div className="bg-card border border-white/5 p-6 rounded-3xl space-y-5 shadow-md">
                     <MacroBar
                         label="Protein"
                         current={totals.protein_g}
@@ -134,7 +137,7 @@ export function Nutrition() {
                         color="bg-protein"
                     />
                     <MacroBar
-                        label="Carbs"
+                        label="Carbohydrates"
                         current={totals.carbs_g}
                         goal={goals.carbs_g}
                         color="bg-carbs"
@@ -151,76 +154,77 @@ export function Nutrition() {
             {/* Macro Pill Summary */}
             <div className="flex gap-2">
                 {[
-                    { label: 'P', value: totals.protein_g, color: 'bg-protein/20 text-protein' },
-                    { label: 'C', value: totals.carbs_g, color: 'bg-carbs/20 text-carbs' },
-                    { label: 'F', value: totals.fat_g, color: 'bg-fat/20 text-fat' },
+                    { label: 'P', value: totals.protein_g, color: 'bg-protein/10 text-protein' },
+                    { label: 'C', value: totals.carbs_g, color: 'bg-carbs/10 text-[#36b4ff]' },
+                    { label: 'F', value: totals.fat_g, color: 'bg-fat/10 text-[#ff793f]' },
                 ].map(m => (
-                    <div key={m.label} className={`macro-pill flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-bold ${m.color}`}>
-                        {m.label} <span>{Math.round(m.value)}g</span>
+                    <div key={m.label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold ${m.color}`}>
+                        <span className="opacity-80">{m.label}</span>
+                        <span>{Math.round(m.value)}g</span>
                     </div>
                 ))}
-                <div className="macro-pill flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-bold bg-primary/10 text-primary ml-auto">
+                <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#ff9f0a]/10 text-[#ff9f0a] ml-auto">
                     <Flame size={12} /> {Math.round(totals.calories)} kcal
                 </div>
             </div>
 
             {/* Today's Log */}
-            <div>
-                <div className="flex justify-between items-center mb-3">
-                    <div className="section-label">Today's Log</div>
+            <div className="space-y-3">
+                <div className="flex justify-between items-center px-1">
+                    <h3 className="text-sm font-extrabold text-zinc-500 uppercase tracking-widest">Food Diary</h3>
                     <Button
                         size="sm"
                         onClick={() => setShowAddModal(true)}
-                        className="h-8 gap-1 text-xs font-bold bg-primary text-black hover:bg-primary/90"
+                        className="h-8 gap-1 text-xs font-bold bg-[#ff9f0a] hover:bg-[#ff9f0a]/90 text-black rounded-full px-3.5"
                     >
-                        <Plus size={14} /> Add Food
+                        <Plus size={13} /> Add Food
                     </Button>
                 </div>
 
                 {!todayLog || todayLog.entries.length === 0 ? (
                     <div
-                        className="glass-card p-8 flex flex-col items-center justify-center gap-3 cursor-pointer"
+                        className="bg-card border border-dashed border-white/5 p-8 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-zinc-900/50 transition-colors"
                         onClick={() => setShowAddModal(true)}
                     >
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <Plus size={24} />
+                        <div className="w-12 h-12 rounded-full bg-[#ff9f0a]/10 flex items-center justify-center text-[#ff9f0a]">
+                            <Plus size={22} />
                         </div>
-                        <p className="text-sm text-muted-foreground">Tap to log your first meal</p>
+                        <p className="text-xs font-bold text-zinc-500">Tap to record your first meal</p>
                     </div>
                 ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {todayLog!.entries.map(entry => (
                             <div
                                 key={entry.id}
-                                className="group glass-card p-4 rounded-2xl flex justify-between items-center hover:bg-white/5 transition-colors border border-white/5 bg-black/20"
+                                className="group bg-card border border-white/5 p-4 rounded-2xl flex justify-between items-center hover:bg-zinc-900/90 transition-colors"
                             >
-                                <div className="flex gap-4 items-center">
-                                    <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                                        <Flame size={20} />
+                                <div className="flex gap-3.5 items-center">
+                                    <div className="w-9 h-9 rounded-full bg-[#ff9f0a]/10 flex items-center justify-center text-[#ff9f0a] shrink-0">
+                                        <Flame size={16} />
                                     </div>
                                     <div>
-                                        <div className="font-bold text-white text-base">{entry.food_name}</div>
-                                        <div className="text-xs font-medium text-zinc-500 mt-1">
-                                            {entry.servings > 1 ? <span className="text-white bg-white/10 px-1.5 py-0.5 rounded-md mr-1.5">{entry.servings}x</span> : ''}
+                                        <div className="font-bold text-white text-sm">{entry.food_name}</div>
+                                        <div className="text-[10px] font-bold text-zinc-500 mt-0.5 flex items-center gap-1.5">
+                                            {entry.servings > 1 ? <span className="text-white bg-white/10 px-1.5 py-0.5 rounded-md">{entry.servings}x</span> : ''}
                                             <span className="text-protein">P {entry.protein_g}g</span>
-                                            <span className="mx-1.5 opacity-30">•</span>
-                                            <span className="text-carbs">C {entry.carbs_g}g</span>
-                                            <span className="mx-1.5 opacity-30">•</span>
-                                            <span className="text-fat">F {entry.fat_g}g</span>
+                                            <span>•</span>
+                                            <span className="text-[#36b4ff]">C {entry.carbs_g}g</span>
+                                            <span>•</span>
+                                            <span className="text-[#ff793f]">F {entry.fat_g}g</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3">
                                     <div className="text-right">
-                                        <div className="text-lg font-black text-white">{entry.calories}</div>
-                                        <div className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mt-0.5">kcal</div>
+                                        <div className="text-base font-extrabold text-white">{entry.calories}</div>
+                                        <div className="text-[9px] uppercase tracking-widest font-black text-zinc-500 leading-none">kcal</div>
                                     </div>
                                     <button
                                         aria-label={`Delete ${entry.food_name}`}
                                         onClick={() => deleteNutritionEntry(today, entry.id)}
-                                        className="w-11 h-11 rounded-full bg-destructive/10 text-destructive flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white shrink-0"
+                                        className="w-9 h-9 rounded-full bg-destructive/10 text-destructive flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white shrink-0"
                                     >
-                                        <Trash2 size={16} />
+                                        <Trash2 size={14} />
                                     </button>
                                 </div>
                             </div>

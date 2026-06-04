@@ -2,25 +2,32 @@ import { useStore } from "../store/useStore";
 import { Link, useNavigate } from "react-router-dom";
 import {
     Play, TrendingUp, Coffee, Dumbbell, Quote,
-    Footprints, Flame, HeartPulse, MapPin, ChevronRight
+    ChevronRight, Calendar, Sparkles
 } from "lucide-react";
 import { getDailyQuote, cn } from "../lib/utils";
-import { StatCard } from "../components/ui/stat-card";
+import { getMuscleIcon } from "../lib/muscleIcons";
+import type { TargetMuscle } from "../types";
+
+const MUSCLE_COLORS: Record<TargetMuscle, string> = {
+    Chest: "text-orange-400 bg-orange-400/10",
+    Back: "text-blue-400 bg-blue-400/10",
+    Legs: "text-green-400 bg-green-400/10",
+    Shoulders: "text-purple-400 bg-purple-400/10",
+    Biceps: "text-pink-400 bg-pink-400/10",
+    Triceps: "text-yellow-400 bg-yellow-400/10",
+    Core: "text-red-400 bg-red-400/10",
+    Forearms: "text-zinc-400 bg-zinc-400/10",
+    Other: "text-zinc-400 bg-zinc-400/10",
+};
 
 export function Home() {
-    const { user, templates, logs, startWorkout, activeWorkout, getDailyInsights } = useStore();
+    const { user, templates, exercises, logs, startWorkout, activeWorkout } = useStore();
     const navigate = useNavigate();
-
-    // age removed since it was unused
     const dailyQuote = getDailyQuote();
 
-    const today = new Date().toISOString().split('T')[0];
-    const todayInsights = getDailyInsights(today);
-
-    const insights = todayInsights ?? null;
+    const now = new Date();
 
     // Workouts this week
-    const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
@@ -37,195 +44,237 @@ export function Home() {
         return count;
     })();
 
-    // C2: Dynamic schedule — find today's template by scheduled_days
+    // Schedule logic
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const todayDayIndex = now.getDay(); // 0=Sun … 6=Sat
+    const todayDayIndex = now.getDay();
     const currentDayName = days[todayDayIndex];
-    // todayLog removed since it was unused
-    const isRestDay = todayDayIndex === 0 || todayDayIndex === 3; // Sunday=0, Wednesday=3
+    
+    // Rest days are Sunday (0) and Wednesday (3)
+    const isRestDay = todayDayIndex === 0 || todayDayIndex === 3;
     const todayTemplate = isRestDay
         ? null
         : templates.find(t => t.scheduled_days?.includes(todayDayIndex)) ?? null;
     const targetId: string | 'REST' = isRestDay ? 'REST' : (todayTemplate?.id ?? 'NONE');
-    // alreadyWorkedOutToday removed since it was unused
+
+    const getExerciseName = (id: string) => {
+        return exercises.find(e => e.id === id)?.name ?? id;
+    };
+
+    const getExerciseMuscle = (id: string) => {
+        return exercises.find(e => e.id === id)?.target_muscle ?? "Other";
+    };
 
     return (
-        <div className="space-y-7 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+            {/* Greeting Header */}
+            <div className="flex justify-between items-end px-1 pt-2">
+                <div>
+                    <span className="text-xs font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">
+                        {currentDayName}, {now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
+                        Hello, <span className="text-[#3ccf94]">{user?.name?.split(" ")[0] || "Athlete"}</span>
+                    </h2>
+                </div>
+            </div>
 
-            {/* M2: Onboarding card for new users with no profile set */}
+            {/* Onboarding card for new users with no profile set */}
             {!user && (
-                <div className="glass-card p-5 rounded-2xl border border-primary/30 bg-primary/5 flex items-start gap-4 animate-in slide-in-from-top-4 duration-500">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                        <span className="text-lg font-black">👋</span>
+                <div className="bg-card border border-[#3ccf94]/20 rounded-3xl p-5 flex items-start gap-4 animate-in slide-in-from-top-4 duration-500">
+                    <div className="w-10 h-10 rounded-full bg-[#3ccf94]/10 flex items-center justify-center text-[#3ccf94] shrink-0 font-bold">
+                        👋
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-black text-white text-base">Welcome to Bio Stack!</h3>
-                        <p className="text-zinc-400 text-sm mt-0.5">Set up your profile to get personalised insights and track your progress.</p>
-                        <Link to="/profile" className="inline-flex items-center gap-1 mt-3 text-xs font-bold text-primary bg-primary/15 px-3 py-1.5 rounded-full hover:bg-primary/25 transition-colors">
-                            Set Up Profile <ChevronRight size={12} />
+                        <h3 className="font-extrabold text-white text-base">Setup Profile</h3>
+                        <p className="text-zinc-500 text-sm mt-0.5">Enter your biometrics to set custom training and recovery goals.</p>
+                        <Link to="/profile" className="inline-flex items-center gap-1 mt-3 text-xs font-bold text-[#3ccf94] bg-[#3ccf94]/10 px-3 py-1.5 rounded-full hover:bg-[#3ccf94]/20 transition-colors">
+                            Set Up Now <ChevronRight size={12} />
                         </Link>
                     </div>
                 </div>
             )}
 
-            {/* ── Hero Section (Greeting + Protocol) ──────────────── */}
-            <div className="glass-card relative overflow-hidden rounded-3xl p-6 border border-white/5 bg-linear-to-br from-zinc-900/90 to-zinc-950 shadow-2xl shadow-black/40">
-                {/* Decorative background element */}
-                <div className="absolute -top-10 -right-10 opacity-[0.03] pointer-events-none">
-                    <Dumbbell size={200} className="rotate-12 text-white" />
+            {/* ── HERO: Workout Scheduler ──────────────── */}
+            <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                    <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <Calendar size={13} /> Scheduled Protocol
+                    </h3>
                 </div>
-                
-                <div className="relative z-10">
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">
-                                {currentDayName}
-                            </p>
-                            <h2 className="text-3xl font-black text-white tracking-tight leading-none">
-                                Hello, <span className="text-primary">{user?.name?.split(" ")[0] || "Athlete"}</span>
-                            </h2>
-                        </div>
-                    </div>
 
-                    {targetId === "REST" ? (
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center gap-4 mt-2">
-                            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                {targetId === "REST" ? (
+                    <div className="bg-card border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-lg">
+                        <div className="absolute -right-4 -bottom-4 text-white/[0.02] pointer-events-none">
+                            <Coffee size={120} />
+                        </div>
+                        <div className="flex items-start gap-4 relative z-10">
+                            <div className="w-12 h-12 rounded-full bg-[#3ccf94]/10 flex items-center justify-center text-[#3ccf94] shrink-0">
                                 <Coffee size={24} />
                             </div>
-                            <div>
-                                <h4 className="text-lg font-black text-white">Active Recovery</h4>
-                                <p className="text-sm text-zinc-400 mt-0.5">Light walk or mobility today.</p>
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest">Recovery Phase</span>
+                                <h4 className="text-xl font-extrabold text-white">Active Recovery Day</h4>
+                                <p className="text-sm text-zinc-400 leading-relaxed mt-1">
+                                    Let your muscles rebuild and adapt. Hydrate well, do a light walk or stretch, and rest up for your next session.
+                                </p>
                             </div>
                         </div>
-                    ) : todayTemplate ? (
-                        <button
-                            className="w-full text-left bg-black/40 border border-white/5 rounded-2xl p-4 flex justify-between items-center hover:bg-black/60 transition-colors group mt-2"
-                            onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
-                        >
-                            <div>
-                                <div className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Today's Session</div>
-                                <h4 className="text-xl font-black text-white group-hover:text-primary transition-colors line-clamp-1">
-                                    {todayTemplate.name}
-                                </h4>
-                                <div className="flex gap-4 mt-2 text-xs font-medium text-zinc-400">
-                                    <span className="flex items-center gap-1.5"><Dumbbell size={14} className="text-zinc-500" /> {todayTemplate.exercises.length} Exercises</span>
-                                    <span className="flex items-center gap-1.5"><TrendingUp size={14} className="text-zinc-500" /> ~{todayTemplate.exercises.length * 5} min</span>
+                    </div>
+                ) : todayTemplate ? (
+                    <div className="bg-card border border-[#3ccf94]/30 rounded-3xl p-6 relative overflow-hidden shadow-xl bg-gradient-to-br from-card to-zinc-950/80">
+                        <div className="absolute -right-6 -bottom-6 text-white/[0.02] pointer-events-none">
+                            <Dumbbell size={140} />
+                        </div>
+                        <div className="space-y-4 relative z-10">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest flex items-center gap-1">
+                                        <Sparkles size={10} className="animate-pulse" /> Today's Target
+                                    </span>
+                                    <h4 className="text-2xl font-black text-white leading-tight">
+                                        {todayTemplate.name}
+                                    </h4>
                                 </div>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-black shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform shrink-0">
-                                <Play fill="currentColor" size={20} className="ml-0.5" />
-                            </div>
-                        </button>
-                    ) : (
-                        <div className="p-4 bg-black/40 border border-dashed border-white/10 rounded-2xl text-zinc-500 text-center text-sm mt-2">
-                            No workout scheduled — <Link to="/workouts" className="text-primary hover:underline font-medium">set one up</Link>
-                        </div>
-                    )}
-                </div>
-            </div>
 
-            {/* ── Daily Insights ───────────────────────────────── */}
-            <div className="space-y-4 pt-2">
-                <div className="flex items-center justify-between px-1">
-                    <h3 className="text-lg font-black text-white">Daily Activity</h3>
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Today</span>
-                </div>
-                {insights ? (
-                    <div className="grid grid-cols-2 gap-3">
-                        <StatCard
-                            icon={<Footprints size={18} />}
-                            value={insights.steps.toLocaleString()}
-                            label="Steps"
-                            color="text-emerald-400"
-                        />
-                        <StatCard
-                            icon={<Flame size={18} />}
-                            value={insights.calories_burned}
-                            unit="kcal"
-                            label="Burned"
-                            color="text-orange-400"
-                        />
-                        <StatCard
-                            icon={<HeartPulse size={18} />}
-                            value={insights.heart_rate_avg}
-                            unit="bpm"
-                            label="Avg HR"
-                            color="text-rose-400"
-                        />
-                        <StatCard
-                            icon={<MapPin size={18} />}
-                            value={insights.distance_km.toFixed(1)}
-                            unit="km"
-                            label="Distance"
-                            color="text-violet-400"
-                        />
+                            {/* Muscle Group Badges */}
+                            <div className="flex flex-wrap gap-1.5">
+                                {[...new Set(todayTemplate.exercises.map(e => getExerciseMuscle(e.exercise_id)))].map(muscle => (
+                                    <span key={muscle} className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                        {getMuscleIcon(muscle as TargetMuscle, 11)} {muscle}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {/* Exercises List Preview */}
+                            <div className="space-y-1 bg-black/40 p-4 rounded-2xl border border-white/5">
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-wider mb-2">Workout Plan Preview</p>
+                                {todayTemplate.exercises.slice(0, 4).map((ex, idx) => {
+                                    const muscle = getExerciseMuscle(ex.exercise_id);
+                                    return (
+                                        <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-white/[0.03] last:border-0">
+                                            <span className="text-zinc-300 font-bold truncate pr-3">{getExerciseName(ex.exercise_id)}</span>
+                                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                                {getMuscleIcon(muscle as TargetMuscle, 9)} {muscle}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                                {todayTemplate.exercises.length > 4 && (
+                                    <div className="text-[10px] text-zinc-500 font-bold text-center mt-2 pt-1 border-t border-white/[0.03]">
+                                        + {todayTemplate.exercises.length - 4} more exercises in this routine
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Start Workout Call to Action */}
+                            <button
+                                onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
+                                className="w-full mt-4 py-3.5 bg-[#3ccf94] hover:bg-[#2fb27f] text-black font-black rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-[0_4px_20px_rgba(60,207,148,0.2)]"
+                            >
+                                <Play size={16} fill="currentColor" />
+                                {activeWorkout ? "Resume Active Session" : "Start Workout"}
+                            </button>
+                        </div>
                     </div>
                 ) : (
-                    <div className="glass-card p-5 rounded-2xl text-center text-sm text-zinc-400 border-dashed border-white/5">
-                        No activity data yet today. Connect a wearable to track automatically.
+                    <div className="p-6 bg-card border border-dashed border-white/10 rounded-3xl text-center space-y-4">
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 mx-auto">
+                            <Calendar size={22} />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="text-base font-extrabold text-white">No Workout Scheduled Today</h4>
+                            <p className="text-xs text-zinc-500 max-w-xs mx-auto">Set up your routine program schedule to build consistency, or start any routine below.</p>
+                        </div>
+                        <Link to="/workouts" className="inline-flex items-center gap-1.5 text-xs font-black text-[#3ccf94] bg-[#3ccf94]/10 hover:bg-[#3ccf94]/20 px-4 py-2 rounded-full transition-colors">
+                            Configure Schedule <ChevronRight size={12} />
+                        </Link>
                     </div>
                 )}
             </div>
 
-            {/* ── Week Stats ───────────────────────────────────── */}
+            {/* ── Week Summary Stats ─────────────────── */}
             <div className="grid grid-cols-2 gap-3">
                 <Link to="/history">
-                    <div className="glass-card p-4 rounded-2xl space-y-1 hover:bg-white/5 transition-colors group">
-                        <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1 group-hover:text-primary transition-colors">
-                            <TrendingUp size={12} /> This Week
+                    <div className="bg-card border border-white/5 p-4 rounded-3xl space-y-1 hover:bg-zinc-900/90 transition-colors group">
+                        <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1 group-hover:text-[#3ccf94] transition-colors">
+                            <TrendingUp size={11} /> This Week
                         </div>
-                        <div className="text-3xl font-black text-white">{workoutsThisWeek}</div>
-                        <div className="text-xs text-zinc-500">sessions done</div>
+                        <div className="text-3xl font-extrabold text-white">{workoutsThisWeek}</div>
+                        <div className="text-[10px] font-bold text-zinc-500">sessions completed</div>
                     </div>
                 </Link>
-                <div className="glass-card p-4 rounded-2xl space-y-1">
+                <div className="bg-card border border-white/5 p-4 rounded-3xl space-y-1">
                     <div className="text-xs font-bold uppercase tracking-widest text-zinc-500">🔥 Streak</div>
-                    <div className={cn("text-3xl font-black", streak > 0 ? "text-orange-400" : "text-zinc-600")}>{streak}</div>
-                    <div className="text-xs text-zinc-500">
+                    <div className={cn("text-3xl font-extrabold", streak > 0 ? "text-[#ff793f]" : "text-zinc-600")}>{streak}</div>
+                    <div className="text-[10px] font-bold text-zinc-500">
                         {streak === 1 ? "day in a row" : streak > 1 ? "days in a row" : "Start today!"}
                     </div>
                 </div>
             </div>
 
-            {/* ── Quote ────────────────────────────────────────── */}
-            <div className="glass-card p-5 rounded-2xl bg-linear-to-br from-primary/5 to-violet-500/5 border-primary/15 relative overflow-hidden">
-                <Quote className="absolute top-2 right-3 text-primary/8 rotate-180" size={56} />
+            {/* ── Tip of the Day (Quote) ───────────────── */}
+            <div className="bg-card border border-white/5 p-5 rounded-3xl relative overflow-hidden">
+                <Quote className="absolute top-2 right-3 text-white/[0.02] rotate-180" size={56} />
+                <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest block mb-1">Wellness Tip</span>
                 <p className="text-sm font-medium text-zinc-300 italic relative z-10 leading-relaxed">
                     "{dailyQuote}"
                 </p>
             </div>
 
-            {/* ── All Templates ────────────────────────────────── */}
-            <div className="pt-2">
-                <div className="flex justify-between items-center mb-4 px-1">
-                    <h3 className="text-lg font-black text-white">All Templates</h3>
-                    <Link to="/workouts" className="text-xs font-bold text-primary uppercase tracking-widest hover:text-white transition-colors flex items-center gap-0.5">
-                        Manage <ChevronRight size={14} />
+            {/* ── Workout Routines List ──────────────────── */}
+            <div className="space-y-3">
+                <div className="flex justify-between items-center px-1">
+                    <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest">Workout Routines</h3>
+                    <Link to="/workouts" className="text-xs font-bold text-[#3ccf94] uppercase tracking-widest hover:text-white transition-colors flex items-center gap-0.5">
+                        Manage <ChevronRight size={13} />
                     </Link>
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-3">
                     {templates.length === 0 ? (
-                        <div className="glass-card p-5 rounded-2xl text-center border border-dashed border-white/10">
-                            <p className="text-sm text-zinc-400 mb-3">No routines yet.</p>
-                            <Link to="/workouts" className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary/15 px-3 py-1.5 rounded-full">
+                        <div className="bg-card p-6 rounded-3xl text-center border border-dashed border-white/5">
+                            <p className="text-sm text-zinc-500 mb-3">No routines yet.</p>
+                            <Link to="/workouts" className="inline-flex items-center gap-1 text-xs font-bold text-[#3ccf94] bg-[#3ccf94]/10 px-3 py-1.5 rounded-full">
                                 Create Routine <ChevronRight size={12} />
                             </Link>
                         </div>
-                    ) : templates.map(t => (
-                        <button
-                            key={t.id}
-                            className="glass-card px-4 py-3 rounded-xl flex justify-between items-center hover:bg-white/5 transition-colors group w-full text-left"
-                            onClick={() => { if (!activeWorkout) startWorkout(t.id); navigate("/active"); }}
-                        >
-                            <div className="font-semibold text-sm text-zinc-300 group-hover:text-white transition-colors">
-                                {t.name}
+                    ) : templates.map(t => {
+                        const templateMuscles = [...new Set(t.exercises.map(e => getExerciseMuscle(e.exercise_id)))];
+                        return (
+                            <div
+                                key={t.id}
+                                className="bg-card p-5 border border-white/5 rounded-3xl flex justify-between items-center hover:border-[#3ccf94]/30 transition-all group"
+                            >
+                                <div className="space-y-2 flex-1 min-w-0 pr-4">
+                                    <div className="font-extrabold text-base text-white truncate group-hover:text-[#3ccf94] transition-colors">
+                                        {t.name}
+                                    </div>
+                                    {/* Muscles trained in this routine */}
+                                    <div className="flex flex-wrap gap-1">
+                                        {templateMuscles.slice(0, 3).map(muscle => (
+                                            <span key={muscle} className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                                {getMuscleIcon(muscle as TargetMuscle, 9)} {muscle}
+                                            </span>
+                                        ))}
+                                        {templateMuscles.length > 3 && (
+                                            <span className="text-[10px] text-zinc-500 font-bold px-1.5 py-0.5 bg-white/5 rounded-full">
+                                                +{templateMuscles.length - 3}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 shrink-0">
+                                    <button
+                                        onClick={() => { if (!activeWorkout) startWorkout(t.id); navigate("/active"); }}
+                                        className="w-10 h-10 rounded-full bg-white/5 text-zinc-300 hover:bg-[#3ccf94] hover:text-black flex items-center justify-center transition-all shadow-sm group-hover:scale-105"
+                                        title="Start routine"
+                                    >
+                                        <Play fill="currentColor" size={14} className="ml-0.5" />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-zinc-600">{t.exercises.length} Ex</span>
-                                <ChevronRight size={14} className="text-zinc-700 group-hover:text-primary transition-colors" />
-                            </div>
-                        </button>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

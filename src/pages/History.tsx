@@ -5,6 +5,7 @@ import {
     ResponsiveContainer, CartesianGrid
 } from "recharts";
 import { Trophy, Clock, Dumbbell, TrendingUp, Award } from "lucide-react";
+import { getMuscleIcon } from "../lib/muscleIcons";
 
 function formatDuration(seconds: number) {
     const m = Math.floor(seconds / 60);
@@ -163,22 +164,31 @@ export function HistoryLog() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4 pt-0 space-y-2">
-                                {topPRs.map(([exId, pr]) => (
-                                    <div key={exId} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
-                                        <div>
-                                            <div className="text-sm font-bold text-white">{getExerciseName(exId)}</div>
-                                            <div className="text-xs text-zinc-500">
-                                                {new Date(pr.date).toLocaleDateString()}
+                                {topPRs.map(([exId, pr]) => {
+                                    const exData = exercises.find(e => e.id === exId);
+                                    const muscle = exData?.target_muscle || 'Other';
+                                    return (
+                                        <div key={exId} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[#3ccf94] bg-[#3ccf94]/10 w-6.5 h-6.5 rounded-full flex items-center justify-center shrink-0">
+                                                    {getMuscleIcon(muscle, 11)}
+                                                </span>
+                                                <div>
+                                                    <div className="text-sm font-bold text-white leading-tight">{getExerciseName(exId)}</div>
+                                                    <div className="text-[10px] text-zinc-500 font-bold mt-0.5">
+                                                        {new Date(pr.date).toLocaleDateString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Award size={14} className="text-primary" />
+                                                <span className="text-primary font-black text-sm">
+                                                    {pr.weight}kg × {pr.reps}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Award size={14} className="text-primary" />
-                                            <span className="text-primary font-black text-sm">
-                                                {pr.weight}kg × {pr.reps}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </CardContent>
                         </Card>
                     )}
@@ -213,16 +223,25 @@ export function HistoryLog() {
                                                 </span>
                                             </div>
                                             <div className="space-y-1">
-                                                {log.completed_exercises.map((set, idx) => (
-                                                    <div key={idx} className="flex justify-between text-xs border-b border-white/5 py-1 last:border-0">
-                                                        <span className="text-zinc-400">
-                                                            {getExerciseName(set.exercise_id)} · Set {set.set_number}
-                                                        </span>
-                                                        <span className="text-primary font-bold">
-                                                            {set.weight_kg}kg × {set.reps_completed}
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                                {log.completed_exercises.map((set, idx) => {
+                                                    const exData = exercises.find(e => e.id === set.exercise_id);
+                                                    const muscle = exData?.target_muscle || 'Other';
+                                                    return (
+                                                        <div key={idx} className="flex justify-between items-center text-xs border-b border-white/5 py-1.5 last:border-0">
+                                                            <span className="text-zinc-400 flex items-center gap-2">
+                                                                <span className="text-zinc-600 shrink-0">
+                                                                    {getMuscleIcon(muscle, 11)}
+                                                                </span>
+                                                                <span>
+                                                                    {getExerciseName(set.exercise_id)} · Set {set.set_number}
+                                                                </span>
+                                                            </span>
+                                                            <span className="text-primary font-bold">
+                                                                {set.weight_kg}kg × {set.reps_completed}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </CardContent>
                                     </Card>

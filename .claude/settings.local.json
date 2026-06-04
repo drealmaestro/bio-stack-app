@@ -11,7 +11,14 @@
       "Bash(firebase deploy:*)",
       "Bash(npm list:*)",
       "Bash(npm root:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(vercel --version)",
+      "Bash(npm test *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(curl -sI https://bio-stack-app.vercel.app/)",
+      "Bash(curl -s https://bio-stack-app.vercel.app/)"
     ]
   }
 }

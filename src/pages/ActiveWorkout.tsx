@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useStore } from "../store/useStore";
 import { Button } from "../components/ui/button";
+import { getMuscleIcon } from "../lib/muscleIcons";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
@@ -316,10 +317,10 @@ export function ActiveWorkout() {
     return (
         <div className="animate-in slide-in-from-bottom-10 duration-500 relative pb-32">
             {/* Header / Timer */}
-            <div className="glass sticky top-16 z-40 -mx-4 px-4 py-4 mb-6 flex justify-between items-center border-y border-white/5">
+            <div className="bg-card border border-white/5 rounded-3xl p-5 mb-6 flex justify-between items-center shadow-md sticky top-16 z-40">
                 <div>
-                    <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">{activeTemplate.name}</h2>
-                    <div className="text-4xl font-black text-white font-mono tracking-tighter tabular-nums">
+                    <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">{activeTemplate.name}</span>
+                    <div className="text-3xl font-extrabold text-white font-mono tracking-tighter tabular-nums leading-none">
                         {formatTime(elapsedSeconds)}
                     </div>
                 </div>
@@ -328,7 +329,7 @@ export function ActiveWorkout() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowCancelConfirm(true)}
-                    className="text-destructive h-auto py-1 px-3 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-bold uppercase tracking-wider"
+                    className="text-[#ff3b30] h-auto py-1.5 px-3.5 bg-[#ff3b30]/10 hover:bg-[#ff3b30]/20 rounded-full text-xs font-extrabold uppercase tracking-widest border border-[#ff3b30]/10"
                 >
                     Cancel
                 </Button>
@@ -337,21 +338,27 @@ export function ActiveWorkout() {
             <div className="space-y-6">
                 {activeTemplate.exercises.map((exercise, index) => {
                     const lastExData = lastSessionData?.[exercise.exercise_id];
+                    const exData = exercises.find(e => e.id === exercise.exercise_id);
+                    const muscle = exData?.target_muscle || 'Other';
+
                     return (
                     <div key={exercise.exercise_id} className="space-y-2">
-                        <div className="flex justify-between items-baseline px-1">
-                            <h3 className="text-lg font-bold text-white tracking-tight">
+                        <div className="flex justify-between items-center px-1">
+                            <h3 className="text-sm font-extrabold text-white tracking-tight flex items-center gap-2">
+                                <span className="text-[#3ccf94] bg-[#3ccf94]/10 w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+                                    {getMuscleIcon(muscle, 12)}
+                                </span>
                                 {getExerciseName(exercise.exercise_id)}
                             </h3>
-                            <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-[#3ccf94] bg-[#3ccf94]/10 px-2 py-0.5 rounded-full">
                                 {exercise.rest_seconds}s Rest
                             </span>
                         </div>
 
-                        <Card className="glass-card overflow-hidden">
+                        <Card className="bg-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
                             <CardContent className="p-0">
-                                {/* Header Row — wider columns for bigger touch targets */}
-                                <div className="grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-2 bg-white/5 text-xs items-center text-zinc-400 font-bold uppercase tracking-widest text-center">
+                                {/* Header Row */}
+                                <div className="grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[10px] items-center text-zinc-500 font-extrabold uppercase tracking-widest text-center border-b border-white/5">
                                     <div>Set</div>
                                     <div>kg</div>
                                     <div>Reps</div>
@@ -369,22 +376,22 @@ export function ActiveWorkout() {
 
                                     return (
                                         <div key={setNum} className={cn(
-                                            "grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-1.5 items-center border-t border-white/5 transition-colors",
-                                            isCompleted ? "bg-primary/5" : ""
+                                            "grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-2 items-center border-t border-white/5 transition-colors",
+                                            isCompleted ? "bg-[#3ccf94]/5" : ""
                                         )}>
-                                            {/* Set number + last session hint */}
+                                            {/* Set number */}
                                             <div className="flex flex-col items-center">
-                                                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-400">
+                                                <div className="w-7 h-7 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-xs font-bold text-zinc-400">
                                                     {setNum}
                                                 </div>
                                                 {lastSet && (
-                                                    <span className="text-[9px] text-zinc-600 mt-0.5 leading-none">
+                                                    <span className="text-[8px] text-zinc-600 mt-0.5 leading-none">
                                                         {lastSet.weight}x{lastSet.reps}
                                                     </span>
                                                 )}
                                             </div>
 
-                                            {/* Weight — 48px touch target */}
+                                            {/* Weight */}
                                             <div>
                                                 <Input
                                                     type="number"
@@ -394,12 +401,12 @@ export function ActiveWorkout() {
                                                     min={0}
                                                     step={0.5}
                                                     value={currentWeight || ''}
-                                                    className="h-12 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-base font-bold rounded-xl"
+                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-[#3ccf94] text-white font-mono text-sm font-bold rounded-xl"
                                                     onChange={(e) => updateSetWeight(index, setNum, Math.max(0, parseFloat(e.target.value) || 0))}
                                                 />
                                             </div>
 
-                                            {/* Reps — 48px touch target */}
+                                            {/* Reps */}
                                             <div>
                                                 <Input
                                                     type="number"
@@ -409,12 +416,12 @@ export function ActiveWorkout() {
                                                     min={0}
                                                     max={999}
                                                     value={currentReps === exercise.target_reps && !(key in (activeWorkout.setReps || {})) ? '' : currentReps}
-                                                    className="h-12 text-center bg-black/40 border-white/10 focus:border-primary text-white font-mono text-base font-bold rounded-xl"
+                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-[#3ccf94] text-white font-mono text-sm font-bold rounded-xl"
                                                     onChange={(e) => updateSetReps(index, setNum, Math.max(0, parseInt(e.target.value) || exercise.target_reps))}
                                                 />
                                             </div>
 
-                                            {/* Done toggle — 48px touch target + haptic */}
+                                            {/* Done toggle */}
                                             <div className="flex justify-center">
                                                 <button
                                                     aria-label={`${isCompleted ? 'Mark incomplete' : 'Mark complete'} ${getExerciseName(exercise.exercise_id)} set ${setNum}`}
@@ -423,13 +430,13 @@ export function ActiveWorkout() {
                                                         if (!isCompleted) navigator.vibrate?.(50);
                                                     }}
                                                     className={cn(
-                                                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
+                                                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95",
                                                         isCompleted
-                                                            ? "bg-primary text-black shadow-[0_0_12px_rgba(0,212,255,0.4)] scale-105"
-                                                            : "bg-white/10 text-zinc-600 hover:bg-white/20"
+                                                            ? "bg-[#3ccf94] text-black shadow-md shadow-[#3ccf94]/20 scale-105"
+                                                            : "bg-white/5 border border-white/5 text-zinc-600 hover:bg-white/10"
                                                     )}
                                                 >
-                                                    <Check size={20} strokeWidth={3} />
+                                                    <Check size={18} strokeWidth={3} />
                                                 </button>
                                             </div>
                                         </div>
@@ -444,8 +451,8 @@ export function ActiveWorkout() {
 
             {/* Finish Button */}
             <div className="absolute bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
-                <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl shadow-primary/20 bg-primary text-black hover:scale-[1.02] transition-transform active:scale-95">
-                    <CheckCircle className="mr-2" size={24} /> FINISH WORKOUT
+                <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-3xl font-black text-base tracking-wider bg-[#3ccf94] hover:bg-[#3ccf94]/90 text-black hover:scale-[1.01] transition-transform active:scale-95 shadow-lg shadow-[#3ccf94]/20 uppercase">
+                    <CheckCircle className="mr-2" size={20} /> FINISH WORKOUT
                 </Button>
             </div>
 
@@ -543,11 +550,11 @@ export function ActiveWorkout() {
                         size={200}
                         strokeWidth={8}
                         progress={restProgress}
-                        color="#00D4FF"
-                        trackColor="rgba(255,255,255,0.05)"
+                        color="#3ccf94"
+                        trackColor="rgba(255,255,255,0.03)"
                     >
                         <div className="flex flex-col items-center">
-                            <span className="text-5xl font-black text-primary font-mono tabular-nums tracking-tighter">
+                            <span className="text-5xl font-extrabold text-[#3ccf94] font-mono tabular-nums tracking-tighter">
                                 {formatTime(restSecondsRemaining)}
                             </span>
                             <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-1">remaining</span>

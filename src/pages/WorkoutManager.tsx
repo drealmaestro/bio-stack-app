@@ -15,6 +15,7 @@ import type { TargetMuscle } from "../types";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { CustomExerciseCreator } from "../components/CustomExerciseCreator";
+import { getMuscleIcon } from "../lib/muscleIcons";
 
 const MUSCLE_COLORS: Record<TargetMuscle, string> = {
     Chest: "text-orange-400 bg-orange-400/10",
@@ -253,8 +254,8 @@ export function WorkoutManager() {
                                             </h3>
                                             <div className="flex flex-wrap gap-1.5 mt-1.5">
                                                 {muscleGroups.slice(0, 4).map(m => (
-                                                    <span key={m} className={`text-xs font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[m as TargetMuscle]}`}>
-                                                        {m}
+                                                    <span key={m} className={`text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[m as TargetMuscle]}`}>
+                                                        {getMuscleIcon(m as TargetMuscle, 10)} {m}
                                                     </span>
                                                 ))}
                                                 {muscleGroups.length > 4 && (
@@ -337,8 +338,8 @@ export function WorkoutManager() {
                                                     {/* Exercise header */}
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-2 min-w-0">
-                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
-                                                                {muscle}
+                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                                                {getMuscleIcon(muscle as TargetMuscle, 10)} {muscle}
                                                             </span>
                                                             <span className="font-bold text-sm text-white truncate">
                                                                 {getExerciseName(ex.exercise_id)}
@@ -500,8 +501,8 @@ export function WorkoutManager() {
                                                                 <div className="text-xs text-zinc-500 mt-0.5 line-clamp-1">{e.instructions}</div>
                                                             </div>
                                                             <div className="flex items-center gap-2 ml-2 shrink-0">
-                                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[e.target_muscle]}`}>
-                                                                    {e.target_muscle}
+                                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[e.target_muscle]}`}>
+                                                                    {getMuscleIcon(e.target_muscle, 9)} {e.target_muscle}
                                                                 </span>
                                                                 {alreadyAdded
                                                                     ? <CheckCircle2 size={16} className="text-primary" />
