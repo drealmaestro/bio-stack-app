@@ -1,22 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText, Timer, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { User } from 'lucide-react';
 import { Dialog } from './ui/dialog';
-
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const { resetStore, user, activeWorkout, templates } = useStore();
     const location = useLocation();
     const navigate = useNavigate();
+    const mainRef = useRef<HTMLElement>(null);
 
     const isSessionLocked = !!activeWorkout;
     const activeTemplateName = isSessionLocked
         ? templates.find(t => t.id === activeWorkout.templateId)?.name ?? 'Workout'
         : '';
+
+    // Scroll to top on route change to defeat browser scroll-restoration races
+    useEffect(() => {
+        const resetScroll = () => {
+            if (mainRef.current) {
+                mainRef.current.scrollTop = 0;
+            }
+        };
+        resetScroll();
+        const rAF = requestAnimationFrame(resetScroll);
+        return () => cancelAnimationFrame(rAF);
+    }, [location.pathname]);
 
     // SESSION LOCK: redirect to /active whenever a workout is in progress
     useEffect(() => {
@@ -153,7 +165,7 @@ export function Layout() {
             </Dialog>
 
             {/* Main Content */}
-            <main key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-28 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
+            <main ref={mainRef} key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-28 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
                 <Outlet />
             </main>
             {/* Bottom Nav — swaps to Session Locked bar when workout active */}

@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState, NutritionLog, NutritionEntry, DailyInsights } from '../types';
+import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState, NutritionLog, NutritionEntry, DailyInsights, SleepStageData, VitalsData } from '../types';
 import { INITIAL_EXERCISES } from '../data/exercises';
 import { INITIAL_TEMPLATES } from '../data/templates';
 import { nanoid } from 'nanoid';
+
 
 interface AppState {
     user: UserProfile | null;
@@ -18,6 +19,14 @@ interface AppState {
 
     // Daily Insights
     dailyInsights: DailyInsights[];
+
+    // Samsung Health v7 Redesign fields
+    waterIntake: Record<string, number>; // date -> ml
+    sleepDuration: Record<string, number>; // date -> mins
+    sleepScore: Record<string, number>; // date -> score
+    stressScore: Record<string, number>; // date -> score
+    sleepStages: Record<string, SleepStageData>; // date -> stages
+    vitals: Record<string, VitalsData>; // date -> vitals
 
     // Actions
     setUser: (user: UserProfile) => void;
@@ -51,6 +60,12 @@ interface AppState {
     updateDailyInsights: (insights: DailyInsights) => void;
     getDailyInsights: (date: string) => DailyInsights | undefined;
 
+    // Samsung Health Actions
+    logWaterIntake: (date: string, ml: number) => void;
+    logSleep: (date: string, minutes: number, score: number, stages: SleepStageData) => void;
+    updateStressScore: (date: string, score: number) => void;
+    updateVitals: (date: string, vitals: Partial<VitalsData>) => void;
+
     seed: () => void;
     resetStore: () => void;
 }
@@ -66,6 +81,12 @@ export const useStore = create<AppState>()(
             seeded: false,
             nutritionLogs: [],
             dailyInsights: [],
+            waterIntake: {},
+            sleepDuration: {},
+            sleepScore: {},
+            stressScore: {},
+            sleepStages: {},
+            vitals: {},
 
             setUser: (user) => set({ user }),
 
@@ -250,19 +271,120 @@ export const useStore = create<AppState>()(
                 return get().dailyInsights.find(d => d.date === date);
             },
 
+            // --- Samsung Health Actions ---
+
+            logWaterIntake: (date, ml) => set((state) => ({
+                waterIntake: {
+                    ...state.waterIntake,
+                    [date]: Math.max((state.waterIntake[date] || 0) + ml, 0)
+                }
+            })),
+
+            logSleep: (date, minutes, score, stages) => set((state) => ({
+                sleepDuration: {
+                    ...state.sleepDuration,
+                    [date]: minutes
+                },
+                sleepScore: {
+                    ...state.sleepScore,
+                    [date]: score
+                },
+                sleepStages: {
+                    ...state.sleepStages,
+                    [date]: stages
+                }
+            })),
+
+            updateStressScore: (date, score) => set((state) => ({
+                stressScore: {
+                    ...state.stressScore,
+                    [date]: score
+                }
+            })),
+
+            updateVitals: (date, newVitals) => set((state) => {
+                const current = state.vitals[date] || {
+                    resting_hr: 62,
+                    hrv: 58,
+                    spo2: 97,
+                    skin_temp: 36.4,
+                    resp_rate: 14.5
+                };
+                return {
+                    vitals: {
+                        ...state.vitals,
+                        [date]: {
+                            ...current,
+                            ...newVitals
+                        }
+                    }
+                };
+            }),
+
             seed: () => set((state) => {
+                const todayStr = new Date().toISOString().slice(0, 10);
+                const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+                const twoDaysAgoStr = new Date(Date.now() - 172800000).toISOString().slice(0, 10);
+
+                let updates: Partial<AppState> = {};
+
                 if (!state.seeded) {
-                    return {
-                        exercises: INITIAL_EXERCISES,
-                        templates: INITIAL_TEMPLATES,
-                        seeded: true
+                    updates.exercises = INITIAL_EXERCISES;
+                    updates.templates = INITIAL_TEMPLATES;
+                    updates.seeded = true;
+                } else {
+                    const existingIds = new Set(state.templates.map(t => t.id));
+                    const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingIds.has(t.id));
+                    if (missingTemplates.length > 0) {
+                        updates.templates = [...state.templates, ...missingTemplates];
+                    }
+                }
+
+                // Seed daily insights if empty
+                if (!state.dailyInsights || state.dailyInsights.length === 0) {
+                    updates.dailyInsights = [
+                        { date: twoDaysAgoStr, steps: 6120, calories_burned: 280, heart_rate_avg: 74, distance_km: 4.1 },
+                        { date: yesterdayStr, steps: 9850, calories_burned: 420, heart_rate_avg: 70, distance_km: 6.8 },
+                        { date: todayStr, steps: 7420, calories_burned: 330, heart_rate_avg: 72, distance_km: 5.2 },
+                    ];
+                }
+
+                // Seed Samsung Health v7 Redesign metrics if empty
+                if (!state.waterIntake || Object.keys(state.waterIntake).length === 0) {
+                    updates.waterIntake = {
+                        [twoDaysAgoStr]: 1750,
+                        [yesterdayStr]: 2000,
+                        [todayStr]: 1250,
+                    };
+                    updates.sleepDuration = {
+                        [twoDaysAgoStr]: 380,
+                        [yesterdayStr]: 480,
+                        [todayStr]: 430,
+                    };
+                    updates.sleepScore = {
+                        [twoDaysAgoStr]: 65,
+                        [yesterdayStr]: 86,
+                        [todayStr]: 78,
+                    };
+                    updates.sleepStages = {
+                        [twoDaysAgoStr]: { deep: 60, rem: 80, light: 200, awake: 40 },
+                        [yesterdayStr]: { deep: 95, rem: 110, light: 250, awake: 25 },
+                        [todayStr]: { deep: 80, rem: 95, light: 225, awake: 30 },
+                    };
+                    updates.stressScore = {
+                        [twoDaysAgoStr]: 60,
+                        [yesterdayStr]: 32,
+                        [todayStr]: 45,
+                    };
+                    updates.vitals = {
+                        [twoDaysAgoStr]: { resting_hr: 65, hrv: 50, spo2: 96, skin_temp: 36.6, resp_rate: 15.0 },
+                        [yesterdayStr]: { resting_hr: 60, hrv: 64, spo2: 98, skin_temp: 36.2, resp_rate: 14.0 },
+                        [todayStr]: { resting_hr: 62, hrv: 58, spo2: 97, skin_temp: 36.4, resp_rate: 14.5 },
                     };
                 }
-                // Add any initial templates that are missing (e.g. added in a new update)
-                const existingIds = new Set(state.templates.map(t => t.id));
-                const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingIds.has(t.id));
-                if (missingTemplates.length === 0) return state;
-                return { templates: [...state.templates, ...missingTemplates] };
+
+                if (Object.keys(updates).length === 0) return state;
+                return updates;
             }),
 
             resetStore: () => set({
@@ -274,6 +396,12 @@ export const useStore = create<AppState>()(
                 seeded: false,
                 nutritionLogs: [],
                 dailyInsights: [],
+                waterIntake: {},
+                sleepDuration: {},
+                sleepScore: {},
+                stressScore: {},
+                sleepStages: {},
+                vitals: {},
             })
         }),
         {

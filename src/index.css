@@ -131,3 +131,56 @@
 @utility tap-active {
     @apply active:scale-95 transition-transform duration-200;
 }
+
+/* ── Samsung Health v7 Redesign Animations ── */
+
+@keyframes pulse-beat {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4)); }
+    15% { transform: scale(1.12); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)); }
+    30% { transform: scale(1.02); filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6)); }
+    45% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7)); }
+}
+
+@keyframes wave-fill {
+    0% { transform: translateY(0) scaleY(1); }
+    50% { transform: translateY(-3px) scaleY(1.04); }
+    100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes float-gentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@utility animate-pulse-beat {
+    animation: pulse-beat var(--pulse-duration, 0.8s) infinite ease-in-out;
+}
+
+@utility animate-wave {
+    animation: wave-fill 3s infinite ease-in-out;
+}
+
+@utility animate-float {
+    animation: float-gentle 4s infinite ease-in-out;
+}
+
+/* Custom premium color backgrounds per health pillar */
+@utility bg-pillar-activity {
+    @apply bg-gradient-to-b from-[#10241b] to-background;
+}
+
+@utility bg-pillar-sleep {
+    @apply bg-gradient-to-b from-[#0f1026] to-background;
+}
+
+@utility bg-pillar-vitals {
+    @apply bg-gradient-to-b from-[#241014] to-background;
+}
+
+@utility bg-pillar-nutrition {
+    @apply bg-gradient-to-b from-[#221710] to-background;
+}
+
+@utility bg-pillar-mindfulness {
+    @apply bg-gradient-to-b from-[#181024] to-background;
+}

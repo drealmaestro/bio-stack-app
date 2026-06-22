@@ -120,3 +120,19 @@ export interface DailyInsights {
     heart_rate_avg: number;
     distance_km: number;
 }
+
+export interface SleepStageData {
+    deep: number;   // minutes
+    rem: number;    // minutes
+    light: number;  // minutes
+    awake: number;  // minutes
+}
+
+export interface VitalsData {
+    resting_hr: number;
+    hrv: number;
+    spo2: number;
+    skin_temp: number;
+    resp_rate: number;
+}
+

@@ -317,7 +317,7 @@ export function ActiveWorkout() {
     return (
         <div className="animate-in slide-in-from-bottom-10 duration-500 relative pb-32">
             {/* Header / Timer */}
-            <div className="bg-card border border-white/5 rounded-3xl p-5 mb-6 flex justify-between items-center shadow-md sticky top-16 z-40">
+            <div className="bg-card border border-white/5 rounded-3xl p-5 mb-6 flex justify-between items-center shadow-md relative z-10">
                 <div>
                     <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">{activeTemplate.name}</span>
                     <div className="text-3xl font-extrabold text-white font-mono tracking-tighter tabular-nums leading-none">
@@ -450,7 +450,7 @@ export function ActiveWorkout() {
             </div>
 
             {/* Finish Button */}
-            <div className="absolute bottom-20 left-0 right-0 p-4 bg-linear-to-t from-black via-black/90 to-transparent z-50">
+            <div className="w-full mt-8 px-1 pb-12 relative z-10">
                 <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-3xl font-black text-base tracking-wider bg-[#3ccf94] hover:bg-[#3ccf94]/90 text-black hover:scale-[1.01] transition-transform active:scale-95 shadow-lg shadow-[#3ccf94]/20 uppercase">
                     <CheckCircle className="mr-2" size={20} /> FINISH WORKOUT
                 </Button>
