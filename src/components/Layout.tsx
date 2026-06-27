@@ -130,13 +130,16 @@ export function Layout() {
                     ))}
                 </nav>
 
-                <div className="absolute bottom-10 flex flex-col items-center gap-4">
+                <div className="absolute bottom-10 flex flex-col items-center gap-3">
                     <button
                         onClick={() => setShowResetConfirm(true)}
                         className="flex items-center gap-2 text-destructive font-medium text-sm border border-destructive/20 px-4 py-2 rounded-full hover:bg-destructive/10"
                     >
                         <Trash2 size={16} /> Reset All Data
                     </button>
+                    <div className="text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest mt-1">
+                        v1.2.2 (One UI 7)
+                    </div>
                 </div>
             </div>
 

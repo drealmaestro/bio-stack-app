@@ -416,12 +416,17 @@ export function Profile() {
             </div>
 
             {/* ── Save ──────────────────────────── */}
-            <Button
-                onClick={handleSave}
-                className="w-full py-6 text-base font-black bg-linear-to-r from-primary to-orange-400 text-black hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
-            >
-                Save Profile
-            </Button>
+            <div className="space-y-4">
+                <Button
+                    onClick={handleSave}
+                    className="w-full py-6 text-base font-black bg-linear-to-r from-primary to-orange-400 text-black hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+                >
+                    Save Profile
+                </Button>
+                <div className="text-center text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest pt-2">
+                    v1.2.2 (One UI 7)
+                </div>
+            </div>
         </div>
     );
 }
