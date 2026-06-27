@@ -35,3 +35,27 @@ export function getDailyQuote(): string {
     const index = Math.abs(hash) % MOTIVATIONAL_QUOTES.length;
     return MOTIVATIONAL_QUOTES[index];
 }
+
+export interface TempoStep {
+    label: string;
+    sec: string;
+    desc: string;
+}
+
+export function getTempoBreakdown(tempo: string, muscle: string): TempoStep[] | null {
+    if (!tempo || tempo.toLowerCase() === 'static' || tempo.toLowerCase() === 'controlled') {
+        return null;
+    }
+    const parts = tempo.split('-');
+    if (parts.length !== 4) return null;
+    
+    const [ecc, p1, con, p2] = parts;
+    const isPush = ['Chest', 'Shoulders', 'Legs', 'Triceps'].includes(muscle);
+    
+    return [
+        { label: 'Eccentric', sec: ecc, desc: isPush ? 'Lowering down' : 'Releasing/lowering' },
+        { label: 'Stretch Pause', sec: p1, desc: 'Hold at bottom stretch' },
+        { label: 'Concentric', sec: con, desc: isPush ? 'Pushing/driving up' : 'Pulling/curling up' },
+        { label: 'Peak Pause', sec: p2, desc: isPush ? 'Reset at top' : 'Squeeze at peak' }
+    ];
+}

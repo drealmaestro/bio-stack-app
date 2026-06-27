@@ -371,8 +371,13 @@ export function HistoryLog() {
                                                                     {getExerciseName(set.exercise_id)} · Set {set.set_number}
                                                                 </span>
                                                             </span>
-                                                            <span className="text-primary font-bold">
-                                                                {set.weight_kg}kg × {set.reps_completed}
+                                                            <span className="text-primary font-bold flex items-center gap-1.5">
+                                                                <span>{set.weight_kg}kg × {set.reps_completed}</span>
+                                                                {set.rpe && (
+                                                                    <span className="text-[10px] font-black bg-white/5 text-zinc-400 border border-white/10 px-1.5 py-0.5 rounded uppercase">
+                                                                        @ RPE {set.rpe}
+                                                                    </span>
+                                                                )}
                                                             </span>
                                                         </div>
                                                     );

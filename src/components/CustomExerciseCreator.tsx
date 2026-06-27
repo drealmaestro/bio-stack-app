@@ -24,6 +24,9 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
     const [name, setName] = useState("");
     const [muscle, setMuscle] = useState<TargetMuscle>("Other");
     const [instructions, setInstructions] = useState("");
+    const [intensityLevel, setIntensityLevel] = useState<'Heavy' | 'Moderate' | 'Light'>("Moderate");
+    const [tempo, setTempo] = useState("");
+    const [coachTips, setCoachTips] = useState("");
 
     const handleSave = () => {
         if (!name.trim()) {
@@ -36,6 +39,9 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
             name: name.trim(),
             target_muscle: muscle,
             instructions: instructions.trim() || "Custom exercise.",
+            intensity_level: intensityLevel,
+            tempo: tempo.trim() || undefined,
+            coach_tips: coachTips.trim() || undefined,
         };
 
         addExercise(newExercise);
@@ -85,6 +91,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                             {MUSCLE_OPTIONS.map((m) => (
                                 <button
                                     key={m}
+                                    type="button"
                                     onClick={() => setMuscle(m)}
                                     className={`text-[11px] font-bold py-2 rounded-xl transition-colors border ${
                                         muscle === m 
@@ -98,13 +105,56 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                         </div>
                     </div>
 
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Intensity Load</label>
+                            <div className="flex gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                                {(["Heavy", "Moderate", "Light"] as const).map((level) => (
+                                    <button
+                                        key={level}
+                                        type="button"
+                                        onClick={() => setIntensityLevel(level)}
+                                        className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg transition-all ${
+                                            intensityLevel === level
+                                                ? level === "Heavy" ? "bg-red-500 text-white"
+                                                  : level === "Moderate" ? "bg-blue-500 text-white"
+                                                  : "bg-green-500 text-black"
+                                                : "text-zinc-400 hover:text-white"
+                                        }`}
+                                    >
+                                        {level}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Tempo (Optional)</label>
+                            <Input
+                                value={tempo}
+                                onChange={(e) => setTempo(e.target.value)}
+                                placeholder="e.g. 3-0-1-0"
+                                className="bg-black/50 text-xs py-1.5 h-auto"
+                            />
+                        </div>
+                    </div>
+
                     <div>
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Instructions / Notes (Optional)</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Coach's Tip (Optional)</label>
+                        <Input
+                            value={coachTips}
+                            onChange={(e) => setCoachTips(e.target.value)}
+                            placeholder="e.g. Keep elbows tucked to sides"
+                            className="bg-black/50"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Instructions / Description (Optional)</label>
                         <textarea
                             value={instructions}
                             onChange={(e) => setInstructions(e.target.value)}
-                            placeholder="Add form cues or specific machine settings..."
-                            className="w-full h-24 bg-black/50 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                            placeholder="Add basic steps, machine setup, etc..."
+                            className="w-full h-20 bg-black/50 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors resize-none"
                         />
                     </div>
                 </div>

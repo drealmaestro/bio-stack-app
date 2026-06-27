@@ -13,7 +13,7 @@ import { nanoid } from "nanoid";
 import type { WorkoutTemplate, ExerciseSet } from "../types";
 import type { TargetMuscle } from "../types";
 import { Link } from "react-router-dom";
-import { cn } from "../lib/utils";
+import { cn, getTempoBreakdown } from "../lib/utils";
 import { CustomExerciseCreator } from "../components/CustomExerciseCreator";
 import { getMuscleIcon } from "../lib/muscleIcons";
 
@@ -52,6 +52,7 @@ export function WorkoutManager() {
 
     // ─── Form cue panel state ─────────────────────────────────────────────────
     const [formCueOpen, setFormCueOpen] = useState<string | null>(null);
+    const [expandedTempo, setExpandedTempo] = useState<string | null>(null);
 
     const getExerciseData = (id: string) => exercises.find(e => e.id === id);
 
@@ -249,22 +250,51 @@ export function WorkoutManager() {
                                 <CardContent className="p-4">
                                     <div className="flex justify-between items-start">
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-black text-lg text-white leading-tight truncate">
-                                                {template.name}
-                                            </h3>
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="font-black text-lg text-white leading-tight truncate">
+                                                    {template.name}
+                                                </h3>
+                                            </div>
+                                            
+                                            {/* Coaching badges */}
                                             <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                                {template.focus_goal && (
+                                                    <span className="text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md">
+                                                        {template.focus_goal}
+                                                    </span>
+                                                )}
+                                                {template.difficulty && (
+                                                    <span className="text-[9px] font-black uppercase tracking-wider bg-white/5 text-zinc-300 border border-white/10 px-2 py-0.5 rounded-md">
+                                                        {template.difficulty}
+                                                    </span>
+                                                )}
+                                                {template.target_duration && (
+                                                    <span className="text-[9px] font-bold bg-white/5 text-zinc-400 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                        <Clock size={9} /> {template.target_duration}m
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {template.description && (
+                                                <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                                                    {template.description}
+                                                </p>
+                                            )}
+
+                                            <div className="flex flex-wrap gap-1.5 mt-2.5">
                                                 {muscleGroups.slice(0, 4).map(m => (
-                                                    <span key={m} className={`text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[m as TargetMuscle]}`}>
-                                                        {getMuscleIcon(m as TargetMuscle, 10)} {m}
+                                                    <span key={m} className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[m as TargetMuscle]}`}>
+                                                        {getMuscleIcon(m as TargetMuscle, 9)} {m}
                                                     </span>
                                                 ))}
                                                 {muscleGroups.length > 4 && (
-                                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-500">
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-500">
                                                         +{muscleGroups.length - 4}
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex gap-3 mt-2 text-[11px] text-zinc-500">
+
+                                            <div className="flex gap-3 mt-2.5 text-[11px] text-zinc-500 border-t border-white/[0.03] pt-2">
                                                 <span className="flex items-center gap-1">
                                                     <Dumbbell size={10} /> {template.exercises.length} exercises
                                                 </span>
@@ -314,6 +344,77 @@ export function WorkoutManager() {
                             {isOpen && draft && (
                                 <div className="border border-primary/30 border-t-0 rounded-b-2xl bg-zinc-950 animate-in slide-in-from-top-2 duration-200">
 
+                                    {/* Program Details Editor */}
+                                    <div className="p-4 border-b border-white/5 bg-white/[0.01] space-y-3">
+                                        <p className="text-xs font-bold text-primary uppercase tracking-widest">Plan Coaching & Strategy</p>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Focus Goal</label>
+                                                <input
+                                                    type="text"
+                                                    value={draft.focus_goal || ""}
+                                                    onChange={(e) => setDraft({ ...draft, focus_goal: e.target.value })}
+                                                    placeholder="e.g. Strength & Power"
+                                                    className="w-full bg-black/60 border border-white/10 rounded-lg text-white font-bold text-xs px-3 py-2 focus:outline-none focus:border-primary/50 transition-colors"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Target Duration (min)</label>
+                                                <input
+                                                    type="number"
+                                                    value={draft.target_duration || ""}
+                                                    onChange={(e) => setDraft({ ...draft, target_duration: Number(e.target.value) || undefined })}
+                                                    placeholder="e.g. 60"
+                                                    className="w-full bg-black/60 border border-white/10 rounded-lg text-white font-bold text-xs px-3 py-2 focus:outline-none focus:border-primary/50 transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Difficulty</label>
+                                                <select
+                                                    value={draft.difficulty || ""}
+                                                    onChange={(e) => setDraft({ ...draft, difficulty: (e.target.value as any) || undefined })}
+                                                    className="w-full bg-black/60 border border-white/10 rounded-lg text-white font-bold text-xs px-3 py-2.5 focus:outline-none focus:border-primary/50 transition-colors"
+                                                >
+                                                    <option value="">Select Difficulty</option>
+                                                    <option value="Beginner">Beginner</option>
+                                                    <option value="Intermediate">Intermediate</option>
+                                                    <option value="Advanced">Advanced</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Description</label>
+                                                <input
+                                                    type="text"
+                                                    value={draft.description || ""}
+                                                    onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                                                    placeholder="Brief overview..."
+                                                    className="w-full bg-black/60 border border-white/10 rounded-lg text-white font-bold text-xs px-3 py-2 focus:outline-none focus:border-primary/50 transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block">Coach's Strategy Notes</label>
+                                            <textarea
+                                                value={draft.coach_notes || ""}
+                                                onChange={(e) => setDraft({ ...draft, coach_notes: e.target.value })}
+                                                placeholder="Warmup advice, mindset targets, RPE targets..."
+                                                className="w-full h-16 bg-black/60 border border-white/10 rounded-lg text-white text-xs p-2 focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Strategy Banner display if not in editing mode */}
+                                    {draft.coach_notes && (
+                                        <div className="mx-4 mt-4 p-3 bg-primary/5 border border-primary/10 rounded-2xl">
+                                            <div className="text-[9px] font-black text-primary uppercase tracking-widest mb-0.5 flex items-center gap-1">
+                                                💡 Coach's Strategy
+                                            </div>
+                                            <p className="text-xs text-zinc-300 leading-relaxed font-medium">{draft.coach_notes}</p>
+                                        </div>
+                                    )}
+
                                     {/* Exercise list */}
                                     <div className="p-4 space-y-2">
                                         <div className="flex justify-between items-center mb-3">
@@ -331,16 +432,29 @@ export function WorkoutManager() {
                                         )}
 
                                         {draft.exercises.map((ex, idx) => {
+                                            const exData = getExerciseData(ex.exercise_id);
                                             const muscle = getExerciseMuscle(ex.exercise_id);
+                                            const intensity = exData?.intensity_level;
+                                            
                                             return (
                                                 <div key={ex.exercise_id}
                                                     className="bg-white/3 border border-white/5 rounded-xl p-3 space-y-2">
                                                     {/* Exercise header */}
                                                     <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-2 min-w-0">
-                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
-                                                                {getMuscleIcon(muscle as TargetMuscle, 10)} {muscle}
+                                                        <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+                                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
+                                                                {getMuscleIcon(muscle as TargetMuscle, 9)} {muscle}
                                                             </span>
+                                                            {intensity && (
+                                                                <span className={cn(
+                                                                    "text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0",
+                                                                    intensity === 'Heavy' ? "bg-red-500/10 text-red-400 border border-red-500/15" :
+                                                                    intensity === 'Moderate' ? "bg-blue-500/10 text-blue-400 border border-blue-500/15" :
+                                                                    "bg-green-500/10 text-green-400 border border-green-500/15"
+                                                                )}>
+                                                                    {intensity}
+                                                                </span>
+                                                            )}
                                                             <span className="font-bold text-sm text-white truncate">
                                                                 {getExerciseName(ex.exercise_id)}
                                                             </span>
@@ -365,6 +479,47 @@ export function WorkoutManager() {
                                                             ><X size={14} /></button>
                                                         </div>
                                                     </div>
+
+                                                     {/* Coaching Tips / Tempo */}
+                                                     {(exData?.tempo || exData?.coach_tips) && (
+                                                        <div className="bg-black/40 border border-white/5 rounded-lg p-2.5 space-y-1.5">
+                                                            {exData.tempo && (() => {
+                                                                const isTempoExpanded = expandedTempo === ex.exercise_id;
+                                                                const breakdown = getTempoBreakdown(exData.tempo, muscle);
+                                                                return (
+                                                                    <div>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setExpandedTempo(isTempoExpanded ? null : ex.exercise_id)}
+                                                                            className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                                                                        >
+                                                                            <span className="font-bold text-zinc-400 uppercase tracking-wider">Tempo:</span> 
+                                                                            <span className="font-mono underline decoration-dashed decoration-zinc-600 underline-offset-2">{exData.tempo}</span>
+                                                                            <span className="text-[8px] text-[#3ccf94] bg-[#3ccf94]/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
+                                                                        </button>
+                                                                        {isTempoExpanded && breakdown && (
+                                                                            <div className="mt-1.5 p-2 bg-black/60 border border-white/5 rounded-lg space-y-0.5 text-[9px] text-zinc-400 animate-in slide-in-from-top-1 duration-150">
+                                                                                {breakdown.map((b, i) => (
+                                                                                    <div key={i} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0 last:pb-0">
+                                                                                         <span className="font-semibold text-zinc-500">{b.label}</span>
+                                                                                         <span className="text-right text-zinc-300">
+                                                                                             <span className="font-mono font-bold text-primary mr-1">{b.sec}s</span>
+                                                                                             <span className="text-zinc-500">({b.desc})</span>
+                                                                                         </span>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                            {exData.coach_tips && (
+                                                                <div className="text-zinc-400 leading-relaxed text-[11px]">
+                                                                    <span className="text-[#3ccf94] font-bold">💡 Tip:</span> {exData.coach_tips}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                     )}
 
                                                     {/* Sets / Reps / Rest row */}
                                                     <div className="grid grid-cols-3 gap-2">

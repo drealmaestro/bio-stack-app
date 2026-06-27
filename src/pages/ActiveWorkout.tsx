@@ -10,7 +10,7 @@ import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp } from
 import { nanoid } from "nanoid";
 import confetti from "canvas-confetti";
 import type { SetLog } from "../types";
-import { cn } from "../lib/utils";
+import { cn, getTempoBreakdown } from "../lib/utils";
 
 // Helper component for counting animation
 function AnimatedNumber({ value, formatter }: { value: number, formatter?: (val: number) => string | number }) {
@@ -44,7 +44,7 @@ export function ActiveWorkout() {
     const {
         templates, exercises, logs, addLog,
         activeWorkout, startWorkout, cancelWorkout,
-        toggleSetComplete, updateSetWeight, updateSetReps,
+        toggleSetComplete, updateSetWeight, updateSetReps, updateSetRpe,
         addRestTime, skipRest
     } = useStore();
 
@@ -59,6 +59,9 @@ export function ActiveWorkout() {
     const [summaryData, setSummaryData] = useState<{ durationSecs: number; sets: number; volume: number; prs: string[] } | null>(null);
     // H3: Store original rest duration so we can compute ring progress
     const originalRestRef = useRef<number>(0);
+    // Coach strategy collapsible state
+    const [showStrategy, setShowStrategy] = useState(true);
+    const [expandedTempo, setExpandedTempo] = useState<string | null>(null);
 
     useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -152,11 +155,13 @@ export function ActiveWorkout() {
                 const reps = activeWorkout.setReps[key] ?? ex.target_reps;
 
                 if (isCompleted || weight > 0) {
+                    const rpe = activeWorkout.setRpes?.[key];
                     completedLog.push({
                         exercise_id: ex.exercise_id,
                         set_number: i,
                         reps_completed: reps,
-                        weight_kg: weight
+                        weight_kg: weight,
+                        rpe: rpe || undefined
                     });
                 }
             }
@@ -335,11 +340,43 @@ export function ActiveWorkout() {
                 </Button>
             </div>
 
+            {/* Coach's Day Strategy */}
+            {(activeTemplate.description || activeTemplate.coach_notes) && (
+                <div className="bg-[#3ccf94]/5 border border-[#3ccf94]/10 rounded-3xl p-4.5 mb-5 space-y-2 animate-in slide-in-from-top-3 duration-300">
+                    <button 
+                        onClick={() => setShowStrategy(!showStrategy)}
+                        className="w-full flex justify-between items-center text-left"
+                    >
+                        <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest flex items-center gap-1.5">
+                            💡 Coach's Strategy
+                        </span>
+                        <span className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors">
+                            {showStrategy ? "Hide Strategy" : "Show Strategy"}
+                        </span>
+                    </button>
+                    {showStrategy && (
+                        <div className="space-y-2 animate-in fade-in duration-200">
+                            {activeTemplate.description && (
+                                <p className="text-xs text-zinc-300 leading-relaxed font-semibold">
+                                    {activeTemplate.description}
+                                </p>
+                            )}
+                            {activeTemplate.coach_notes && (
+                                <p className="text-xs text-zinc-400 leading-relaxed border-t border-white/5 pt-2">
+                                    {activeTemplate.coach_notes}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="space-y-6">
                 {activeTemplate.exercises.map((exercise, index) => {
                     const lastExData = lastSessionData?.[exercise.exercise_id];
                     const exData = exercises.find(e => e.id === exercise.exercise_id);
                     const muscle = exData?.target_muscle || 'Other';
+                    const intensity = exData?.intensity_level;
 
                     return (
                     <div key={exercise.exercise_id} className="space-y-2">
@@ -348,20 +385,72 @@ export function ActiveWorkout() {
                                 <span className="text-[#3ccf94] bg-[#3ccf94]/10 w-6 h-6 rounded-full flex items-center justify-center shrink-0">
                                     {getMuscleIcon(muscle, 12)}
                                 </span>
-                                {getExerciseName(exercise.exercise_id)}
+                                <span className="truncate">{getExerciseName(exercise.exercise_id)}</span>
+                                {intensity && (
+                                    <span className={cn(
+                                        "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0",
+                                        intensity === 'Heavy' ? "bg-red-500/10 text-red-400 border border-red-500/15" :
+                                        intensity === 'Moderate' ? "bg-blue-500/10 text-blue-400 border border-blue-500/15" :
+                                        "bg-green-500/10 text-green-400 border border-green-500/15"
+                                    )}>
+                                        {intensity}
+                                    </span>
+                                )}
                             </h3>
                             <span className="text-[10px] font-bold text-[#3ccf94] bg-[#3ccf94]/10 px-2 py-0.5 rounded-full">
                                 {exercise.rest_seconds}s Rest
                             </span>
                         </div>
 
+                        {/* Coach Tip / Tempo Row */}
+                        {(exData?.tempo || exData?.coach_tips) && (
+                            <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-3 flex flex-col gap-1.5 text-[11px] mx-1">
+                                {exData.tempo && (() => {
+                                    const isTempoExpanded = expandedTempo === exercise.exercise_id;
+                                    const breakdown = getTempoBreakdown(exData.tempo, muscle);
+                                    return (
+                                        <div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setExpandedTempo(isTempoExpanded ? null : exercise.exercise_id)}
+                                                className="text-zinc-500 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                                            >
+                                                <span className="font-bold text-zinc-400 uppercase tracking-wider">Tempo:</span> 
+                                                <span className="font-mono underline decoration-dashed decoration-zinc-600 underline-offset-2">{exData.tempo}</span>
+                                                <span className="text-[8px] text-[#3ccf94] bg-[#3ccf94]/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
+                                            </button>
+                                            {isTempoExpanded && breakdown && (
+                                                <div className="mt-1.5 p-2 bg-black/60 border border-white/5 rounded-xl space-y-0.5 text-[9px] text-zinc-400 animate-in slide-in-from-top-1 duration-150">
+                                                    {breakdown.map((b, i) => (
+                                                        <div key={i} className="flex justify-between items-center py-0.5 border-b border-white/5 last:border-0 last:pb-0">
+                                                            <span className="font-semibold text-zinc-500">{b.label}</span>
+                                                            <span className="text-right text-zinc-300">
+                                                                <span className="font-mono font-bold text-primary mr-1">{b.sec}s</span>
+                                                                <span className="text-zinc-500">({b.desc})</span>
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                                {exData.coach_tips && (
+                                    <div className="text-zinc-300 font-medium">
+                                        <span className="text-[#3ccf94] font-bold">💡 Tip:</span> {exData.coach_tips}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <Card className="bg-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
                             <CardContent className="p-0">
-                                {/* Header Row */}
-                                <div className="grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[10px] items-center text-zinc-500 font-extrabold uppercase tracking-widest text-center border-b border-white/5">
+                                 {/* Header Row */}
+                                <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[10px] items-center text-zinc-500 font-extrabold uppercase tracking-widest text-center border-b border-white/5">
                                     <div>Set</div>
                                     <div>kg</div>
                                     <div>Reps</div>
+                                    <div>RPE</div>
                                     <div>Done</div>
                                 </div>
 
@@ -372,11 +461,12 @@ export function ActiveWorkout() {
                                     const lastSet = lastExData?.[setNum];
                                     const currentWeight = activeWorkout.setWeights[key] || 0;
                                     const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
+                                    const currentRpe = activeWorkout.setRpes?.[key] || 0;
                                     const weightPlaceholder = lastSet ? String(lastSet.weight) : '0';
 
                                     return (
                                         <div key={setNum} className={cn(
-                                            "grid grid-cols-[2.5rem_1fr_1fr_3rem] gap-1.5 px-3 py-2 items-center border-t border-white/5 transition-colors",
+                                            "grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 items-center border-t border-white/5 transition-colors",
                                             isCompleted ? "bg-[#3ccf94]/5" : ""
                                         )}>
                                             {/* Set number */}
@@ -419,6 +509,28 @@ export function ActiveWorkout() {
                                                     className="h-11 text-center bg-black/30 border-white/5 focus:border-[#3ccf94] text-white font-mono text-sm font-bold rounded-xl"
                                                     onChange={(e) => updateSetReps(index, setNum, Math.max(0, parseInt(e.target.value) || exercise.target_reps))}
                                                 />
+                                            </div>
+
+                                            {/* RPE */}
+                                            <div>
+                                                <select
+                                                    aria-label={`${getExerciseName(exercise.exercise_id)} set ${setNum} RPE`}
+                                                    value={currentRpe || ''}
+                                                    onChange={(e) => updateSetRpe(index, setNum, parseFloat(e.target.value) || 0)}
+                                                    className="w-full h-11 text-center bg-black/30 border border-white/5 focus:border-[#3ccf94] text-white font-mono text-xs font-bold rounded-xl outline-none transition-colors cursor-pointer appearance-none px-1"
+                                                >
+                                                    <option value="" className="bg-[#18181c] text-zinc-500">-</option>
+                                                    <option value="10" className="bg-[#18181c] text-red-400 font-bold">10</option>
+                                                    <option value="9.5" className="bg-[#18181c] text-orange-400">9.5</option>
+                                                    <option value="9" className="bg-[#18181c] text-orange-400">9</option>
+                                                    <option value="8.5" className="bg-[#18181c] text-yellow-400">8.5</option>
+                                                    <option value="8" className="bg-[#18181c] text-yellow-400">8</option>
+                                                    <option value="7.5" className="bg-[#18181c] text-blue-400">7.5</option>
+                                                    <option value="7" className="bg-[#18181c] text-blue-400">7</option>
+                                                    <option value="6.5" className="bg-[#18181c] text-zinc-400">6.5</option>
+                                                    <option value="6" className="bg-[#18181c] text-zinc-400">6</option>
+                                                    <option value="5" className="bg-[#18181c] text-zinc-500">5</option>
+                                                </select>
                                             </div>
 
                                             {/* Done toggle */}

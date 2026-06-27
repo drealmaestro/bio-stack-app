@@ -9,7 +9,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Lie on bench, lower bar to forehead. Keep elbows tucked and stationary.',
         form_cues: ['Keep elbows pointing straight up', 'Lower bar to forehead, not behind head', 'Lock upper arms — only forearms move', 'Control the eccentric (3 sec down)'],
         common_mistakes: ['Elbows flaring out wide', 'Lowering bar behind the head', 'Using momentum on the concentric'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '3-0-1-0',
+        coach_tips: 'Pin your elbows and avoid letting them flare. Lower the bar under strict control to your hairline.'
     },
     {
         id: 'ex_pushdown',
@@ -18,7 +21,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Keep elbows pinned at sides. Full extension at bottom, squeeze hard.',
         form_cues: ['Elbows stay at your sides throughout', 'Full lockout at the bottom', 'Lean slightly forward', 'Squeeze triceps at full extension'],
         common_mistakes: ['Letting elbows drift forward', 'Not reaching full extension', 'Using body momentum'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-1',
+        coach_tips: 'Lean slightly forward at the hips and squeeze your triceps hard at the bottom as if trying to break the bar in half.'
     },
     {
         id: 'ex_dips',
@@ -27,7 +33,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Keep torso upright for tricep focus. Lower until elbows reach 90°.',
         form_cues: ['Stay upright — lean forward shifts to chest', 'Lower to 90° elbow angle', 'Elbows close to body', 'Full lockout at the top'],
         common_mistakes: ['Leaning too far forward', 'Not going deep enough', 'Flaring elbows out'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-1-1-0',
+        coach_tips: 'Keep your torso as vertical as possible to keep tension on the triceps. If you lean forward, you transition the load to the chest.'
     },
     {
         id: 'ex_close_grip_bench',
@@ -36,7 +45,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Hands shoulder-width. Keep elbows tucked, full ROM.',
         form_cues: ['Hands shoulder-width apart (not too close)', 'Tuck elbows to sides at ~45°', 'Touch chest on every rep', 'Drive bar straight up'],
         common_mistakes: ['Hands too close (wrist strain)', 'Wide elbows (becomes chest exercise)', 'Partial range of motion'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Grip should be shoulder-width. Do not place hands too close together, as this puts unnecessary strain on your wrists.'
     },
     {
         id: 'ex_overhead_tri_ext',
@@ -45,7 +57,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Get a deep stretch at bottom. Keep elbows high and tight.',
         form_cues: ['Elbows point forward, not flared', 'Lower weight behind head for deep stretch', 'Brace core, no lower back arch', 'Full extension at top'],
         common_mistakes: ['Elbows drifting wide', 'Arching lower back to compensate', 'Skipping the stretch position'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '3-0-1-1',
+        coach_tips: 'Focus on getting a deep stretch at the bottom of the movement. Keep your abs tight so you don\'t arch your lower back.'
     },
     // Biceps
     {
@@ -55,7 +70,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Palms facing each other. Targets brachialis and brachioradialis.',
         form_cues: ['Neutral grip throughout the movement', 'No swinging — pin elbows at sides', 'Full extension at bottom', 'Slow eccentric (2-3 sec)'],
         common_mistakes: ['Supinating the wrist (defeats the purpose)', 'Swinging the torso', 'Cutting the range short'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '2-0-1-1',
+        coach_tips: 'Keep your palms facing each other. Squeeze at the top to build thickness in your outer biceps and forearms.'
     },
     {
         id: 'ex_barbell_curl',
@@ -64,7 +82,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Strict form. No swinging. Squeeze at peak contraction.',
         form_cues: ['Stand tall, elbows pinned to sides', 'Curl with your forearms, not shoulders', 'Squeeze hard at the top', '3-second controlled descent'],
         common_mistakes: ['Swinging hips for momentum', 'Elbows drifting forward at top', 'Dropping weight without control'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-1',
+        coach_tips: 'Do not swing! Stand tall and pin your elbows to your ribcage. Control the lowering phase completely.'
     },
     {
         id: 'ex_incline_db_curl',
@@ -73,7 +94,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Bench at 45°. Arms hang behind body for maximum stretch.',
         form_cues: ['Let arm hang straight down for full stretch', 'Curl without swinging arm forward', 'Supinate at top for peak contraction', 'Resist the weight on the way down'],
         common_mistakes: ['Bench angle too steep (reduces stretch)', 'Swinging arms forward to initiate', 'Not supinating at contraction'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '3-0-1-1',
+        coach_tips: 'Keep your shoulders back against the bench. Let your arms hang straight down for an intense stretch at the bottom.'
     },
     {
         id: 'ex_spider_curl',
@@ -82,7 +106,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Chest on incline bench. Isolates biceps fully — no body swing possible.',
         form_cues: ['Chest flat on the bench', 'Arms hang straight down', 'Curl strictly with forearms', 'Full extension between reps'],
         common_mistakes: ['Pulling elbows back (shoulder involvement)', 'Not extending fully at bottom', 'Going too heavy'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-2',
+        coach_tips: 'Keep your upper arms pointing straight down. Squeeze your biceps hard at the top for 2 seconds to isolate the peak.'
     },
     // Chest
     {
@@ -92,7 +119,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Bench at 30-45°. Focus on upper chest. Full ROM.',
         form_cues: ['Set bench to 30-45° (not higher)', 'Retract scapula before pressing', 'Lower to chest level, elbows at ~75°', 'Press in a slight arc, not straight up'],
         common_mistakes: ['Bench too steep (becomes shoulder press)', 'Bouncing off chest', 'Flaring elbows 90°'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Keep your shoulder blades pinched together and down on the bench. Lower the weights under control to your upper chest.'
     },
     {
         id: 'ex_cable_fly_high',
@@ -101,7 +131,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'High pulley. Step forward, bring hands together at waist. Targets lower chest.',
         form_cues: ['Cables set above shoulder height', 'Keep slight bend in elbows', 'Pull in a downward arc, meet at hip level', 'Squeeze chest at endpoint'],
         common_mistakes: ['Straightening arms (becomes tricep movement)', 'Pulling with hands not chest', 'Not enough forward lean'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-2',
+        coach_tips: 'Imagine hugging a large tree. Focus entirely on bringing your biceps together at the bottom to maximize chest contraction.'
     },
     {
         id: 'ex_incline_barbell_press',
@@ -110,7 +143,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Bench at 30°. Pause at chest. Drive explosively.',
         form_cues: ['Grip slightly wider than shoulder width', 'Bar touches upper chest', 'Leg drive through heels', 'Keep wrists stacked over elbows'],
         common_mistakes: ['Bar touching too low (flat chest area)', 'Losing upper back arch', 'Uneven bar path'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-1-1-0',
+        coach_tips: 'Touch the bar high on your chest, near the collarbone, and press it back in a slight diagonal line over your face.'
     },
     {
         id: 'ex_flat_db_press',
@@ -119,7 +155,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Full ROM. Squeeze chest at top. Control descent.',
         form_cues: ['Lie flat, feet on floor', 'Lower dumbbells to chest level', 'Press and squeeze at full extension', 'Slight inward arc on the press'],
         common_mistakes: ['Dumbbells too wide at bottom', 'No chest squeeze at top', 'Rushing the eccentric'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Drive your feet into the floor to stabilize your body. Keep a slight arch in your lower back, but keep your glutes on the bench.'
     },
     {
         id: 'ex_pec_deck',
@@ -128,7 +167,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Maintain constant tension. Squeeze hard when arms meet.',
         form_cues: ['Sit tall, chest up', 'Slight bend in elbows throughout', 'Feel the stretch at the open position', 'Squeeze for 1 second at close'],
         common_mistakes: ['Letting arms go too far back (shoulder risk)', 'Moving elbows instead of chest', 'No pause/squeeze at contraction'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-2',
+        coach_tips: 'Sit tall and push your chest forward. Do not let your shoulders roll forward at the end of the movement.'
     },
     // Legs
     {
@@ -138,7 +180,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Feet shoulder-width. Break at hips and knees simultaneously. Depth below parallel.',
         form_cues: ['Push knees out over toes', 'Chest up, core braced', 'Break parallel — hip crease below knee', 'Drive through mid foot'],
         common_mistakes: ['Knees caving inward', 'Heels rising off floor', 'Squatting too shallow'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-1-1-0',
+        coach_tips: 'Brace your core as if taking a punch before descending. Pull the bar down into your traps to engage your upper back.'
     },
     {
         id: 'ex_lunge',
@@ -147,7 +192,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Step forward. Back knee touches ground. Keep torso upright.',
         form_cues: ['Long stride to protect front knee', 'Keep torso tall throughout', 'Front knee stays over ankle', 'Push off front heel to step through'],
         common_mistakes: ['Knee collapsing inward', 'Leaning forward', 'Too short a stride (front knee too far forward)'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '2-1-1-0',
+        coach_tips: 'Take a long enough step so your front knee doesn\'t pass your toes. Push through your front heel to stand up.'
     },
     {
         id: 'ex_rdl',
@@ -156,7 +204,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Hinge at hips, soft knees, feel hamstring stretch all the way.',
         form_cues: ['Push hips back (not bend knees)', 'Bar stays glued to legs', 'Feel the hamstring stretch before returning', 'Squeeze glutes at the top'],
         common_mistakes: ['Rounding the lower back', 'Bending knees too much (becomes squat)', 'Bar drifting away from body'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-1-1-0',
+        coach_tips: 'Imagine trying to push a door shut with your hips. Keep the dumbbells or barbell dragging along your thighs throughout.'
     },
     {
         id: 'ex_bulgarian_split_squat',
@@ -165,7 +216,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Rear foot elevated on bench. Drop back knee deep.',
         form_cues: ['Front foot far enough to stay over ankle', 'Stay tall — no forward lean', 'Drop straight down, not forward', 'Drive through front heel'],
         common_mistakes: ['Front foot too close (knee over toes)', 'Leaning forward excessively', 'Using rear leg to push'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '3-1-1-0',
+        coach_tips: 'Keep your weight balanced on your front heel. Think about dropping your back knee straight down toward the floor.'
     },
     {
         id: 'ex_leg_press',
@@ -174,7 +228,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Feet hip-width, mid-height on plate. Full ROM without letting pelvis tuck.',
         form_cues: ['Place feet hip-width, mid-platform', 'Lower until knees reach ~90°', "Don't let lower back peel off pad", 'Push through entire foot'],
         common_mistakes: ['Removing the safety stops too early', 'Pelvis tucking at bottom (butt wink)', 'Locking out knees at top'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Do not lock your knees out fully at the top. Keep your hips pinned firmly against the seat pad throughout.'
     },
     {
         id: 'ex_leg_curl',
@@ -183,7 +240,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Squeeze hamstrings at peak. Control the eccentric all the way down.',
         form_cues: ['Hips stay flat on pad', 'Curl all the way to full contraction', 'Lower slowly — 3 second eccentric', 'Toes pointed slightly for more hamstring'],
         common_mistakes: ['Hips rising off pad', 'Not reaching full contraction', 'Dropping weight without control'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '3-0-1-1',
+        coach_tips: 'Keep your hips pressed firmly into the bench pad to prevent your lower back from taking over the lift.'
     },
     {
         id: 'ex_calf_raise',
@@ -192,7 +252,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Full range — pause and stretch at bottom, squeeze at top.',
         form_cues: ['Full stretch at the bottom (heel below platform)', 'Pause 1 second at peak contraction', 'Straight up — no rolling inward/outward', '3-second controlled descent'],
         common_mistakes: ['Bouncing at the bottom (no stretch)', 'Partial reps only', 'Rolling ankles outward'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '3-1-1-2',
+        coach_tips: 'Hold the stretch at the bottom for a full second to remove the Achilles tendon bounce. Explode up onto your big toes.'
     },
     // Back
     {
@@ -202,7 +265,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Hinge at hips, bar close to legs, drive through heels.',
         form_cues: ['Bar over mid-foot at setup', 'Hips and shoulders rise at same rate', 'Keep bar dragging up the legs', 'Lock out glutes at the top'],
         common_mistakes: ['Bar drifting away from body', 'Rounding lower back under load', 'Jerking the bar off the floor'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '2-1-1-0',
+        coach_tips: 'Pull the slack out of the barbell and wedge your hips down before starting the pull. Push the floor away with your feet.'
     },
     {
         id: 'ex_row',
@@ -211,7 +277,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Flat back, hinge at 45°. Pull bar to lower sternum. Lead with elbows.',
         form_cues: ['Torso at ~45° angle', 'Pull bar to lower chest/upper abs', 'Lead with elbows, not hands', 'Squeeze back at top'],
         common_mistakes: ['Too upright (becomes bicep exercise)', 'Jerking torso to help the lift', 'Pulling to wrong point (too high)'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '2-0-1-1',
+        coach_tips: 'Pull the bar toward your belly button, not your chest. Keep your shoulder blades squeezed tightly at the peak.'
     },
     {
         id: 'ex_lat_pulldown',
@@ -220,7 +289,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Wide grip. Pull bar to upper chest. Retract scapula first.',
         form_cues: ['Lean back slightly at ~80°', 'Initiate by depressing shoulder blades', 'Pull bar to upper chest', 'Control bar back up — stretch lats fully'],
         common_mistakes: ['Pulling behind the neck (neck strain)', 'Arms doing all the work (no lat engagement)', 'Not extending fully between reps'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '3-0-1-1',
+        coach_tips: 'Pull with your elbows, not your hands. Think about pulling your elbows down into your back pockets.'
     },
     {
         id: 'ex_pull_up',
@@ -229,7 +301,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Full hang to chin over bar. No kipping.',
         form_cues: ['Dead hang at bottom (full stretch)', 'Pull elbows down and back', 'Chin clears the bar', 'Lower under full control'],
         common_mistakes: ['Kipping for momentum', 'Not reaching a full dead hang', 'Chin not clearing bar'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Initiate the movement by packing your shoulders down (active hang) before bending your arms. Control the descent.'
     },
     {
         id: 'ex_single_arm_row',
@@ -238,7 +313,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Brace on bench. Let dumbbell hang for full lat stretch, then row to hip.',
         form_cues: ['Let dumbbell hang straight down first', 'Pull elbow back toward hip', 'Rotate torso slightly for range', 'Pause and squeeze at top'],
         common_mistakes: ['Pulling with bicep, not back', 'Rotating too much (become twisting movement)', 'Short ROM — no stretch at bottom'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '2-0-1-1',
+        coach_tips: 'Pull the dumbbell in an arc toward your hip rather than straight up. This isolates the lower lat much better.'
     },
     // Shoulders
     {
@@ -248,7 +326,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'From collarbone to full lockout. Brace core, stay tight.',
         form_cues: ['Grip slightly wider than shoulders', 'Press bar in a straight vertical path', 'Move head back on the way up, forward after', 'Lock out arms fully at top'],
         common_mistakes: ['Pressing bar in front instead of slightly behind head', 'Excessive lower back arch', 'Not locking out at the top'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Heavy',
+        tempo: '3-0-1-0',
+        coach_tips: 'Squeeze your glutes and brace your abs as hard as possible to create a bulletproof base and protect your lower back.'
     },
     {
         id: 'ex_lateral_raise',
@@ -257,7 +338,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Lead with elbows. Stop at shoulder height. Slight forward lean.',
         form_cues: ['Tilt dumbbells so pinky is higher than thumb', 'Lead with elbows, not hands', 'Stop at shoulder level — no higher', 'Slow 3-second descent'],
         common_mistakes: ['Shrugging traps during the movement', 'Swinging dumbbells with body', 'Going above shoulder height'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-2',
+        coach_tips: 'Think about pushing the dumbbells OUT to the walls, rather than pulling them up. Keep your shoulders down (don\'t shrug).'
     },
     {
         id: 'ex_face_pull',
@@ -266,7 +350,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'High pulley. Pull to face with external rotation. Crucial for shoulder health.',
         form_cues: ['Cable at head height or above', 'Pull to face — hands beside ears', 'External rotate at end (hands back)', 'Hold 1 second at peak'],
         common_mistakes: ['Pulling to neck/chin instead of face', 'No external rotation', 'Too heavy — sacrifices form'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-2',
+        coach_tips: 'Pull the middle of the rope toward your nose while pulling the ends apart. Show off your biceps at the peak of the movement.'
     },
     {
         id: 'ex_db_shrug',
@@ -275,7 +362,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Straight up shrug. Pause at peak. Low rotational movement.',
         form_cues: ['Shrug straight up — no rolling', 'Hold peak for 1-2 seconds', 'Keep arms straight throughout', 'Full depression between reps'],
         common_mistakes: ['Rolling shoulders (no benefit, injury risk)', 'No pause at top', 'Using momentum'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Moderate',
+        tempo: '2-1-1-2',
+        coach_tips: 'Hold the contraction at the top for 2 seconds. Never roll your shoulders; it does nothing for traps and risks rotator cuff injury.'
     },
     // Core
     {
@@ -285,7 +375,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Brace everything. Push the floor away. Breathe steadily.',
         form_cues: ['Elbows under shoulders', 'Squeeze glutes and quads', 'Brace core as if taking a punch', 'Neutral spine — no hips up or down'],
         common_mistakes: ['Hips too high (easy mode)', 'Hips sagging (lower back strain)', 'Holding breath'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: 'Static',
+        coach_tips: 'Keep your body in a perfectly straight line. Active recovery: pull your elbows and toes toward each other to maximize tension.'
     },
     {
         id: 'ex_woodchop',
@@ -294,7 +387,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Rotate from torso, not arms. Keep arms extended.',
         form_cues: ['Pivot rear foot', 'Arms stay extended throughout', 'Initiate from obliques, not arms', 'Explosive rotation, controlled return'],
         common_mistakes: ['Bending elbows (arm exercise)', 'No hip rotation — just arm swing', 'Too heavy — sacrifices rotation quality'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: '2-0-1-1',
+        coach_tips: 'Keep your arms straight and rotate entirely through your torso. Pivot your back foot as you twist.'
     },
     {
         id: 'ex_forearm_roller',
@@ -303,6 +399,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
         instructions: 'Roll weight up and down under control. Use both directions.',
         form_cues: ['Arms extended at shoulder height', 'Roll by wrist flexion/extension only', 'Go both up AND down for full effect', 'Slow and controlled throughout'],
         common_mistakes: ['Arms dropping down (reduces isolation)', 'Only doing one direction', 'Too much weight — breaks form'],
-        video_url: ''
+        video_url: '',
+        intensity_level: 'Light',
+        tempo: 'Controlled',
+        coach_tips: 'Keep your arms fully locked out straight in front of you. Roll the weight up slowly, then resist it as you unroll it.'
     }
 ];

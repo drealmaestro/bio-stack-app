@@ -18,6 +18,10 @@ export interface Exercise {
     instructions: string;
     form_cues?: string[];
     common_mistakes?: string[];
+    intensity_level?: 'Heavy' | 'Moderate' | 'Light';
+    tempo?: string;
+    coach_tips?: string;
+    warmup_sets?: number;
 }
 
 export interface ExerciseSet {
@@ -32,6 +36,11 @@ export interface WorkoutTemplate {
     name: string;
     exercises: ExerciseSet[];
     scheduled_days?: number[]; // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+    description?: string;
+    coach_notes?: string;
+    difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+    target_duration?: number; // in minutes
+    focus_goal?: string;
 }
 
 export interface SetLog {
@@ -39,6 +48,7 @@ export interface SetLog {
     set_number: number;
     reps_completed: number;
     weight_kg: number;
+    rpe?: number;
 }
 
 export interface WorkoutLog {
@@ -78,6 +88,7 @@ export interface ActiveWorkoutState {
     completedSets: string[];
     setWeights: Record<string, number>;
     setReps: Record<string, number>;
+    setRpes?: Record<string, number>;
     restEndTime: number | null;
     originalRestDuration: number;
 }

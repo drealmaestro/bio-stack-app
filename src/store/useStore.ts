@@ -46,6 +46,7 @@ interface AppState {
     toggleSetComplete: (exerciseIdx: number, setNum: number, restSeconds: number) => void;
     updateSetWeight: (exerciseIdx: number, setNum: number, weight: number) => void;
     updateSetReps: (exerciseIdx: number, setNum: number, reps: number) => void;
+    updateSetRpe: (exerciseIdx: number, setNum: number, rpe: number) => void;
 
     // Rest Timer Actions
     addRestTime: (seconds: number) => void;
@@ -132,6 +133,7 @@ export const useStore = create<AppState>()(
                     completedSets: [],
                     setWeights: {},
                     setReps: {},
+                    setRpes: {},
                     restEndTime: null,
                     originalRestDuration: 0
                 }
@@ -192,6 +194,20 @@ export const useStore = create<AppState>()(
                         setReps: {
                             ...state.activeWorkout.setReps,
                             [key]: reps
+                        }
+                    }
+                };
+            }),
+
+            updateSetRpe: (exerciseIdx, setNum, rpe) => set((state) => {
+                if (!state.activeWorkout) return state;
+                const key = `${exerciseIdx}-${setNum}`;
+                return {
+                    activeWorkout: {
+                        ...state.activeWorkout,
+                        setRpes: {
+                            ...(state.activeWorkout.setRpes || {}),
+                            [key]: rpe
                         }
                     }
                 };
@@ -333,11 +349,37 @@ export const useStore = create<AppState>()(
                     updates.templates = INITIAL_TEMPLATES;
                     updates.seeded = true;
                 } else {
-                    const existingIds = new Set(state.templates.map(t => t.id));
-                    const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingIds.has(t.id));
-                    if (missingTemplates.length > 0) {
-                        updates.templates = [...state.templates, ...missingTemplates];
-                    }
+                    // Update existing exercises with new coaching attributes if they are defaults
+                    const updatedExercises = state.exercises.map(ex => {
+                        const initial = INITIAL_EXERCISES.find(ie => ie.id === ex.id);
+                        return initial ? { 
+                            ...ex, 
+                            intensity_level: ex.intensity_level || initial.intensity_level, 
+                            tempo: ex.tempo || initial.tempo, 
+                            coach_tips: ex.coach_tips || initial.coach_tips 
+                        } : ex;
+                    });
+                    
+                    const existingExIds = new Set(state.exercises.map(e => e.id));
+                    const missingExercises = INITIAL_EXERCISES.filter(e => !existingExIds.has(e.id));
+                    updates.exercises = missingExercises.length > 0 ? [...updatedExercises, ...missingExercises] : updatedExercises;
+
+                    // Update existing templates with new coaching attributes if they are defaults
+                    const updatedTemplates = state.templates.map(t => {
+                        const initial = INITIAL_TEMPLATES.find(it => it.id === t.id);
+                        return initial ? { 
+                            ...t, 
+                            description: t.description || initial.description, 
+                            coach_notes: t.coach_notes || initial.coach_notes,
+                            difficulty: t.difficulty || initial.difficulty,
+                            target_duration: t.target_duration || initial.target_duration,
+                            focus_goal: t.focus_goal || initial.focus_goal
+                        } : t;
+                    });
+
+                    const existingTmplIds = new Set(state.templates.map(t => t.id));
+                    const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingTmplIds.has(t.id));
+                    updates.templates = missingTemplates.length > 0 ? [...updatedTemplates, ...missingTemplates] : updatedTemplates;
                 }
 
                 // Seed daily insights if empty
