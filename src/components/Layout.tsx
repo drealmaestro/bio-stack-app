@@ -165,32 +165,32 @@ export function Layout() {
             </Dialog>
 
             {/* Main Content */}
-            <main ref={mainRef} key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-28 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
+            <main ref={mainRef} key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-32 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
                 <Outlet />
             </main>
             {/* Bottom Nav — swaps to Session Locked bar when workout active */}
             {location.pathname !== '/active' && (
                 isSessionLocked ? (
-                    <div className="glass absolute bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-between z-50 shadow-2xl shadow-black/50 px-5 border border-[#3ccf94]/30 bg-[#3ccf94]/5 animate-in slide-in-from-bottom-4 duration-300">
+                    <div className="bg-[#121216]/90 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-18 rounded-full flex items-center justify-between z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)] px-6 border border-[#3ccf94]/30 animate-in slide-in-from-bottom-4 duration-300">
                         <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-[#3ccf94]/20 flex items-center justify-center animate-pulse">
                                 <Lock size={16} className="text-[#3ccf94]" />
                             </div>
                             <div>
                                 <div className="text-[10px] font-black uppercase tracking-widest text-[#3ccf94] leading-none">Session Active</div>
-                                <div className="text-sm font-extrabold text-white leading-tight mt-0.5">{activeTemplateName}</div>
+                                <div className="text-xs font-extrabold text-white leading-tight mt-0.5 truncate max-w-[140px]">{activeTemplateName}</div>
                             </div>
                         </div>
                         <button
                             onClick={() => navigate('/active')}
-                            className="flex items-center gap-2 bg-[#3ccf94] text-black font-extrabold text-xs px-4 py-2 rounded-full hover:scale-105 transition-transform active:scale-95 shadow-md shadow-[#3ccf94]/15"
+                            className="flex items-center gap-2 bg-[#3ccf94] text-black font-extrabold text-xs px-4 py-2.5 rounded-full hover:scale-105 transition-transform active:scale-95 shadow-md shadow-[#3ccf94]/15"
                             aria-label="Resume active workout"
                         >
                             <Timer size={13} /> Resume
                         </button>
                     </div>
                 ) : (
-                    <nav className="glass absolute bottom-4 left-4 right-4 h-16 rounded-2xl flex items-center justify-around z-50 shadow-2xl shadow-black/50 px-2 border border-white/5">
+                    <nav className="bg-[#121216]/80 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-18 rounded-full flex items-center justify-around z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)] px-2 border border-white/5">
                         <NavLink to="/" className={navLinkClass} end>
                             {({ isActive }) => (
                                 <>
@@ -220,8 +220,8 @@ export function Layout() {
                                 to="/active"
                                 aria-label="Start workout"
                                 className={({ isActive }) => cn(
-                                    "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-[#3ccf94] to-[#36b4ff] text-black shadow-lg shadow-[#3ccf94]/20 transition-all active:scale-95 border-4 border-[#18181c]",
-                                    isActive ? "scale-110 ring-2 ring-[#3ccf94] ring-offset-2 ring-offset-[#18181c]" : "hover:scale-105"
+                                    "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-[#3ccf94] to-[#36b4ff] text-black shadow-lg shadow-[#3ccf94]/20 transition-all active:scale-95 border-4 border-[#121216]",
+                                    isActive ? "scale-110 ring-2 ring-[#3ccf94] ring-offset-2 ring-offset-[#121216]" : "hover:scale-105"
                                 )}
                             >
                                 <Play size={22} fill="currentColor" className="ml-0.5" />
