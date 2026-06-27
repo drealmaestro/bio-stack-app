@@ -51,7 +51,7 @@ export function Layout() {
 
     return (
         <div className="min-h-screen bg-zinc-950 flex md:items-center justify-center md:p-6 lg:p-12">
-            <div className="w-full max-w-[400px] bg-background flex flex-col min-h-screen md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-20px_rgba(60,207,148,0.12)] md:ring-1 ring-white/10 mx-auto md:[transform:translate3d(0,0,0)]">
+            <div className="w-full max-w-[400px] bg-background flex flex-col h-[100dvh] max-h-[100dvh] md:h-auto md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-20px_rgba(60,207,148,0.12)] md:ring-1 ring-white/10 mx-auto md:[transform:translate3d(0,0,0)]">
             {/* Header */}
             <header className={cn(
                 "absolute top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center transition-all duration-300",
