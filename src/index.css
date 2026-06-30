@@ -59,9 +59,10 @@
         font-family: var(--font-sans);
         @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
         background-image:
-            radial-gradient(ellipse at 50% -10%, rgba(60, 207, 148, 0.07) 0%, transparent 60%),
-            radial-gradient(ellipse at 100% 80%, rgba(167, 139, 250, 0.03) 0%, transparent 40%),
-            radial-gradient(ellipse at 0% 60%, rgba(251, 146, 60, 0.02) 0%, transparent 40%);
+            radial-gradient(circle at 50% 0%, rgba(60, 207, 148, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 100% 40%, rgba(54, 180, 255, 0.06) 0%, transparent 40%),
+            radial-gradient(circle at 0% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 50% 100%, rgba(255, 89, 117, 0.03) 0%, transparent 40%);
         min-height: 100vh;
         overflow-x: hidden;
         font-variant-numeric: tabular-nums;
@@ -70,12 +71,12 @@
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-display);
         font-weight: 800;
-        letter-spacing: -0.01em;
+        letter-spacing: -0.02em;
     }
 
     ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
     }
     
     ::-webkit-scrollbar-track {
@@ -83,12 +84,12 @@
     }
     
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.06);
         border-radius: 10px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.12);
     }
     
     input[type="date"]::-webkit-calendar-picker-indicator {
@@ -103,40 +104,62 @@
 }
 
 @utility glass {
-    @apply bg-[#18181c]/80 backdrop-blur-xl border border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.4)];
+    @apply bg-[#0e0e12]/75 backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
 }
 
 @utility glass-card {
-    background-color: #121216;
+    background-color: rgba(18, 18, 22, 0.7);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1.5rem; /* 24px */
-    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    @apply shadow-[0_4px_24px_rgba(0,0,0,0.4)];
+    border-radius: 1.75rem; /* 28px */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    @apply shadow-[0_8px_30px_rgba(0,0,0,0.5)];
 
     &:hover {
         border-color: rgba(255, 255, 255, 0.08);
-        background-color: #16161c;
+        background-color: rgba(22, 22, 28, 0.85);
         transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.01);
     }
 
     &:active {
-        transform: scale(0.985) translateY(0);
+        transform: scale(0.985) translateY(-0.5px);
+    }
+}
+
+@utility glass-premium {
+    background: linear-gradient(135deg, rgba(22, 22, 28, 0.8) 0%, rgba(14, 14, 18, 0.9) 100%);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2rem; /* 32px */
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+        border-color: rgba(60, 207, 148, 0.2);
+        box-shadow: 
+            0 20px 45px rgba(0, 0, 0, 0.7),
+            inset 0 1px 1px rgba(255, 255, 255, 0.08),
+            0 0 20px rgba(60, 207, 148, 0.05);
     }
 }
 
 @utility glass-panel {
-    background-color: #121216;
+    background-color: rgba(14, 14, 18, 0.8);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1.5rem; /* 24px */
-    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 1.75rem; /* 28px */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility glass-button {
     @apply flex items-center justify-center bg-white/5 border border-white/5 rounded-2xl transition-all duration-300;
-    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-        @apply bg-white/10 border-primary/20;
+        @apply bg-white/10 border-primary/20 text-primary;
     }
 
     &:active {
@@ -145,19 +168,20 @@
 }
 
 @utility insight-card {
-    background-color: #121216;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: rgba(18, 18, 22, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.03);
     border-radius: 1.5rem; /* 24px */
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    @apply shadow-md;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    @apply shadow-lg;
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.08);
-        background-color: #16161c;
+        border-color: rgba(255, 255, 255, 0.06);
+        background-color: rgba(22, 22, 28, 0.8);
         transform: translateY(-1px);
     }
 
@@ -167,15 +191,15 @@
 }
 
 @utility macro-pill {
-    @apply text-xs font-bold px-2 py-0.5 rounded-full;
+    @apply text-[10px] font-black px-2.5 py-1 rounded-xl uppercase tracking-wider;
 }
 
 @utility section-label {
-    @apply text-xs font-bold uppercase tracking-widest text-muted-foreground;
+    @apply text-[10px] font-black uppercase tracking-widest text-zinc-500;
 }
 
 @utility tap-active {
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:active {
         transform: scale(0.97);

@@ -6,6 +6,7 @@ interface SamsungActivityHeartProps {
     caloriesProgress: number; // 0 to 1
     size?: number;
     strokeWidth?: number;
+    centerLabel?: string;
 }
 
 export function SamsungActivityHeart({
@@ -13,7 +14,8 @@ export function SamsungActivityHeart({
     activeProgress,
     caloriesProgress,
     size = 180,
-    strokeWidth = 6.5
+    strokeWidth = 6.5,
+    centerLabel = "Fit"
 }: SamsungActivityHeartProps) {
     const [lengths, setLengths] = useState([200, 160, 120]);
     const outerRef = useRef<SVGPathElement>(null);
@@ -123,7 +125,7 @@ export function SamsungActivityHeart({
                     </span>
                     <span className="text-[10px] text-zinc-500 font-bold leading-none">%</span>
                 </div>
-                <span className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mt-0.5">Active</span>
+                <span className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mt-0.5">{centerLabel}</span>
             </div>
         </div>
     );

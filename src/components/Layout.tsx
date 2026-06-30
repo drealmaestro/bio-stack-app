@@ -51,18 +51,18 @@ export function Layout() {
 
     return (
         <div className="min-h-screen bg-zinc-950 flex md:items-center justify-center md:p-6 lg:p-12">
-            <div className="w-full max-w-[400px] bg-background flex flex-col h-[100dvh] max-h-[100dvh] md:h-auto md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-20px_rgba(60,207,148,0.12)] md:ring-1 ring-white/10 mx-auto md:[transform:translate3d(0,0,0)]">
+            <div className="w-full max-w-[400px] bg-background flex flex-col h-[100dvh] max-h-[100dvh] md:h-auto md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-10px_rgba(60,207,148,0.15),0_0_0_1px_rgba(255,255,255,0.05)] md:ring-1 ring-white/10 mx-auto md:[transform:translate3d(0,0,0)]">
             {/* Header */}
             <header className={cn(
-                "absolute top-0 left-0 right-0 z-50 h-16 px-4 flex justify-between items-center transition-all duration-300",
-                scrolled ? "bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20" : "bg-transparent"
+                "absolute top-0 left-0 right-0 z-50 h-16 px-5 flex justify-between items-center transition-all duration-300",
+                scrolled ? "bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/25" : "bg-transparent"
             )}>
-                <NavLink to="/" className="flex items-center gap-2 group cursor-pointer">
-                    <div className="w-8 h-8 rounded-xl bg-linear-to-br from-[#3ccf94] to-[#36b4ff] flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-[#3ccf94]/20">
-                        <span className="font-black text-black text-base">M</span>
+                <NavLink to="/" className="flex items-center gap-2 group cursor-pointer select-none">
+                    <div className="w-7 h-7 rounded-lg bg-linear-to-br from-[#3ccf94] to-[#36b4ff] flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-[#3ccf94]/25">
+                        <span className="font-black text-black text-xs tracking-tight">M</span>
                     </div>
-                    <h1 className="text-lg font-extrabold tracking-tight text-white group-hover:text-[#3ccf94] transition-colors">
-                        el <span className="text-[#3ccf94] font-black group-hover:text-white transition-colors">Maestro</span>
+                    <h1 className="text-sm font-black tracking-tight text-white group-hover:text-[#3ccf94] transition-colors">
+                        Mel <span className="text-[#3ccf94] font-black group-hover:text-white transition-colors">Maestro</span>
                     </h1>
                 </NavLink>
                 <div className="flex items-center gap-2">
@@ -174,34 +174,34 @@ export function Layout() {
             {/* Bottom Nav — swaps to Session Locked bar when workout active */}
             {location.pathname !== '/active' && (
                 isSessionLocked ? (
-                    <div className="bg-[#121216]/90 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-18 rounded-full flex items-center justify-between z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)] px-6 border border-[#3ccf94]/30 animate-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-[#3ccf94]/20 flex items-center justify-center animate-pulse">
-                                <Lock size={16} className="text-[#3ccf94]" />
+                    <div className="bg-[#0e0e12]/95 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-16 rounded-2xl flex items-center justify-between z-50 shadow-[0_12px_40px_rgba(0,0,0,0.7)] px-5 border border-[#3ccf94]/30 animate-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-[#3ccf94]/15 flex items-center justify-center animate-pulse">
+                                <Lock size={14} className="text-[#3ccf94]" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-[#3ccf94] leading-none">Session Active</div>
-                                <div className="text-xs font-extrabold text-white leading-tight mt-0.5 truncate max-w-[140px]">{activeTemplateName}</div>
+                                <div className="text-[9px] font-black uppercase tracking-wider text-[#3ccf94] leading-none">Session Active</div>
+                                <div className="text-xs font-black text-white leading-tight mt-0.5 truncate max-w-[130px]">{activeTemplateName}</div>
                             </div>
                         </div>
                         <button
                             onClick={() => navigate('/active')}
-                            className="flex items-center gap-2 bg-[#3ccf94] text-black font-extrabold text-xs px-4 py-2.5 rounded-full hover:scale-105 transition-transform active:scale-95 shadow-md shadow-[#3ccf94]/15"
+                            className="flex items-center gap-1.5 bg-[#3ccf94] text-black font-black text-xs px-3.5 py-2 rounded-xl hover:scale-105 transition-all active:scale-95 shadow-md shadow-[#3ccf94]/20"
                             aria-label="Resume active workout"
                         >
-                            <Timer size={13} /> Resume
+                            <Timer size={12} /> Resume
                         </button>
                     </div>
                 ) : (
-                    <nav className="bg-[#121216]/80 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-18 rounded-full flex items-center justify-around z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)] px-2 border border-white/5">
+                    <nav className="bg-[#0e0e12]/80 backdrop-blur-3xl absolute bottom-6 left-5 right-5 h-16 rounded-2xl flex items-center justify-around z-50 shadow-[0_12px_40px_rgba(0,0,0,0.7)] px-2 border border-white/5">
                         <NavLink to="/" className={navLinkClass} end>
                             {({ isActive }) => (
                                 <>
                                     <div className="relative flex flex-col items-center">
-                                        <Home size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                        <Home size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
                                     </div>
-                                    <span className="text-[11px] mt-1 font-bold">Home</span>
+                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Home</span>
                                 </>
                             )}
                         </NavLink>
@@ -209,25 +209,25 @@ export function Layout() {
                             {({ isActive }) => (
                                 <>
                                     <div className="relative flex flex-col items-center">
-                                        <Dumbbell size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                        <Dumbbell size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
                                     </div>
-                                    <span className="text-[11px] mt-1 font-bold">Train</span>
+                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Train</span>
                                 </>
                             )}
                         </NavLink>
     
                         {/* Center floating Play button */}
-                        <div className="relative -top-6">
+                        <div className="relative -top-5">
                             <NavLink
                                 to="/active"
                                 aria-label="Start workout"
                                 className={({ isActive }) => cn(
-                                    "flex items-center justify-center w-14 h-14 rounded-full bg-linear-to-tr from-[#3ccf94] to-[#36b4ff] text-black shadow-lg shadow-[#3ccf94]/20 transition-all active:scale-95 border-4 border-[#121216]",
-                                    isActive ? "scale-110 ring-2 ring-[#3ccf94] ring-offset-2 ring-offset-[#121216]" : "hover:scale-105"
+                                    "flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-tr from-[#3ccf94] to-[#36b4ff] text-black shadow-lg shadow-[#3ccf94]/20 transition-all active:scale-90 border-4 border-[#0e0e12]",
+                                    isActive ? "scale-110 ring-1 ring-[#3ccf94] ring-offset-2 ring-offset-[#0e0e12]" : "hover:scale-105"
                                 )}
                             >
-                                <Play size={22} fill="currentColor" className="ml-0.5" />
+                                <Play size={18} fill="currentColor" className="ml-0.5" />
                             </NavLink>
                         </div>
     
@@ -235,10 +235,10 @@ export function Layout() {
                             {({ isActive }) => (
                                 <>
                                     <div className="relative flex flex-col items-center">
-                                        <Salad size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                        <Salad size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
                                     </div>
-                                    <span className="text-[11px] mt-1 font-bold">Fuel</span>
+                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Fuel</span>
                                 </>
                             )}
                         </NavLink>
@@ -246,10 +246,10 @@ export function Layout() {
                             {({ isActive }) => (
                                 <>
                                     <div className="relative flex flex-col items-center">
-                                        <ScrollText size={20} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                        <ScrollText size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
+                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
                                     </div>
-                                    <span className="text-[11px] mt-1 font-bold">Log</span>
+                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Log</span>
                                 </>
                             )}
                         </NavLink>
@@ -262,6 +262,6 @@ export function Layout() {
 }
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "flex flex-col items-center gap-0 p-2 rounded-xl transition-all duration-300 tap-active relative group",
+    "flex flex-col items-center gap-0 p-1.5 rounded-xl transition-all duration-300 tap-active relative group",
     isActive ? "text-primary scale-105" : "text-zinc-500 hover:text-zinc-300"
 );
