@@ -6,11 +6,12 @@ import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { ProgressRing } from "../components/ui/progress-ring";
 import { Dialog } from "../components/ui/dialog";
-import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp } from "lucide-react";
+import { Play, CheckCircle, Check, ShieldAlert, Trophy, Clock, TrendingUp, Sparkles } from "lucide-react";
 import { nanoid } from "nanoid";
 import confetti from "canvas-confetti";
 import type { SetLog } from "../types";
 import { cn, getTempoBreakdown } from "../lib/utils";
+import { suggestNextWeight } from "../lib/progression";
 
 // Helper component for counting animation
 function AnimatedNumber({ value, formatter }: { value: number, formatter?: (val: number) => string | number }) {
@@ -124,6 +125,20 @@ export function ActiveWorkout() {
         lastLog.completed_exercises.forEach(set => {
             if (!map[set.exercise_id]) map[set.exercise_id] = {};
             map[set.exercise_id][set.set_number] = { weight: set.weight_kg, reps: set.reps_completed };
+        });
+        return map;
+    }, [activeWorkout?.templateId, logs]);
+
+    // Full set list (incl. RPE) per exercise from the last session — feeds the progression coach
+    const lastSetsByExercise = useMemo(() => {
+        if (!activeWorkout) return {};
+        const previousLogs = logs
+            .filter(l => l.template_id === activeWorkout.templateId)
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        if (!previousLogs.length) return {};
+        const map: Record<string, SetLog[]> = {};
+        previousLogs[0].completed_exercises.forEach(set => {
+            (map[set.exercise_id] ??= []).push(set);
         });
         return map;
     }, [activeWorkout?.templateId, logs]);
@@ -377,6 +392,12 @@ export function ActiveWorkout() {
                     const exData = exercises.find(e => e.id === exercise.exercise_id);
                     const muscle = exData?.target_muscle || 'Other';
                     const intensity = exData?.intensity_level;
+                    const suggestion = suggestNextWeight({
+                        targetSets: exercise.target_sets,
+                        targetReps: exercise.target_reps,
+                        lastSets: lastSetsByExercise[exercise.exercise_id] ?? [],
+                        muscle,
+                    });
 
                     return (
                     <div key={exercise.exercise_id} className="space-y-2">
@@ -401,6 +422,52 @@ export function ActiveWorkout() {
                                 {exercise.rest_seconds}s Rest
                             </span>
                         </div>
+
+                        {/* Progression Coach — suggested weight from last session */}
+                        {suggestion && suggestion.weightKg > 0 && (
+                            <div className={cn(
+                                "rounded-2xl p-3 mx-1 flex items-center justify-between gap-3 border",
+                                suggestion.action === 'increase' ? "bg-primary/5 border-primary/15" :
+                                suggestion.action === 'deload' ? "bg-warning/5 border-warning/15" :
+                                "bg-white/[0.02] border-white/5"
+                            )}>
+                                <div className="flex items-start gap-2 min-w-0">
+                                    <Sparkles size={13} className={cn(
+                                        "mt-0.5 shrink-0",
+                                        suggestion.action === 'increase' ? "text-primary" :
+                                        suggestion.action === 'deload' ? "text-warning" : "text-zinc-400"
+                                    )} />
+                                    <div className="min-w-0">
+                                        <div className="text-[11px] font-black text-white">
+                                            Coach: {suggestion.weightKg}kg today
+                                            <span className={cn(
+                                                "ml-1.5 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider",
+                                                suggestion.action === 'increase' ? "bg-primary/10 text-primary" :
+                                                suggestion.action === 'deload' ? "bg-warning/10 text-warning" :
+                                                "bg-white/5 text-zinc-400"
+                                            )}>
+                                                {suggestion.action === 'increase' ? '+ Progress' : suggestion.action === 'deload' ? 'Deload' : 'Repeat'}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] text-zinc-500 leading-snug mt-0.5">{suggestion.reason}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        for (let setNum = 1; setNum <= exercise.target_sets; setNum++) {
+                                            const key = `${index}-${setNum}`;
+                                            if (!activeWorkout.completedSets.includes(key)) {
+                                                updateSetWeight(index, setNum, suggestion.weightKg);
+                                            }
+                                        }
+                                        navigator.vibrate?.(30);
+                                    }}
+                                    className="shrink-0 px-3 py-1.5 bg-white/5 hover:bg-primary hover:text-black border border-white/10 rounded-xl text-[10px] font-black text-white transition-all tap-active"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        )}
 
                         {/* Coach Tip / Tempo Row */}
                         {(exData?.tempo || exData?.coach_tips) && (
