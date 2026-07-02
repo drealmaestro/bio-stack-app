@@ -18,7 +18,10 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(curl -sI https://bio-stack-app.vercel.app/)",
-      "Bash(curl -s https://bio-stack-app.vercel.app/)"
+      "Bash(curl -s https://bio-stack-app.vercel.app/)",
+      "PowerShell(npx vitest run src/lib/progression.test.ts src/lib/volume.test.ts 2>&1 | Select-Object -Last 25)",
+      "PowerShell(npx tsc --noEmit 2>&1 | Select-Object -First 30)",
+      "PowerShell(npm test *)"
     ]
   }
 }

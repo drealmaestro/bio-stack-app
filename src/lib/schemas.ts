@@ -14,6 +14,10 @@ export const ExerciseSchema = z.object({
     instructions: z.string().max(2000),
     form_cues: z.array(z.string().max(300)).max(20).optional(),
     common_mistakes: z.array(z.string().max(300)).max(20).optional(),
+    intensity_level: z.enum(['Heavy', 'Moderate', 'Light']).optional(),
+    tempo: z.string().max(40).optional(),
+    coach_tips: z.string().max(600).optional(),
+    warmup_sets: z.number().int().min(0).max(10).optional(),
 }).strict();
 
 export const ExerciseSetSchema = z.object({
@@ -28,6 +32,11 @@ export const WorkoutTemplateSchema = z.object({
     name: z.string().min(1).max(120),
     exercises: z.array(ExerciseSetSchema).max(100),
     scheduled_days: z.array(z.number().int().min(0).max(6)).optional(),
+    description: z.string().max(1000).optional(),
+    coach_notes: z.string().max(1000).optional(),
+    difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
+    target_duration: z.number().int().min(0).max(600).optional(),
+    focus_goal: z.string().max(120).optional(),
 }).strict();
 
 export const SetLogSchema = z.object({
@@ -35,6 +44,7 @@ export const SetLogSchema = z.object({
     set_number: z.number().int().min(1).max(100),
     reps_completed: z.number().int().min(0).max(1000),
     weight_kg: z.number().min(0).max(1000),
+    rpe: z.number().min(0).max(10).optional(),
 }).strict();
 
 export const WorkoutLogSchema = z.object({
@@ -93,7 +103,7 @@ export const DailyInsightsSchema = z.object({
     distance_km: z.number().min(0).max(1000),
 }).strict();
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 // Top-level Firestore document for users/{uid}. Tolerant on read (missing fields → defaults).
 export const UserDocSchema = z.object({

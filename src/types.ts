@@ -123,6 +123,8 @@ export interface NutritionLog {
 }
 
 // --- Daily Insights ---
+// Retained for Firestore document compatibility only (legacy synced field).
+// Nothing in the UI reads or writes this anymore — no wearable data source exists.
 
 export interface DailyInsights {
     date: string; // YYYY-MM-DD
@@ -130,20 +132,5 @@ export interface DailyInsights {
     calories_burned: number;
     heart_rate_avg: number;
     distance_km: number;
-}
-
-export interface SleepStageData {
-    deep: number;   // minutes
-    rem: number;    // minutes
-    light: number;  // minutes
-    awake: number;  // minutes
-}
-
-export interface VitalsData {
-    resting_hr: number;
-    hrv: number;
-    spo2: number;
-    skin_temp: number;
-    resp_rate: number;
 }
 

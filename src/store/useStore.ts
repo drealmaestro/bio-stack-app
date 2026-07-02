@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState, NutritionLog, NutritionEntry, DailyInsights, SleepStageData, VitalsData } from '../types';
+import type { UserProfile, WorkoutTemplate, WorkoutLog, Exercise, ActiveWorkoutState, NutritionLog, NutritionEntry, DailyInsights } from '../types';
 import { INITIAL_EXERCISES } from '../data/exercises';
 import { INITIAL_TEMPLATES } from '../data/templates';
 import { nanoid } from 'nanoid';
@@ -17,16 +17,12 @@ interface AppState {
     // Nutrition
     nutritionLogs: NutritionLog[];
 
-    // Daily Insights
+    // Daily Insights — legacy synced field, kept for Firestore compat (no UI usage)
     dailyInsights: DailyInsights[];
 
-    // Samsung Health v7 Redesign fields
+    // Manual recovery tracking (no wearable data — user-entered only)
     waterIntake: Record<string, number>; // date -> ml
     sleepDuration: Record<string, number>; // date -> mins
-    sleepScore: Record<string, number>; // date -> score
-    stressScore: Record<string, number>; // date -> score
-    sleepStages: Record<string, SleepStageData>; // date -> stages
-    vitals: Record<string, VitalsData>; // date -> vitals
 
     // Actions
     setUser: (user: UserProfile) => void;
@@ -57,15 +53,10 @@ interface AppState {
     deleteNutritionEntry: (date: string, entryId: string) => void;
     getNutritionLog: (date: string) => NutritionLog | undefined;
 
-    // Daily Insights Actions
-    updateDailyInsights: (insights: DailyInsights) => void;
-    getDailyInsights: (date: string) => DailyInsights | undefined;
-
-    // Samsung Health Actions
-    logWaterIntake: (date: string, ml: number) => void;
-    logSleep: (date: string, minutes: number, score: number, stages: SleepStageData) => void;
-    updateStressScore: (date: string, score: number) => void;
-    updateVitals: (date: string, vitals: Partial<VitalsData>) => void;
+    // Recovery Actions (manual entry only)
+    logWaterIntake: (date: string, deltaMl: number) => void;
+    resetWater: (date: string) => void;
+    logSleep: (date: string, minutes: number) => void;
 
     seed: () => void;
     resetStore: () => void;
@@ -84,10 +75,6 @@ export const useStore = create<AppState>()(
             dailyInsights: [],
             waterIntake: {},
             sleepDuration: {},
-            sleepScore: {},
-            stressScore: {},
-            sleepStages: {},
-            vitals: {},
 
             setUser: (user) => set({ user }),
 
@@ -267,81 +254,30 @@ export const useStore = create<AppState>()(
                 return get().nutritionLogs.find(l => l.date === date);
             },
 
-            // --- Daily Insights Actions ---
+            // --- Recovery Actions (manual entry only) ---
 
-            updateDailyInsights: (insights) => set((state) => {
-                const existing = state.dailyInsights.find(d => d.date === insights.date);
-                if (existing) {
-                    return {
-                        dailyInsights: state.dailyInsights.map(d =>
-                            d.date === insights.date ? insights : d
-                        )
-                    };
-                }
-                return {
-                    dailyInsights: [...state.dailyInsights, insights]
-                };
-            }),
-
-            getDailyInsights: (date) => {
-                return get().dailyInsights.find(d => d.date === date);
-            },
-
-            // --- Samsung Health Actions ---
-
-            logWaterIntake: (date, ml) => set((state) => ({
+            logWaterIntake: (date, deltaMl) => set((state) => ({
                 waterIntake: {
                     ...state.waterIntake,
-                    [date]: Math.max((state.waterIntake[date] || 0) + ml, 0)
+                    [date]: Math.max((state.waterIntake[date] || 0) + deltaMl, 0)
                 }
             })),
 
-            logSleep: (date, minutes, score, stages) => set((state) => ({
+            resetWater: (date) => set((state) => ({
+                waterIntake: {
+                    ...state.waterIntake,
+                    [date]: 0
+                }
+            })),
+
+            logSleep: (date, minutes) => set((state) => ({
                 sleepDuration: {
                     ...state.sleepDuration,
                     [date]: minutes
-                },
-                sleepScore: {
-                    ...state.sleepScore,
-                    [date]: score
-                },
-                sleepStages: {
-                    ...state.sleepStages,
-                    [date]: stages
                 }
             })),
-
-            updateStressScore: (date, score) => set((state) => ({
-                stressScore: {
-                    ...state.stressScore,
-                    [date]: score
-                }
-            })),
-
-            updateVitals: (date, newVitals) => set((state) => {
-                const current = state.vitals[date] || {
-                    resting_hr: 62,
-                    hrv: 58,
-                    spo2: 97,
-                    skin_temp: 36.4,
-                    resp_rate: 14.5
-                };
-                return {
-                    vitals: {
-                        ...state.vitals,
-                        [date]: {
-                            ...current,
-                            ...newVitals
-                        }
-                    }
-                };
-            }),
 
             seed: () => set((state) => {
-                const todayStr = new Date().toISOString().slice(0, 10);
-                const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-                const twoDaysAgoStr = new Date(Date.now() - 172800000).toISOString().slice(0, 10);
-
                 let updates: Partial<AppState> = {};
 
                 if (!state.seeded) {
@@ -382,49 +318,6 @@ export const useStore = create<AppState>()(
                     updates.templates = missingTemplates.length > 0 ? [...updatedTemplates, ...missingTemplates] : updatedTemplates;
                 }
 
-                // Seed daily insights if empty
-                if (!state.dailyInsights || state.dailyInsights.length === 0) {
-                    updates.dailyInsights = [
-                        { date: twoDaysAgoStr, steps: 6120, calories_burned: 280, heart_rate_avg: 74, distance_km: 4.1 },
-                        { date: yesterdayStr, steps: 9850, calories_burned: 420, heart_rate_avg: 70, distance_km: 6.8 },
-                        { date: todayStr, steps: 7420, calories_burned: 330, heart_rate_avg: 72, distance_km: 5.2 },
-                    ];
-                }
-
-                // Seed Samsung Health v7 Redesign metrics if empty
-                if (!state.waterIntake || Object.keys(state.waterIntake).length === 0) {
-                    updates.waterIntake = {
-                        [twoDaysAgoStr]: 1750,
-                        [yesterdayStr]: 2000,
-                        [todayStr]: 1250,
-                    };
-                    updates.sleepDuration = {
-                        [twoDaysAgoStr]: 380,
-                        [yesterdayStr]: 480,
-                        [todayStr]: 430,
-                    };
-                    updates.sleepScore = {
-                        [twoDaysAgoStr]: 65,
-                        [yesterdayStr]: 86,
-                        [todayStr]: 78,
-                    };
-                    updates.sleepStages = {
-                        [twoDaysAgoStr]: { deep: 60, rem: 80, light: 200, awake: 40 },
-                        [yesterdayStr]: { deep: 95, rem: 110, light: 250, awake: 25 },
-                        [todayStr]: { deep: 80, rem: 95, light: 225, awake: 30 },
-                    };
-                    updates.stressScore = {
-                        [twoDaysAgoStr]: 60,
-                        [yesterdayStr]: 32,
-                        [todayStr]: 45,
-                    };
-                    updates.vitals = {
-                        [twoDaysAgoStr]: { resting_hr: 65, hrv: 50, spo2: 96, skin_temp: 36.6, resp_rate: 15.0 },
-                        [yesterdayStr]: { resting_hr: 60, hrv: 64, spo2: 98, skin_temp: 36.2, resp_rate: 14.0 },
-                        [todayStr]: { resting_hr: 62, hrv: 58, spo2: 97, skin_temp: 36.4, resp_rate: 14.5 },
-                    };
-                }
-
                 if (Object.keys(updates).length === 0) return state;
                 return updates;
             }),
@@ -440,15 +333,26 @@ export const useStore = create<AppState>()(
                 dailyInsights: [],
                 waterIntake: {},
                 sleepDuration: {},
-                sleepScore: {},
-                stressScore: {},
-                sleepStages: {},
-                vitals: {},
             })
         }),
         {
             name: 'bio-stack-storage',
             storage: createJSONStorage(() => localStorage),
+            version: 2,
+            // v2: wearable-style metrics removed (sleep stages/score, stress, vitals,
+            // fake dailyInsights seeds). Only strips dead keys — never touches
+            // logs, templates, nutritionLogs, or user profile.
+            migrate: (persisted, version) => {
+                if (version >= 2 || !persisted || typeof persisted !== 'object') return persisted;
+                const state = persisted as Record<string, unknown>;
+                delete state.sleepScore;
+                delete state.sleepStages;
+                delete state.stressScore;
+                delete state.vitals;
+                // dailyInsights was only ever seeded with demo values — clear it
+                state.dailyInsights = [];
+                return state;
+            },
         }
     )
 );
