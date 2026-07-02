@@ -89,7 +89,7 @@ export function ProgressTab({ todayStr }: { todayStr: string }) {
                     <div>
                         <h4 className="font-black text-white text-base leading-tight">{user?.name || "Athlete Profile"}</h4>
                         <span className="text-xs text-zinc-500 font-bold capitalize mt-0.5">
-                            {user?.experience_level || "Intermediate"} • {user?.age || 40} yrs old
+                            {user?.experience_level || "Intermediate"} • {user?.age || 47} yrs old
                         </span>
                     </div>
                 </div>

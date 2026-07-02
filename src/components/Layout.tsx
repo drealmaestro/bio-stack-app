@@ -62,7 +62,7 @@ export function Layout() {
                         <span className="font-black text-black text-xs tracking-tight">M</span>
                     </div>
                     <h1 className="text-sm font-black tracking-tight text-white group-hover:text-primary transition-colors">
-                        Mel <span className="text-primary font-black group-hover:text-white transition-colors">Maestro</span>
+                        el <span className="text-primary font-black group-hover:text-white transition-colors">Maestro</span>
                     </h1>
                 </NavLink>
                 <div className="flex items-center gap-2">

@@ -69,7 +69,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                     {(isRestDay ? [
                         { icon: <Footprints size={14} />, text: "30–40 min zone-2 walk — easy pace, fat-burning, zero recovery cost." },
                         { icon: <UtensilsCrossed size={14} />, text: "Keep protein high even without training — muscle repair happens today." },
-                        { icon: <BedDouble size={14} />, text: "Aim for 7+ hours of sleep. It's the strongest natural anabolic you have at 40." },
+                        { icon: <BedDouble size={14} />, text: "Aim for 7+ hours of sleep. It's the strongest natural anabolic you have." },
                     ] : [
                         { icon: <Droplet size={14} />, text: "Hit 2L of water — dehydrated muscle underperforms and recovers slower." },
                         { icon: <UtensilsCrossed size={14} />, text: "Get 30–40g protein within a couple of hours after training." },
