@@ -135,7 +135,7 @@ export function HistoryLog() {
                 <div className="bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs">
                     <p className="text-zinc-400 mb-1">{String(label ?? '')}</p>
                     <p className="text-white font-bold">Max Weight: <span className="text-primary">{weight} kg</span></p>
-                    <p className="text-white font-bold">Est. 1-Rep Max: <span className="text-[#36b4ff]">{oneRepMax} kg</span></p>
+                    <p className="text-white font-bold">Est. 1-Rep Max: <span className="text-carbs">{oneRepMax} kg</span></p>
                 </div>
             );
         }
@@ -217,12 +217,12 @@ export function HistoryLog() {
                             <CardHeader className="p-4 pb-2">
                                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                                     <CardTitle className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                                        <Activity size={14} className="text-[#36b4ff]" /> Lift Progression
+                                        <Activity size={14} className="text-carbs" /> Lift Progression
                                     </CardTitle>
                                     <select
                                         value={selectedExerciseId}
                                         onChange={(e) => setSelectedExerciseId(e.target.value)}
-                                        className="bg-black/60 border border-white/10 text-white font-bold text-xs py-1.5 px-3 rounded-xl focus:outline-none focus:border-[#3ccf94]/50 cursor-pointer min-w-[160px]"
+                                        className="bg-black/60 border border-white/10 text-white font-bold text-xs py-1.5 px-3 rounded-xl focus:outline-none focus:border-primary/50 cursor-pointer min-w-[160px]"
                                     >
                                         {loggedExercises.map(e => (
                                             <option key={e.id} value={e.id}>
@@ -240,7 +240,7 @@ export function HistoryLog() {
                                     </div>
                                     <div className="text-center">
                                         <div className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Best Est. 1RM</div>
-                                        <div className="text-lg font-black text-[#36b4ff]">{best1RM} kg</div>
+                                        <div className="text-lg font-black text-carbs">{best1RM} kg</div>
                                     </div>
                                 </div>
 
@@ -305,7 +305,7 @@ export function HistoryLog() {
                                     return (
                                         <div key={exId} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[#3ccf94] bg-[#3ccf94]/10 w-6.5 h-6.5 rounded-full flex items-center justify-center shrink-0">
+                                                <span className="text-primary bg-primary/10 w-6.5 h-6.5 rounded-full flex items-center justify-center shrink-0">
                                                     {getMuscleIcon(muscle, 11)}
                                                 </span>
                                                 <div>

@@ -9,6 +9,16 @@ export default defineConfig({
         environment: 'jsdom',
         globals: true
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Firebase rarely changes — its own chunk stays cached across app updates
+                    firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+                },
+            },
+        },
+    },
     plugins: [
         react(),
         VitePWA({

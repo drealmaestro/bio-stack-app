@@ -87,7 +87,7 @@ export function Nutrition() {
 
             {/* Header */}
             <div className="px-1">
-                <span className="text-xs font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">Nutrition</span>
+                <span className="text-xs font-black text-primary uppercase tracking-widest block mb-0.5">Nutrition</span>
                 <h2 className="text-2xl font-extrabold text-white">{todayLabel()}</h2>
             </div>
 
@@ -166,15 +166,15 @@ export function Nutrition() {
             <div className="flex gap-2">
                 {[
                     { label: 'P', value: totals.protein_g, color: 'bg-protein/10 text-protein' },
-                    { label: 'C', value: totals.carbs_g, color: 'bg-carbs/10 text-[#36b4ff]' },
-                    { label: 'F', value: totals.fat_g, color: 'bg-fat/10 text-[#ff793f]' },
+                    { label: 'C', value: totals.carbs_g, color: 'bg-carbs/10 text-carbs' },
+                    { label: 'F', value: totals.fat_g, color: 'bg-fat/10 text-fat' },
                 ].map(m => (
                     <div key={m.label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold ${m.color}`}>
                         <span className="opacity-80">{m.label}</span>
                         <span>{Math.round(m.value)}g</span>
                     </div>
                 ))}
-                <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#ff9f0a]/10 text-[#ff9f0a] ml-auto">
+                <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-warning/10 text-warning ml-auto">
                     <Flame size={12} /> {Math.round(totals.calories)} kcal
                 </div>
             </div>
@@ -186,7 +186,7 @@ export function Nutrition() {
                     <Button
                         size="sm"
                         onClick={() => setShowAddModal(true)}
-                        className="h-8 gap-1 text-xs font-bold bg-[#ff9f0a] hover:bg-[#ff9f0a]/90 text-black rounded-full px-3.5"
+                        className="h-8 gap-1 text-xs font-bold bg-warning hover:bg-warning/90 text-black rounded-full px-3.5"
                     >
                         <Plus size={13} /> Add Food
                     </Button>
@@ -197,7 +197,7 @@ export function Nutrition() {
                         className="bg-card border border-dashed border-white/5 p-8 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-zinc-900/50 transition-colors"
                         onClick={() => setShowAddModal(true)}
                     >
-                        <div className="w-12 h-12 rounded-full bg-[#ff9f0a]/10 flex items-center justify-center text-[#ff9f0a]">
+                        <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center text-warning">
                             <Plus size={22} />
                         </div>
                         <p className="text-xs font-bold text-zinc-500">Tap to record your first meal</p>
@@ -210,7 +210,7 @@ export function Nutrition() {
                                 className="group bg-card border border-white/5 p-4 rounded-2xl flex justify-between items-center hover:bg-zinc-900/90 transition-colors"
                             >
                                 <div className="flex gap-3.5 items-center">
-                                    <div className="w-9 h-9 rounded-full bg-[#ff9f0a]/10 flex items-center justify-center text-[#ff9f0a] shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-warning/10 flex items-center justify-center text-warning shrink-0">
                                         <Flame size={16} />
                                     </div>
                                     <div>
@@ -219,9 +219,9 @@ export function Nutrition() {
                                             {entry.servings > 1 ? <span className="text-white bg-white/10 px-1.5 py-0.5 rounded-md">{entry.servings}x</span> : ''}
                                             <span className="text-protein">P {entry.protein_g}g</span>
                                             <span>•</span>
-                                            <span className="text-[#36b4ff]">C {entry.carbs_g}g</span>
+                                            <span className="text-carbs">C {entry.carbs_g}g</span>
                                             <span>•</span>
-                                            <span className="text-[#ff793f]">F {entry.fat_g}g</span>
+                                            <span className="text-fat">F {entry.fat_g}g</span>
                                         </div>
                                     </div>
                                 </div>

@@ -495,7 +495,7 @@ export function WorkoutManager() {
                                                                         >
                                                                             <span className="font-bold text-zinc-400 uppercase tracking-wider">Tempo:</span> 
                                                                             <span className="font-mono underline decoration-dashed decoration-zinc-600 underline-offset-2">{exData.tempo}</span>
-                                                                            <span className="text-[8px] text-[#3ccf94] bg-[#3ccf94]/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
+                                                                            <span className="text-[8px] text-primary bg-primary/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
                                                                         </button>
                                                                         {isTempoExpanded && breakdown && (
                                                                             <div className="mt-1.5 p-2 bg-black/60 border border-white/5 rounded-lg space-y-0.5 text-[9px] text-zinc-400 animate-in slide-in-from-top-1 duration-150">
@@ -515,7 +515,7 @@ export function WorkoutManager() {
                                                             })()}
                                                             {exData.coach_tips && (
                                                                 <div className="text-zinc-400 leading-relaxed text-[11px]">
-                                                                    <span className="text-[#3ccf94] font-bold">💡 Tip:</span> {exData.coach_tips}
+                                                                    <span className="text-primary font-bold">💡 Tip:</span> {exData.coach_tips}
                                                                 </div>
                                                             )}
                                                         </div>

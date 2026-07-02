@@ -17,7 +17,7 @@ export function MacroBar({ label, current, goal, unit = 'g', color, className }:
     const getColorClass = (bgClass: string) => {
         if (bgClass.includes('protein')) return 'bg-[#a78bfa]';
         if (bgClass.includes('carbs')) return 'bg-[#36b4ff]';
-        if (bgClass.includes('fat')) return 'bg-[#ff793f]';
+        if (bgClass.includes('fat')) return 'bg-fat';
         return bgClass;
     };
 

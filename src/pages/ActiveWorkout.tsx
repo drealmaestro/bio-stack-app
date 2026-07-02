@@ -339,7 +339,7 @@ export function ActiveWorkout() {
             {/* Header / Timer */}
             <div className="bg-card border border-white/5 rounded-3xl p-5 mb-6 flex justify-between items-center shadow-md relative z-10">
                 <div>
-                    <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest block mb-0.5">{activeTemplate.name}</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest block mb-0.5">{activeTemplate.name}</span>
                     <div className="text-3xl font-extrabold text-white font-mono tracking-tighter tabular-nums leading-none">
                         {formatTime(elapsedSeconds)}
                     </div>
@@ -349,7 +349,7 @@ export function ActiveWorkout() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowCancelConfirm(true)}
-                    className="text-[#ff3b30] h-auto py-1.5 px-3.5 bg-[#ff3b30]/10 hover:bg-[#ff3b30]/20 rounded-full text-xs font-extrabold uppercase tracking-widest border border-[#ff3b30]/10"
+                    className="text-destructive h-auto py-1.5 px-3.5 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-extrabold uppercase tracking-widest border border-destructive/10"
                 >
                     Cancel
                 </Button>
@@ -357,12 +357,12 @@ export function ActiveWorkout() {
 
             {/* Coach's Day Strategy */}
             {(activeTemplate.description || activeTemplate.coach_notes) && (
-                <div className="bg-[#3ccf94]/5 border border-[#3ccf94]/10 rounded-3xl p-4.5 mb-5 space-y-2 animate-in slide-in-from-top-3 duration-300">
+                <div className="bg-primary/5 border border-primary/10 rounded-3xl p-4.5 mb-5 space-y-2 animate-in slide-in-from-top-3 duration-300">
                     <button 
                         onClick={() => setShowStrategy(!showStrategy)}
                         className="w-full flex justify-between items-center text-left"
                     >
-                        <span className="text-[10px] font-black text-[#3ccf94] uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
                             💡 Coach's Strategy
                         </span>
                         <span className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors">
@@ -403,7 +403,7 @@ export function ActiveWorkout() {
                     <div key={exercise.exercise_id} className="space-y-2">
                         <div className="flex justify-between items-center px-1">
                             <h3 className="text-sm font-extrabold text-white tracking-tight flex items-center gap-2">
-                                <span className="text-[#3ccf94] bg-[#3ccf94]/10 w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+                                <span className="text-primary bg-primary/10 w-6 h-6 rounded-full flex items-center justify-center shrink-0">
                                     {getMuscleIcon(muscle, 12)}
                                 </span>
                                 <span className="truncate">{getExerciseName(exercise.exercise_id)}</span>
@@ -418,7 +418,7 @@ export function ActiveWorkout() {
                                     </span>
                                 )}
                             </h3>
-                            <span className="text-[10px] font-bold text-[#3ccf94] bg-[#3ccf94]/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                 {exercise.rest_seconds}s Rest
                             </span>
                         </div>
@@ -484,7 +484,7 @@ export function ActiveWorkout() {
                                             >
                                                 <span className="font-bold text-zinc-400 uppercase tracking-wider">Tempo:</span> 
                                                 <span className="font-mono underline decoration-dashed decoration-zinc-600 underline-offset-2">{exData.tempo}</span>
-                                                <span className="text-[8px] text-[#3ccf94] bg-[#3ccf94]/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
+                                                <span className="text-[8px] text-primary bg-primary/10 px-1 py-0.2 rounded font-black scale-90 ml-0.5">Guide</span>
                                             </button>
                                             {isTempoExpanded && breakdown && (
                                                 <div className="mt-1.5 p-2 bg-black/60 border border-white/5 rounded-xl space-y-0.5 text-[9px] text-zinc-400 animate-in slide-in-from-top-1 duration-150">
@@ -504,7 +504,7 @@ export function ActiveWorkout() {
                                 })()}
                                 {exData.coach_tips && (
                                     <div className="text-zinc-300 font-medium">
-                                        <span className="text-[#3ccf94] font-bold">💡 Tip:</span> {exData.coach_tips}
+                                        <span className="text-primary font-bold">💡 Tip:</span> {exData.coach_tips}
                                     </div>
                                 )}
                             </div>
@@ -534,7 +534,7 @@ export function ActiveWorkout() {
                                     return (
                                         <div key={setNum} className={cn(
                                             "grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 items-center border-t border-white/5 transition-colors",
-                                            isCompleted ? "bg-[#3ccf94]/5" : ""
+                                            isCompleted ? "bg-primary/5" : ""
                                         )}>
                                             {/* Set number */}
                                             <div className="flex flex-col items-center">
@@ -558,7 +558,7 @@ export function ActiveWorkout() {
                                                     min={0}
                                                     step={0.5}
                                                     value={currentWeight || ''}
-                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-[#3ccf94] text-white font-mono text-sm font-bold rounded-xl"
+                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-primary text-white font-mono text-sm font-bold rounded-xl"
                                                     onChange={(e) => updateSetWeight(index, setNum, Math.max(0, parseFloat(e.target.value) || 0))}
                                                 />
                                             </div>
@@ -573,7 +573,7 @@ export function ActiveWorkout() {
                                                     min={0}
                                                     max={999}
                                                     value={currentReps === exercise.target_reps && !(key in (activeWorkout.setReps || {})) ? '' : currentReps}
-                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-[#3ccf94] text-white font-mono text-sm font-bold rounded-xl"
+                                                    className="h-11 text-center bg-black/30 border-white/5 focus:border-primary text-white font-mono text-sm font-bold rounded-xl"
                                                     onChange={(e) => updateSetReps(index, setNum, Math.max(0, parseInt(e.target.value) || exercise.target_reps))}
                                                 />
                                             </div>
@@ -584,7 +584,7 @@ export function ActiveWorkout() {
                                                     aria-label={`${getExerciseName(exercise.exercise_id)} set ${setNum} RPE`}
                                                     value={currentRpe || ''}
                                                     onChange={(e) => updateSetRpe(index, setNum, parseFloat(e.target.value) || 0)}
-                                                    className="w-full h-11 text-center bg-black/30 border border-white/5 focus:border-[#3ccf94] text-white font-mono text-xs font-bold rounded-xl outline-none transition-colors cursor-pointer appearance-none px-1"
+                                                    className="w-full h-11 text-center bg-black/30 border border-white/5 focus:border-primary text-white font-mono text-xs font-bold rounded-xl outline-none transition-colors cursor-pointer appearance-none px-1"
                                                 >
                                                     <option value="" className="bg-[#18181c] text-zinc-500">-</option>
                                                     <option value="10" className="bg-[#18181c] text-red-400 font-bold">10</option>
@@ -611,7 +611,7 @@ export function ActiveWorkout() {
                                                     className={cn(
                                                         "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95",
                                                         isCompleted
-                                                            ? "bg-[#3ccf94] text-black shadow-md shadow-[#3ccf94]/20 scale-105"
+                                                            ? "bg-primary text-black shadow-md shadow-primary/20 scale-105"
                                                             : "bg-white/5 border border-white/5 text-zinc-600 hover:bg-white/10"
                                                     )}
                                                 >
@@ -630,7 +630,7 @@ export function ActiveWorkout() {
 
             {/* Finish Button */}
             <div className="w-full mt-8 px-1 pb-12 relative z-10">
-                <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-3xl font-black text-base tracking-wider bg-[#3ccf94] hover:bg-[#3ccf94]/90 text-black hover:scale-[1.01] transition-transform active:scale-95 shadow-lg shadow-[#3ccf94]/20 uppercase">
+                <Button onClick={() => setShowFinishConfirm(true)} className="w-full h-14 rounded-3xl font-black text-base tracking-wider bg-primary hover:bg-primary/90 text-black hover:scale-[1.01] transition-transform active:scale-95 shadow-lg shadow-primary/20 uppercase">
                     <CheckCircle className="mr-2" size={20} /> FINISH WORKOUT
                 </Button>
             </div>
@@ -733,7 +733,7 @@ export function ActiveWorkout() {
                         trackColor="rgba(255,255,255,0.03)"
                     >
                         <div className="flex flex-col items-center">
-                            <span className="text-5xl font-extrabold text-[#3ccf94] font-mono tabular-nums tracking-tighter">
+                            <span className="text-5xl font-extrabold text-primary font-mono tabular-nums tracking-tighter">
                                 {formatTime(restSecondsRemaining)}
                             </span>
                             <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-1">remaining</span>

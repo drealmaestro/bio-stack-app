@@ -58,11 +58,11 @@ export function Layout() {
                 scrolled ? "bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/25" : "bg-transparent"
             )}>
                 <NavLink to="/" className="flex items-center gap-2 group cursor-pointer select-none">
-                    <div className="w-7 h-7 rounded-lg bg-linear-to-br from-[#3ccf94] to-[#36b4ff] flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-[#3ccf94]/25">
+                    <div className="w-7 h-7 rounded-lg bg-linear-to-br from-primary to-carbs flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-primary/25">
                         <span className="font-black text-black text-xs tracking-tight">M</span>
                     </div>
-                    <h1 className="text-sm font-black tracking-tight text-white group-hover:text-[#3ccf94] transition-colors">
-                        Mel <span className="text-[#3ccf94] font-black group-hover:text-white transition-colors">Maestro</span>
+                    <h1 className="text-sm font-black tracking-tight text-white group-hover:text-primary transition-colors">
+                        Mel <span className="text-primary font-black group-hover:text-white transition-colors">Maestro</span>
                     </h1>
                 </NavLink>
                 <div className="flex items-center gap-2">
@@ -72,8 +72,8 @@ export function Layout() {
                         className={({ isActive }) => cn(
                             "w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm transition-all",
                             isActive
-                                ? "bg-[#3ccf94] text-black"
-                                : "bg-[#3ccf94]/20 text-[#3ccf94] hover:bg-[#3ccf94]/30"
+                                ? "bg-primary text-black"
+                                : "bg-primary/20 text-primary hover:bg-primary/30"
                         )}
                         title="Profile"
                         aria-label="Open profile"
@@ -138,7 +138,7 @@ export function Layout() {
                         <Trash2 size={16} /> Reset All Data
                     </button>
                     <div className="text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest mt-1">
-                        v1.2.2 (One UI 7)
+                        v1.3.0 (Goal Engine)
                     </div>
                 </div>
             </div>
@@ -174,19 +174,19 @@ export function Layout() {
             {/* Bottom Nav — swaps to Session Locked bar when workout active */}
             {location.pathname !== '/active' && (
                 isSessionLocked ? (
-                    <div className="bg-[#0e0e12]/95 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-16 rounded-2xl flex items-center justify-between z-50 shadow-[0_12px_40px_rgba(0,0,0,0.7)] px-5 border border-[#3ccf94]/30 animate-in slide-in-from-bottom-4 duration-300">
+                    <div className="bg-[#0e0e12]/95 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-16 rounded-2xl flex items-center justify-between z-50 shadow-[0_12px_40px_rgba(0,0,0,0.7)] px-5 border border-primary/30 animate-in slide-in-from-bottom-4 duration-300">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-[#3ccf94]/15 flex items-center justify-center animate-pulse">
-                                <Lock size={14} className="text-[#3ccf94]" />
+                            <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center animate-pulse">
+                                <Lock size={14} className="text-primary" />
                             </div>
                             <div>
-                                <div className="text-[9px] font-black uppercase tracking-wider text-[#3ccf94] leading-none">Session Active</div>
+                                <div className="text-[9px] font-black uppercase tracking-wider text-primary leading-none">Session Active</div>
                                 <div className="text-xs font-black text-white leading-tight mt-0.5 truncate max-w-[130px]">{activeTemplateName}</div>
                             </div>
                         </div>
                         <button
                             onClick={() => navigate('/active')}
-                            className="flex items-center gap-1.5 bg-[#3ccf94] text-black font-black text-xs px-3.5 py-2 rounded-xl hover:scale-105 transition-all active:scale-95 shadow-md shadow-[#3ccf94]/20"
+                            className="flex items-center gap-1.5 bg-primary text-black font-black text-xs px-3.5 py-2 rounded-xl hover:scale-105 transition-all active:scale-95 shadow-md shadow-primary/20"
                             aria-label="Resume active workout"
                         >
                             <Timer size={12} /> Resume
@@ -223,8 +223,8 @@ export function Layout() {
                                 to="/active"
                                 aria-label="Start workout"
                                 className={({ isActive }) => cn(
-                                    "flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-tr from-[#3ccf94] to-[#36b4ff] text-black shadow-lg shadow-[#3ccf94]/20 transition-all active:scale-90 border-4 border-[#0e0e12]",
-                                    isActive ? "scale-110 ring-1 ring-[#3ccf94] ring-offset-2 ring-offset-[#0e0e12]" : "hover:scale-105"
+                                    "flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-tr from-primary to-carbs text-black shadow-lg shadow-primary/20 transition-all active:scale-90 border-4 border-[#0e0e12]",
+                                    isActive ? "scale-110 ring-1 ring-primary ring-offset-2 ring-offset-[#0e0e12]" : "hover:scale-105"
                                 )}
                             >
                                 <Play size={18} fill="currentColor" className="ml-0.5" />

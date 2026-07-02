@@ -15,19 +15,19 @@ export function StatCard({ icon, value, unit, label, color = 'text-primary', onC
     // Dynamic styling helper to map visual status colors to background circles
     const getColors = (colorClass: string) => {
         if (colorClass.includes('emerald') || colorClass.includes('steps')) {
-            return { bg: 'bg-[#3ccf94]/10', text: 'text-[#3ccf94]' };
+            return { bg: 'bg-primary/10', text: 'text-primary' };
         }
         if (colorClass.includes('orange') || colorClass.includes('fat') || colorClass.includes('warning')) {
-            return { bg: 'bg-[#ff793f]/10', text: 'text-[#ff793f]' };
+            return { bg: 'bg-fat/10', text: 'text-fat' };
         }
         if (colorClass.includes('rose') || colorClass.includes('calories') || colorClass.includes('destructive')) {
-            return { bg: 'bg-[#ff5975]/10', text: 'text-[#ff5975]' };
+            return { bg: 'bg-[#ff5975]/10', text: 'text-calories' };
         }
         if (colorClass.includes('violet') || colorClass.includes('sleep') || colorClass.includes('purple')) {
-            return { bg: 'bg-[#a78bfa]/10', text: 'text-[#a78bfa]' };
+            return { bg: 'bg-[#a78bfa]/10', text: 'text-protein' };
         }
         if (colorClass.includes('blue') || colorClass.includes('active') || colorClass.includes('carbs')) {
-            return { bg: 'bg-[#36b4ff]/10', text: 'text-[#36b4ff]' };
+            return { bg: 'bg-[#36b4ff]/10', text: 'text-carbs' };
         }
         return { bg: 'bg-primary/10', text: 'text-primary' };
     };
