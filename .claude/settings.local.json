@@ -22,7 +22,9 @@
       "PowerShell(npx vitest run src/lib/progression.test.ts src/lib/volume.test.ts 2>&1 | Select-Object -Last 25)",
       "PowerShell(npx tsc --noEmit 2>&1 | Select-Object -First 30)",
       "PowerShell(npm test *)",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "PowerShell(vercel *)",
+      "PowerShell(\\(Invoke-WebRequest -Uri 'https://bio-stack-app.vercel.app/index.html' -Headers @{'Cache-Control'='no-cache'} -UseBasicParsing\\).Content)"
     ]
   }
 }

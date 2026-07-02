@@ -303,13 +303,16 @@ export const useStore = create<AppState>()(
                     // Update existing templates with new coaching attributes if they are defaults
                     const updatedTemplates = state.templates.map(t => {
                         const initial = INITIAL_TEMPLATES.find(it => it.id === t.id);
-                        return initial ? { 
-                            ...t, 
-                            description: t.description || initial.description, 
+                        return initial ? {
+                            ...t,
+                            description: t.description || initial.description,
                             coach_notes: t.coach_notes || initial.coach_notes,
                             difficulty: t.difficulty || initial.difficulty,
                             target_duration: t.target_duration || initial.target_duration,
-                            focus_goal: t.focus_goal || initial.focus_goal
+                            focus_goal: t.focus_goal || initial.focus_goal,
+                            // Templates stored before scheduling existed never got their day —
+                            // without it the home screen shows a rest day instead of the workout
+                            scheduled_days: t.scheduled_days?.length ? t.scheduled_days : initial.scheduled_days
                         } : t;
                     });
 
