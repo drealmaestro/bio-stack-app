@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "preview:host": "vite preview --host",
     "test": "vitest run",
+    "lint": "tsc --noEmit",
     "deploy": "npm run build && vercel --prod"
   },
   "devDependencies": {

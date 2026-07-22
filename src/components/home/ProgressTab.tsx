@@ -3,6 +3,8 @@ import { useStore } from "../../store/useStore";
 import { User, Target, TrendingUp, Dumbbell } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { weeklyMuscleVolume, getTrainingWeekStart } from "../../lib/volume";
+import { MuscleHeatmap } from "../analytics/MuscleHeatmap";
+import { MuscleDistributionChart } from "../analytics/MuscleDistributionChart";
 
 const CHART_W = 340;
 const CHART_H = 100;
@@ -107,6 +109,12 @@ export function ProgressTab({ todayStr }: { todayStr: string }) {
                     </div>
                 )}
             </div>
+
+            {/* Interactive Muscle Heatmap */}
+            <MuscleHeatmap volumeRows={volumeRows} />
+
+            {/* Muscle Volume Distribution */}
+            <MuscleDistributionChart logs={logs} exercises={exercises} />
 
             {/* Weekly Muscle Volume — is chest/arms actually getting enough work? */}
             <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-4 shadow-md">

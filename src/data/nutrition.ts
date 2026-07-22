@@ -1,5 +1,54 @@
 import type { FoodItem } from '../types';
 
+export interface MealPreset {
+    id: string;
+    name: string;
+    description: string;
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+}
+
+export const MEAL_PRESETS: MealPreset[] = [
+    {
+        id: 'preset_protein_shake',
+        name: 'High Protein Shake',
+        description: 'Whey + Almond Milk + Banana',
+        calories: 350,
+        protein_g: 40,
+        carbs_g: 30,
+        fat_g: 5,
+    },
+    {
+        id: 'preset_chicken_rice',
+        name: 'Chicken & Rice Bowl',
+        description: '200g Chicken Breast + 1.5 cup Rice + Broccoli',
+        calories: 620,
+        protein_g: 65,
+        carbs_g: 70,
+        fat_g: 9,
+    },
+    {
+        id: 'preset_egg_toast',
+        name: 'Eggs & Avocado Toast',
+        description: '3 Whole Eggs + 2 slices Whole Wheat + 1/2 Avocado',
+        calories: 480,
+        protein_g: 24,
+        carbs_g: 36,
+        fat_g: 26,
+    },
+    {
+        id: 'preset_greek_yogurt_parfait',
+        name: 'Greek Yogurt Parfait',
+        description: '200g Greek Yogurt + Honey + Berries + Almonds',
+        calories: 310,
+        protein_g: 22,
+        carbs_g: 38,
+        fat_g: 7,
+    },
+];
+
 export const COMMON_FOODS: FoodItem[] = [
     { id: 'food_chicken_breast', name: 'Chicken Breast', serving_label: '100g', calories: 165, protein_g: 31, carbs_g: 0, fat_g: 3.6 },
     { id: 'food_white_rice', name: 'White Rice (cooked)', serving_label: '1 cup', calories: 206, protein_g: 4.3, carbs_g: 44.5, fat_g: 0.4 },
