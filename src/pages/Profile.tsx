@@ -199,7 +199,7 @@ export function Profile() {
                     Save Profile
                 </Button>
                 <div className="text-center text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest pt-2">
-                    v1.3.0 (Goal Engine)
+                    v1.4.0 (Action & UI/UX Engine)
                 </div>
             </div>
         </div>

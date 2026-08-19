@@ -128,7 +128,7 @@ export function Layout() {
                             <Trash2 size={16} /> Reset All Data
                         </button>
                         <div className="text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest mt-1">
-                            v1.3.0 (Goal Engine)
+                            v1.4.0 (Action & UI/UX Engine)
                         </div>
                     </div>
                 </div>
