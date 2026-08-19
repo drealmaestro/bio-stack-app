@@ -2,24 +2,12 @@ import { useMemo, useState } from "react";
 import { useStore } from "../../store/useStore";
 import { useActiveWorkoutStore } from "../../store/useActiveWorkoutStore";
 import { Link, useNavigate } from "react-router-dom";
-import { Play, Coffee, ChevronRight, Trophy } from "lucide-react";
+import { Play, ChevronRight, Trophy } from "lucide-react";
 import { SamsungActivityHeart } from "../ui/samsung-activity-heart";
 import { DailyReadinessCard } from "./DailyReadinessCard";
+import { ScheduledProtocolCard } from "./ScheduledProtocolCard";
 import { Dialog } from "../ui/dialog";
 import { getEffectiveNutritionGoals } from "../../lib/nutritionGoals";
-import type { TargetMuscle } from "../../types";
-
-const MUSCLE_COLORS: Record<TargetMuscle, string> = {
-    Chest: "text-orange-400 bg-orange-400/10",
-    Back: "text-blue-400 bg-blue-400/10",
-    Legs: "text-green-400 bg-green-400/10",
-    Shoulders: "text-purple-400 bg-purple-400/10",
-    Biceps: "text-pink-400 bg-pink-400/10",
-    Triceps: "text-yellow-400 bg-yellow-400/10",
-    Core: "text-red-400 bg-red-400/10",
-    Forearms: "text-zinc-400 bg-zinc-400/10",
-    Other: "text-zinc-400 bg-zinc-400/10",
-};
 
 const WORKOUT_TARGET_MINUTES = 45;
 const WATER_TARGET_ML = 2000;
@@ -74,41 +62,46 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
 
     const todayWater = waterIntake?.[todayStr] || 0;
 
+    const nextTemplate = todayTemplate || templates[0] || null;
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-            {/* Overview Card with Concentric Activity Heart */}
-            <div className="bg-gradient-to-br from-[#16161a] to-[#0e0e12] border border-white/5 rounded-3xl p-5 shadow-xl relative overflow-hidden flex items-center justify-between gap-4">
-                <div className="space-y-4 flex-1 min-w-0">
-                    <div className="space-y-1">
+            {/* Overview Card with Concentric Activity Heart & Metric Tiles */}
+            <div className="bg-gradient-to-br from-[#16161a] to-[#0e0e12] border border-white/5 rounded-3xl p-5 shadow-xl relative overflow-hidden space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1 flex-1 min-w-0">
                         <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Daily Movement</span>
-                        <h3 className="text-xl font-black text-white leading-tight">Activity Status</h3>
+                        <h3 className="text-xl font-black text-white leading-tight">
+                            {isRestDay ? "Active Recovery" : "Primed & Ready"}
+                        </h3>
+                        <p className="text-xs text-zinc-400">
+                            {isRestDay ? "Zone-2 walk & tissue recovery" : "Optimal CNS readiness for training"}
+                        </p>
                     </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-steps shrink-0" />
-                            <span className="text-zinc-400 font-medium truncate">Workout:</span>
-                            <span className="font-extrabold text-white ml-auto shrink-0">{activeMinutesToday} / {WORKOUT_TARGET_MINUTES} min</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-active shrink-0" />
-                            <span className="text-zinc-400 font-medium truncate">Hydration:</span>
-                            <span className="font-extrabold text-white ml-auto shrink-0">{todayWater} / {WATER_TARGET_ML.toLocaleString()} ml</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-calories shrink-0" />
-                            <span className="text-zinc-400 font-medium truncate">Nutrition:</span>
-                            <span className="font-extrabold text-white ml-auto shrink-0">{Math.round(todayCalories)} / {nutritionGoals.calories} kcal</span>
-                        </div>
+                    <div className="shrink-0 scale-95 pr-1 drop-shadow-[0_0_15px_rgba(60,207,148,0.15)]">
+                        <SamsungActivityHeart
+                            stepsProgress={activeMinutesToday / WORKOUT_TARGET_MINUTES}
+                            activeProgress={todayWater / WATER_TARGET_ML}
+                            caloriesProgress={nutritionGoals.calories > 0 ? todayCalories / nutritionGoals.calories : 0}
+                            centerLabel="Fit"
+                            size={110}
+                        />
                     </div>
                 </div>
-                <div className="shrink-0 scale-95 pr-1 drop-shadow-[0_0_15px_rgba(60,207,148,0.15)]">
-                    <SamsungActivityHeart
-                        stepsProgress={activeMinutesToday / WORKOUT_TARGET_MINUTES}
-                        activeProgress={todayWater / WATER_TARGET_ML}
-                        caloriesProgress={nutritionGoals.calories > 0 ? todayCalories / nutritionGoals.calories : 0}
-                        centerLabel="Fit"
-                        size={135}
-                    />
+
+                <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/5 text-center">
+                    <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Session</span>
+                        <span className="text-sm font-black text-primary">{activeMinutesToday} / {WORKOUT_TARGET_MINUTES}m</span>
+                    </div>
+                    <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Water</span>
+                        <span className="text-sm font-black text-carbs">{todayWater} ml</span>
+                    </div>
+                    <div className="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Protein</span>
+                        <span className="text-sm font-black text-protein">{Math.round(todayCalories > 0 ? (nutritionLogs.find(l => l.date === todayStr)?.entries ?? []).reduce((s, e) => s + e.protein_g, 0) : 0)} / {nutritionGoals.protein_g}g</span>
+                    </div>
                 </div>
             </div>
 
@@ -121,37 +114,13 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
             />
 
             {/* Scheduled Protocol Widget */}
-            <div className="space-y-3">
-                <h3 className="section-label px-1">Scheduled Protocol</h3>
-
-                {todayTemplate ? (
-                    <div className="bg-card border border-primary/25 rounded-3xl p-5 space-y-4 shadow-md">
-                        <div className="space-y-1">
-                            <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Today's target routine</span>
-                            <h4 className="text-xl font-black text-white leading-tight">{todayTemplate.name}</h4>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                            {[...new Set(todayTemplate.exercises.map(e => getExerciseMuscle(e.exercise_id)))].map(muscle => (
-                                <span key={muscle} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${MUSCLE_COLORS[muscle as TargetMuscle]}`}>
-                                    {muscle}
-                                </span>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
-                            className="w-full min-h-[48px] py-3 bg-primary hover:bg-[#2fb27f] text-black font-black rounded-2xl flex items-center justify-center gap-1.5 transition-all tap-active shadow-lg shadow-primary/15 cursor-pointer"
-                        >
-                            <Play size={15} fill="currentColor" /> {activeWorkout ? "Resume Session" : "Start Workout"}
-                        </button>
-                    </div>
-                ) : (
-                    <div className="p-5 bg-card border border-white/5 rounded-3xl text-center space-y-2">
-                        <Coffee className="mx-auto text-zinc-500" size={24} />
-                        <h4 className="text-sm font-black text-white">Active Recovery Day</h4>
-                        <p className="text-xs text-zinc-500 max-w-xs mx-auto">Rebuild muscle tissue. A 30–40 min brisk walk burns chest fat without eating into recovery.</p>
-                    </div>
-                )}
-            </div>
+            <ScheduledProtocolCard
+                todayTemplate={todayTemplate}
+                nextTemplate={nextTemplate}
+                isSessionLocked={!!activeWorkout}
+                getExerciseMuscle={getExerciseMuscle}
+                onStartWorkout={startWorkout}
+            />
 
             {/* Weekly summaries & Streak */}
             <div className="grid grid-cols-2 gap-3">

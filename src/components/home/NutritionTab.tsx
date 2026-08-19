@@ -111,26 +111,24 @@ export function NutritionTab({ todayStr }: { todayStr: string }) {
             </div>
 
             {/* 1-Tap Meal Preset Chips */}
-            <div className="space-y-2">
-                <div className="flex justify-between items-center px-1">
+            <div className="bg-card border border-white/5 p-4 rounded-3xl space-y-3 shadow-md">
+                <div className="flex justify-between items-center">
                     <span className="section-label flex items-center gap-1">
                         <Zap size={12} className="text-amber-400" /> 1-Tap Meal Presets
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-bold">Instant logging</span>
+                    <span className="text-[9px] text-primary font-bold">Tap to add</span>
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {MEAL_PRESETS.map((preset) => (
                         <button
                             key={preset.id}
                             type="button"
                             onClick={() => handleLogPreset(preset)}
-                            className="shrink-0 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 active:scale-95 rounded-2xl p-3 text-left transition-all tap-active min-w-[140px] cursor-pointer"
+                            className="bg-white/5 hover:bg-protein/15 border border-white/5 hover:border-protein/30 active:scale-95 rounded-2xl p-2.5 text-left transition-all tap-active cursor-pointer min-h-[44px]"
                         >
-                            <div className="text-xs font-black text-amber-300 truncate">{preset.name}</div>
-                            <div className="text-sm font-black text-white mt-1">{preset.calories} <span className="text-[10px] text-zinc-400">kcal</span></div>
-                            <div className="text-[10px] font-bold text-protein mt-0.5">
-                                P {preset.protein_g}g · C {preset.carbs_g}g
-                            </div>
+                            <span className="text-xs font-black text-white block truncate">{preset.name}</span>
+                            <span className="text-[10px] font-bold text-protein">+{preset.protein_g}g P</span>
+                            <span className="text-[9px] text-zinc-500 block">{preset.calories} kcal</span>
                         </button>
                     ))}
                 </div>
