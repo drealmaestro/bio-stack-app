@@ -58,14 +58,17 @@ export function Layout() {
                         </h1>
                     </NavLink>
                     <div className="flex items-center gap-2">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-primary px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
+                        </div>
                         {/* Profile avatar → direct navigation to profile */}
                         <NavLink
                             to="/profile"
                             className={({ isActive }) => cn(
-                                "w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-black text-sm transition-all",
+                                "w-9 h-9 min-w-[36px] min-h-[36px] rounded-full flex items-center justify-center font-black text-xs transition-all border",
                                 isActive
-                                    ? "bg-primary text-black"
-                                    : "bg-primary/20 text-primary hover:bg-primary/30"
+                                    ? "bg-primary text-black border-primary"
+                                    : "bg-primary/20 text-primary border-primary/30 hover:bg-primary/30"
                             )}
                             title="Profile"
                             aria-label="Open profile"
@@ -79,11 +82,11 @@ export function Layout() {
                             )}
                         </NavLink>
                         <button
-                            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors text-white cursor-pointer"
+                            className="p-2 rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors text-white cursor-pointer min-h-[44px] min-w-[44px]"
                             onClick={() => setIsMenuOpen(true)}
                             aria-label="Open menu"
                         >
-                            <Menu size={22} />
+                            <Menu size={20} />
                         </button>
                     </div>
                 </header>
