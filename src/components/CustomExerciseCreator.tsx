@@ -65,7 +65,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                     </h3>
                     <button
                         onClick={onClose}
-                        className="p-1 rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+                        className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-zinc-500 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                         aria-label="Close create exercise"
                     >
                         <X size={20} />
@@ -93,7 +93,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                                     key={m}
                                     type="button"
                                     onClick={() => setMuscle(m)}
-                                    className={`text-[11px] font-bold py-2 rounded-xl transition-colors border ${
+                                    className={`min-h-[44px] text-[11px] font-bold py-2 rounded-xl transition-colors border flex items-center justify-center cursor-pointer ${
                                         muscle === m 
                                         ? "bg-primary text-black border-primary" 
                                         : "bg-white/5 border-white/5 text-zinc-400 hover:border-white/20"
@@ -114,7 +114,7 @@ export function CustomExerciseCreator({ onClose, onCreated }: CustomExerciseCrea
                                         key={level}
                                         type="button"
                                         onClick={() => setIntensityLevel(level)}
-                                        className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg transition-all ${
+                                        className={`min-h-[44px] flex-1 text-[10px] font-bold py-1.5 rounded-lg transition-all flex items-center justify-center cursor-pointer ${
                                             intensityLevel === level
                                                 ? level === "Heavy" ? "bg-red-500 text-white"
                                                   : level === "Moderate" ? "bg-blue-500 text-white"

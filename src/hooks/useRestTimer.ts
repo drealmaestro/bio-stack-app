@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useStore } from "../store/useStore";
+import { useActiveWorkoutStore } from "../store/useActiveWorkoutStore";
 import type { RestTimerWorkerInput, RestTimerWorkerOutput } from "../workers/restTimerWorker";
 
 export function playChimeTone(): void {
@@ -8,6 +8,9 @@ export function playChimeTone(): void {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
         if (!AudioCtx) return;
         const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
 
         const now = ctx.currentTime;
         const osc1 = ctx.createOscillator();
@@ -59,7 +62,7 @@ export function sendRestNotification(
 }
 
 export function useRestTimer() {
-    const { activeWorkout, addRestTime, skipRest: storeSkipRest } = useStore();
+    const { activeWorkout, addRestTime, skipRest: storeSkipRest } = useActiveWorkoutStore();
     const [now, setNow] = useState(Date.now());
     const originalRestRef = useRef<number>(0);
     const hasAlertedRef = useRef<boolean>(false);
@@ -137,6 +140,11 @@ export function useRestTimer() {
                 hasAlertedRef.current = true;
                 playChimeTone();
                 sendRestNotification();
+                try {
+                    navigator.vibrate?.([150, 80, 150, 80, 250]);
+                } catch {
+                    // Safe fallback if haptic vibration unsupported
+                }
             }
             originalRestRef.current = 0;
         }

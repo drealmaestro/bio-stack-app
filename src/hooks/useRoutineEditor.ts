@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useStore } from "../store/useStore";
+import { useActiveWorkoutStore } from "../store/useActiveWorkoutStore";
 import { useToast } from "../components/ui/toast";
 import { nanoid } from "nanoid";
 import type { WorkoutTemplate, ExerciseSet, TargetMuscle } from "../types";
 
 export function useRoutineEditor() {
-    const { templates, exercises, logs, addTemplate, updateTemplate, startWorkout, activeWorkout } = useStore();
+    const { templates, exercises, logs, addTemplate, updateTemplate } = useStore();
+    const { activeWorkout, startWorkout } = useActiveWorkoutStore();
     const toast = useToast();
 
     const [editingId, setEditingId] = useState<string | null>(null);

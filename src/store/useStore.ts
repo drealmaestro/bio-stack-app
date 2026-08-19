@@ -7,6 +7,7 @@ import { createRoutineSlice, type RoutineSlice } from './slices/routineSlice';
 import { createExerciseSlice, type ExerciseSlice } from './slices/exerciseSlice';
 import { createActiveWorkoutSlice, type ActiveWorkoutSlice } from './slices/activeWorkoutSlice';
 import { createNutritionSlice, type NutritionSlice } from './slices/nutritionSlice';
+import { useActiveWorkoutStore } from './useActiveWorkoutStore';
 
 export interface AppState extends UserSlice, RoutineSlice, ExerciseSlice, ActiveWorkoutSlice, NutritionSlice {
     seeded: boolean;
@@ -69,23 +70,43 @@ export const useStore = create<AppState>()(
                 return updates;
             }),
 
-            resetStore: () => set({
-                user: null,
-                templates: [],
-                logs: [],
-                exercises: [],
-                activeWorkout: null,
-                seeded: false,
-                nutritionLogs: [],
-                foodLogs: [],
-                dailyInsights: [],
-                waterIntake: {},
-                sleepDuration: {},
-            })
+            resetStore: () => {
+                useActiveWorkoutStore.getState().cancelWorkout();
+                set({
+                    user: null,
+                    templates: [],
+                    logs: [],
+                    exercises: [],
+                    activeWorkout: null,
+                    seeded: false,
+                    nutritionLogs: [],
+                    foodLogs: [],
+                    dailyInsights: [],
+                    waterIntake: {},
+                    sleepDuration: {},
+                });
+            }
         }),
         {
             name: 'bio-stack-storage',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => {
+                const mem: Record<string, string> = {};
+                try {
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                        return window.localStorage;
+                    }
+                } catch {
+                    // Fallback to in-memory storage if localStorage throws SecurityError
+                }
+                return {
+                    getItem: (k: string) => mem[k] ?? null,
+                    setItem: (k: string, v: string) => { mem[k] = v; },
+                    removeItem: (k: string) => { delete mem[k]; },
+                    clear: () => { for (const k in mem) delete mem[k]; },
+                    key: (i: number) => Object.keys(mem)[i] ?? null,
+                    length: Object.keys(mem).length,
+                } as Storage;
+            }),
             version: 2,
             migrate: (persisted, version) => {
                 if (version >= 2 || !persisted || typeof persisted !== 'object') return persisted;

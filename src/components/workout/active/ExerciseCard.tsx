@@ -6,6 +6,7 @@ import { suggestNextWeight } from "../../../lib/progression";
 import { ProgressionCoachBanner } from "./ProgressionCoachBanner";
 import { TempoGuideCard } from "./TempoGuideCard";
 import { SetRow } from "./SetRow";
+import { SetLoggingBottomSheet } from "./SetLoggingBottomSheet";
 import { WarmUpCalculatorModal } from "./WarmUpCalculatorModal";
 import { Flame } from "lucide-react";
 import type { Exercise, ExerciseSet, ActiveWorkoutState, SetLog } from "../../../types";
@@ -42,6 +43,8 @@ export function ExerciseCard({
     getExerciseName
 }: ExerciseCardProps) {
     const [showWarmUpModal, setShowWarmUpModal] = useState(false);
+    const [activeSheetSetNum, setActiveSheetSetNum] = useState<number | null>(null);
+
     const lastExData = lastSessionData?.[exercise.exercise_id];
     const exData = exercises.find(e => e.id === exercise.exercise_id);
     const muscle = exData?.target_muscle || 'Other';
@@ -54,10 +57,34 @@ export function ExerciseCard({
     });
 
     const exerciseName = getExerciseName(exercise.exercise_id);
-
-    // Initial weight for warm-up calculator (set 1 weight or suggestion weight)
     const firstSetKey = `${index}-1`;
     const currentSet1Weight = activeWorkout.setWeights[firstSetKey] || suggestion?.weightKg || 60;
+
+    const activeSetKey = activeSheetSetNum ? `${index}-${activeSheetSetNum}` : null;
+    const prevSetWeight = activeSheetSetNum && activeSheetSetNum > 1
+        ? (activeWorkout.setWeights[`${index}-${activeSheetSetNum - 1}`] || lastExData?.[activeSheetSetNum - 1]?.weight)
+        : null;
+
+    const activeSheetWeight = activeSetKey
+        ? (activeWorkout.setWeights[activeSetKey] || prevSetWeight || lastExData?.[activeSheetSetNum!]?.weight || suggestion?.weightKg || 0)
+        : 0;
+
+    const activeSheetReps = activeSetKey
+        ? (activeWorkout.setReps?.[activeSetKey] ?? exercise.target_reps)
+        : exercise.target_reps;
+    const activeSheetRpe = activeSetKey
+        ? (activeWorkout.setRpes?.[activeSetKey] || 7)
+        : 7;
+    const activeSheetCompleted = activeSetKey
+        ? activeWorkout.completedSets.includes(activeSetKey)
+        : false;
+
+    const previousSetInfo = activeSheetSetNum && activeSheetSetNum > 1
+        ? {
+            weight: activeWorkout.setWeights[`${index}-${activeSheetSetNum - 1}`] || lastExData?.[activeSheetSetNum - 1]?.weight || 0,
+            reps: activeWorkout.setReps?.[`${index}-${activeSheetSetNum - 1}`] ?? exercise.target_reps,
+        }
+        : undefined;
 
     return (
         <div className="space-y-2">
@@ -80,8 +107,9 @@ export function ExerciseCard({
                 </h3>
                 <div className="flex items-center gap-1.5 shrink-0">
                     <button
+                        type="button"
                         onClick={() => setShowWarmUpModal(true)}
-                        className="text-[10px] font-black text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 px-2 py-0.5 rounded-full flex items-center gap-1 transition-all tap-active"
+                        className="text-[10px] font-black text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all tap-active cursor-pointer min-h-[44px]"
                         title="Warm-up Calculator"
                         aria-label="Open warm-up calculator"
                     >
@@ -134,7 +162,8 @@ export function ExerciseCard({
                         const key = `${index}-${setNum}`;
                         const isCompleted = activeWorkout.completedSets.includes(key);
                         const lastSet = lastExData?.[setNum];
-                        const currentWeight = activeWorkout.setWeights[key] || 0;
+                        const prevWeight = setNum > 1 ? (activeWorkout.setWeights[`${index}-${setNum - 1}`] || lastExData?.[setNum - 1]?.weight) : 0;
+                        const currentWeight = activeWorkout.setWeights[key] || (prevWeight && !isCompleted ? prevWeight : 0);
                         const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
                         const currentRpe = activeWorkout.setRpes?.[key] || 0;
                         const hasRepsKey = key in (activeWorkout.setReps || {});
@@ -156,11 +185,40 @@ export function ExerciseCard({
                                 onRepsChange={(r) => updateSetReps(index, setNum, r)}
                                 onRpeChange={(rpe) => updateSetRpe(index, setNum, rpe)}
                                 onToggleComplete={() => toggleSetComplete(index, setNum, exercise.rest_seconds)}
+                                onOpenSheet={() => setActiveSheetSetNum(setNum)}
                             />
                         );
                     })}
                 </CardContent>
             </Card>
+
+            {/* Set Logging Bottom Sheet Drawer */}
+            {activeSheetSetNum !== null && (
+                <SetLoggingBottomSheet
+                    isOpen={activeSheetSetNum !== null}
+                    onClose={() => setActiveSheetSetNum(null)}
+                    exerciseName={exerciseName}
+                    setIndex={activeSheetSetNum}
+                    totalSets={exercise.target_sets}
+                    targetReps={exercise.target_reps}
+                    weight={activeSheetWeight}
+                    reps={activeSheetReps}
+                    rpe={activeSheetRpe}
+                    isCompleted={activeSheetCompleted}
+                    lastSet={lastExData?.[activeSheetSetNum]}
+                    previousSet={previousSetInfo}
+                    onSave={({ weight, reps, rpe }) => {
+                        updateSetWeight(index, activeSheetSetNum, weight);
+                        updateSetReps(index, activeSheetSetNum, reps);
+                        if (rpe !== undefined) {
+                            updateSetRpe(index, activeSheetSetNum, rpe);
+                        }
+                    }}
+                    onToggleComplete={() => {
+                        toggleSetComplete(index, activeSheetSetNum, exercise.rest_seconds);
+                    }}
+                />
+            )}
 
             <WarmUpCalculatorModal
                 open={showWarmUpModal}
@@ -172,4 +230,3 @@ export function ExerciseCard({
         </div>
     );
 }
-

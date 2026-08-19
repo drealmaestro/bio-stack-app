@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bio-Stack UI/UX Preview — El Maestro</title>
+    <!-- Tailwind CDN & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#000000',
+                        foreground: '#f4f4f9',
+                        card: '#121216',
+                        primary: '#3ccf94',
+                        secondary: '#24252a',
+                        warning: '#ff9f0a',
+                        protein: '#a78bfa',
+                        carbs: '#36b4ff',
+                        fat: '#ff793f',
+                        sleep: '#9b5de5',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050508;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(60, 207, 148, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 40%, rgba(54, 180, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 0% 80%, rgba(167, 139, 250, 0.07) 0%, transparent 50%);
+            color: #f4f4f9;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .tap-active:active {
+            transform: scale(0.97);
+        }
+        .glass-card {
+            background-color: rgba(18, 18, 22, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.75rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(22, 22, 28, 0.9);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-6 select-none">
+
+    <!-- Top Preview Header Banner -->
+    <div class="max-w-[420px] w-full mb-3 px-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-primary/20 text-primary border border-primary/30 animate-pulse">
+                LIVE PREVIEW
+            </span>
+            <span class="text-xs font-bold text-zinc-400">Bio-Stack UI/UX Concept</span>
+        </div>
+        <span class="text-[10px] text-zinc-500 font-bold">Interactive Mockup</span>
+    </div>
+
+    <!-- Phone Device Shell -->
+    <div class="w-full max-w-[410px] h-[92dvh] max-h-[860px] bg-black rounded-[3rem] border-[8px] sm:border-[10px] border-zinc-900 shadow-[0_0_60px_-10px_rgba(60,207,148,0.2),0_0_0_1px_rgba(255,255,255,0.06)] relative overflow-hidden flex flex-col">
+        
+        <!-- App Top Header -->
+        <header class="h-14 px-5 flex justify-between items-center bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 shrink-0 z-40">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-carbs flex items-center justify-center shadow-md shadow-primary/20">
+                    <span class="font-black text-black text-xs">M</span>
+                </div>
+                <h1 class="text-sm font-black tracking-tight text-white">
+                    el <span class="text-primary font-black">Maestro</span>
+                </h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="text-[10px] font-black uppercase tracking-wider text-primary px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    WED, AUG 19
+                </div>
+                <div class="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center font-black text-xs border border-primary/30">
+                    J
+                </div>
+            </div>
+        </header>
+
+        <!-- Sticky Pillar Tab Selector Pills -->
+        <div class="bg-zinc-950/90 backdrop-blur-md border-b border-white/5 py-2.5 px-3 flex justify-between gap-1.5 shrink-0 z-30">
+            <button onclick="switchTab('workouts')" id="tab-btn-workouts" class="tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all bg-white text-zinc-950 shadow-md scale-105">
+                Workouts
+            </button>
+            <button onclick="switchTab('nutrition')" id="tab-btn-nutrition" class="tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all text-zinc-400 hover:text-white bg-white/5">
+                Nutrition
+            </button>
+            <button onclick="switchTab('recovery')" id="tab-btn-recovery" class="tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all text-zinc-400 hover:text-white bg-white/5">
+                Recovery
+            </button>
+            <button onclick="switchTab('progress')" id="tab-btn-progress" class="tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all text-zinc-400 hover:text-white bg-white/5">
+                Progress
+            </button>
+        </div>
+
+        <!-- Inner Scrollable Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-4 space-y-5 pb-24 text-foreground">
+            
+            <!-- ===================== WORKOUTS TAB ===================== -->
+            <div id="tab-content-workouts" class="space-y-4">
+                
+                <!-- Daily Readiness & Movement Status -->
+                <div class="glass-card p-5 relative overflow-hidden bg-gradient-to-br from-[#16161a] to-[#0e0e12]">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-black text-primary uppercase tracking-widest block">Daily Movement</span>
+                            <h3 class="text-xl font-black text-white leading-tight">Readiness: High</h3>
+                            <p class="text-xs text-zinc-400">Restored & primed for Push Protocol</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/5 text-center">
+                        <div class="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                            <span class="text-[9px] text-zinc-500 font-bold block uppercase">Session</span>
+                            <span class="text-sm font-black text-primary" id="disp-workout-min">0 / 45m</span>
+                        </div>
+                        <div class="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                            <span class="text-[9px] text-zinc-500 font-bold block uppercase">Water</span>
+                            <span class="text-sm font-black text-carbs" id="disp-water-ml">1,250 ml</span>
+                        </div>
+                        <div class="bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                            <span class="text-[9px] text-zinc-500 font-bold block uppercase">Protein</span>
+                            <span class="text-sm font-black text-protein" id="disp-protein-g">112 / 150g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduled Protocol Hero Card (With 1-Tap Quick Action) -->
+                <div class="glass-card p-5 space-y-4 border border-primary/30 relative">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-black text-primary uppercase tracking-widest block">Today's Scheduled Target</span>
+                            <h4 class="text-xl font-black text-white">Push Day A (Hypertrophy)</h4>
+                            <div class="flex gap-1.5 mt-2">
+                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">Chest</span>
+                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">Delts</span>
+                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Triceps</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-zinc-400 bg-white/5 px-2 py-1 rounded-xl">5 Exercises</span>
+                    </div>
+
+                    <!-- Overload Cue Badge -->
+                    <div class="p-2.5 rounded-xl bg-primary/5 border border-primary/15 flex items-center justify-between text-xs">
+                        <span class="text-zinc-300 font-medium">🎯 Target overload:</span>
+                        <span class="text-primary font-black">+2.5 kg on Incline Dumbbell Press</span>
+                    </div>
+
+                    <!-- 1-Tap Action Button -->
+                    <button onclick="startDemoWorkout()" id="btn-start-workout" class="w-full py-3.5 bg-primary hover:bg-[#32be85] active:scale-95 text-black font-black rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        <span>Start Push Session</span>
+                    </button>
+                </div>
+
+                <!-- Consistency & Volume Balance -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-card p-4 space-y-1">
+                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Week Progress</span>
+                        <div class="text-2xl font-black text-white">3 / 4</div>
+                        <span class="text-[9px] text-primary font-bold block">1 session to weekly goal</span>
+                    </div>
+                    <div class="glass-card p-4 space-y-1">
+                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Active Streak</span>
+                        <div class="text-2xl font-black text-fat">🔥 14 Days</div>
+                        <span class="text-[9px] text-zinc-400 font-bold block">Peak consistency</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== NUTRITION TAB ===================== -->
+            <div id="tab-content-nutrition" class="space-y-4 hidden">
+                
+                <!-- Protein Hero Card -->
+                <div class="glass-card p-5 flex items-center justify-between gap-4">
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-black text-protein uppercase tracking-widest block">Protein First Target</span>
+                        <div class="text-3xl font-black text-white" id="protein-hero-num">
+                            112 <span class="text-sm font-bold text-zinc-500">/ 150 g</span>
+                        </div>
+                        <div class="text-xs text-zinc-400 space-y-0.5">
+                            <div>Remaining: <span class="font-black text-white" id="protein-remaining-num">38 g</span></div>
+                            <div>Calories: <span class="font-black text-white" id="calories-num">1,740 / 2,200 kcal</span></div>
+                        </div>
+                        <span class="inline-block text-[9px] font-black px-2.5 py-1 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                            460 kcal under budget (Cutting)
+                        </span>
+                    </div>
+
+                    <div class="relative flex items-center justify-center shrink-0">
+                        <svg class="w-24 h-24 -rotate-90">
+                            <circle cx="48" cy="48" r="38" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="transparent"/>
+                            <circle id="protein-circle" cx="48" cy="48" r="38" stroke="#a78bfa" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="60" stroke-linecap="round" fill="transparent" class="transition-all duration-500"/>
+                        </svg>
+                        <span class="absolute text-sm font-black text-white" id="protein-pct-label">75%</span>
+                    </div>
+                </div>
+
+                <!-- 1-Tap Quick Meal Preset Chips (New QoL) -->
+                <div class="glass-card p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">1-Tap Fast Meal Presets</span>
+                        <span class="text-[9px] text-primary font-bold">Tap to add</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="addPresetMeal('Whey Protein Shake', 30, 140)" class="p-2.5 bg-white/5 hover:bg-protein/15 border border-white/5 hover:border-protein/30 active:scale-95 rounded-2xl text-left transition-all">
+                            <span class="text-xs font-black text-white block">Whey Shake</span>
+                            <span class="text-[10px] font-bold text-protein">+30g P</span>
+                            <span class="text-[9px] text-zinc-500 block">140 kcal</span>
+                        </button>
+                        <button onclick="addPresetMeal('Chicken & Rice Bowl', 45, 480)" class="p-2.5 bg-white/5 hover:bg-protein/15 border border-white/5 hover:border-protein/30 active:scale-95 rounded-2xl text-left transition-all">
+                            <span class="text-xs font-black text-white block">Chicken Bowl</span>
+                            <span class="text-[10px] font-bold text-protein">+45g P</span>
+                            <span class="text-[9px] text-zinc-500 block">480 kcal</span>
+                        </button>
+                        <button onclick="addPresetMeal('Greek Yogurt Cup', 20, 130)" class="p-2.5 bg-white/5 hover:bg-protein/15 border border-white/5 hover:border-protein/30 active:scale-95 rounded-2xl text-left transition-all">
+                            <span class="text-xs font-black text-white block">Greek Yogurt</span>
+                            <span class="text-[10px] font-bold text-protein">+20g P</span>
+                            <span class="text-[9px] text-zinc-500 block">130 kcal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Macronutrient Progress Bars -->
+                <div class="glass-card p-4 space-y-3">
+                    <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Macronutrient Target</span>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div class="space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-zinc-300">Protein</span>
+                                <span class="text-protein font-black"><span id="bar-p-num">112</span> / 150g</span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div id="bar-p-fill" class="h-full bg-protein rounded-full transition-all duration-500" style="width: 75%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-zinc-300">Carbohydrates</span>
+                                <span class="text-carbs font-black">160 / 220g</span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div class="h-full bg-carbs rounded-full" style="width: 72%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-zinc-300">Fat</span>
+                                <span class="text-fat font-black">48 / 65g</span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div class="h-full bg-fat rounded-full" style="width: 73%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Logged Meals -->
+                <div class="glass-card p-4 space-y-2.5">
+                    <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Logged Meals Today</span>
+                    <div id="logged-meals-list" class="divide-y divide-white/5 space-y-2">
+                        <div class="pt-1 flex justify-between items-center text-xs">
+                            <div>
+                                <div class="font-extrabold text-white">4 Eggs + Sourdough Toast</div>
+                                <span class="text-[10px] text-zinc-400">26g P • 420 kcal</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 font-bold">08:30 AM</span>
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-xs">
+                            <div>
+                                <div class="font-extrabold text-white">Chicken Breast & Jasmine Rice</div>
+                                <span class="text-[10px] text-zinc-400">48g P • 580 kcal</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 font-bold">12:45 PM</span>
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-xs">
+                            <div>
+                                <div class="font-extrabold text-white">Whey Isolate Shake</div>
+                                <span class="text-[10px] text-zinc-400">38g P • 180 kcal</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 font-bold">04:15 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== RECOVERY TAB ===================== -->
+            <div id="tab-content-recovery" class="space-y-4 hidden">
+                
+                <!-- Hydration Tracker (Interactive QoL Bumps) -->
+                <div class="glass-card p-5 space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-black text-carbs uppercase tracking-widest block">Hydration</span>
+                            <h4 class="text-xl font-black text-white">Water Intake</h4>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-black text-white" id="water-display-num">1,250 <span class="text-xs text-zinc-500 font-bold">ml</span></div>
+                            <span class="text-[10px] text-zinc-500 font-bold">Target: 2,000 ml</span>
+                        </div>
+                    </div>
+
+                    <!-- Water Fill Bar -->
+                    <div class="h-6 w-full rounded-2xl bg-black/40 border border-white/5 overflow-hidden relative">
+                        <div id="water-fill-bar" class="h-full bg-gradient-to-r from-blue-500 to-carbs rounded-2xl transition-all duration-500 flex items-center justify-end pr-2.5" style="width: 62.5%;">
+                            <span class="text-[9px] font-black text-white" id="water-pct-num">63%</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Bump Buttons -->
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button onclick="addWater(250)" class="py-2.5 bg-white/5 hover:bg-carbs/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-carbs flex items-center justify-center gap-1 transition-all">
+                            +250ml
+                        </button>
+                        <button onclick="addWater(500)" class="py-2.5 bg-white/5 hover:bg-carbs/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-carbs flex items-center justify-center gap-1 transition-all">
+                            +500ml
+                        </button>
+                        <button onclick="addWater(750)" class="py-2.5 bg-white/5 hover:bg-carbs/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-carbs flex items-center justify-center gap-1 transition-all">
+                            +750ml
+                        </button>
+                        <button onclick="resetWater()" class="py-2.5 bg-white/5 hover:bg-red-500/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-zinc-400 transition-all">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sleep Target vs Actual -->
+                <div class="glass-card p-5 space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-0.5">
+                            <span class="text-[10px] font-black text-sleep uppercase tracking-widest block">Rest & Anabolic Recovery</span>
+                            <h4 class="text-lg font-black text-white">Last Night's Sleep</h4>
+                        </div>
+                        <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                            Optimal
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-sleep/15 flex items-center justify-center text-sleep shrink-0">
+                            <i data-lucide="moon" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-0.5">
+                            <div class="text-2xl font-black text-white">7h 45m</div>
+                            <span class="text-xs text-primary font-bold">Target met (7h 00m) — CNS fully recovered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Coaching Guidance -->
+                <div class="glass-card p-4 space-y-2 border border-primary/20">
+                    <span class="text-[10px] font-black text-primary uppercase tracking-widest block">Coach's Daily Rule</span>
+                    <p class="text-xs text-zinc-300 leading-relaxed">
+                        Hydrate before caffeine. Hit 2L water before 6:00 PM and maintain high protein intake to preserve lean mass during training.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===================== PROGRESS TAB ===================== -->
+            <div id="tab-content-progress" class="space-y-4 hidden">
+                
+                <!-- Muscle Volume Distribution & Sweet Spot -->
+                <div class="glass-card p-5 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] font-black text-primary uppercase tracking-widest block">Weekly Growth Volume</span>
+                            <h4 class="text-lg font-black text-white">Target Sweet Spot (10–16 Sets)</h4>
+                        </div>
+                        <span class="text-[9px] text-zinc-500 font-bold text-right">Sets Logged</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="font-extrabold text-white">Chest</span>
+                                <span class="text-primary font-black">12 / 14 sets <span class="text-[9px] uppercase px-1.5 py-0.5 bg-primary/10 rounded-md">Optimal</span></span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="font-extrabold text-white">Deltoids / Shoulders</span>
+                                <span class="text-primary font-black">14 / 14 sets <span class="text-[9px] uppercase px-1.5 py-0.5 bg-primary/10 rounded-md">Target Met</span></span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary rounded-full" style="width: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="font-extrabold text-white">Back & Lats</span>
+                                <span class="text-warning font-black">8 / 14 sets <span class="text-[9px] uppercase px-1.5 py-0.5 bg-warning/10 rounded-md">2 Sets Behind</span></span>
+                            </div>
+                            <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div class="h-full bg-warning rounded-full" style="width: 57%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weight & Overload Trends -->
+                <div class="glass-card p-4 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Body Weight Trend</span>
+                        <span class="text-xs font-black text-primary">-1.2 kg this month</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-white">74.8 kg</span>
+                        <span class="text-xs text-zinc-400 font-bold">Goal: 72.0 kg</span>
+                    </div>
+                    <div class="h-16 w-full bg-black/30 rounded-2xl border border-white/5 flex items-center justify-center p-2">
+                        <svg viewBox="0 0 300 60" class="w-full h-full">
+                            <path d="M 10 50 L 70 45 L 140 38 L 210 30 L 280 20" fill="none" stroke="#3ccf94" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="280" cy="20" r="4" fill="#3ccf94"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation Bar (Locked Viewport) -->
+        <nav class="bg-zinc-950/85 backdrop-blur-2xl absolute bottom-4 left-4 right-4 h-14 rounded-2xl flex items-center justify-around z-40 border border-white/10 shadow-2xl px-2">
+            <button onclick="switchTab('workouts')" class="flex flex-col items-center gap-0.5 text-primary">
+                <i data-lucide="home" class="w-4 h-4"></i>
+                <span class="text-[9px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('workouts')" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-300">
+                <i data-lucide="dumbbell" class="w-4 h-4"></i>
+                <span class="text-[9px] font-bold">Train</span>
+            </button>
+            <button onclick="startDemoWorkout()" class="w-10 h-10 -top-3 relative rounded-full bg-gradient-to-tr from-primary to-carbs text-black flex items-center justify-center shadow-lg shadow-primary/30 active:scale-90 transition-transform">
+                <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+            </button>
+            <button onclick="switchTab('nutrition')" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-300">
+                <i data-lucide="salad" class="w-4 h-4"></i>
+                <span class="text-[9px] font-bold">Fuel</span>
+            </button>
+            <button onclick="switchTab('progress')" class="flex flex-col items-center gap-0.5 text-zinc-500 hover:text-zinc-300">
+                <i data-lucide="scroll-text" class="w-4 h-4"></i>
+                <span class="text-[9px] font-bold">Log</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentProtein = 112;
+        let proteinGoal = 150;
+        let currentWater = 1250;
+        let waterGoal = 2000;
+        let currentCalories = 1740;
+
+        function switchTab(tabId) {
+            ['workouts', 'nutrition', 'recovery', 'progress'].forEach(t => {
+                const content = document.getElementById('tab-content-' + t);
+                const btn = document.getElementById('tab-btn-' + t);
+                if (t === tabId) {
+                    content.classList.remove('hidden');
+                    btn.className = 'tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all bg-white text-zinc-950 shadow-md scale-105';
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = 'tab-btn flex-1 py-1.5 rounded-full text-xs font-black transition-all text-zinc-400 hover:text-white bg-white/5';
+                }
+            });
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        function addPresetMeal(name, protein, calories) {
+            currentProtein += protein;
+            currentCalories += calories;
+            
+            document.getElementById('disp-protein-g').innerText = currentProtein + ' / ' + proteinGoal + 'g';
+            document.getElementById('protein-hero-num').innerHTML = currentProtein + ' <span class="text-sm font-bold text-zinc-500">/ ' + proteinGoal + ' g</span>';
+            const remaining = Math.max(0, proteinGoal - currentProtein);
+            document.getElementById('protein-remaining-num').innerText = remaining + ' g';
+            document.getElementById('calories-num').innerText = currentCalories.toLocaleString() + ' / 2,200 kcal';
+            document.getElementById('bar-p-num').innerText = currentProtein;
+
+            const pct = Math.min(1, currentProtein / proteinGoal);
+            document.getElementById('protein-pct-label').innerText = Math.round(pct * 100) + '%';
+            document.getElementById('bar-p-fill').style.width = Math.round(pct * 100) + '%';
+
+            const dashoffset = 238.76 * (1 - pct);
+            document.getElementById('protein-circle').style.strokeDashoffset = Math.max(0, dashoffset);
+
+            const list = document.getElementById('logged-meals-list');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'pt-2 flex justify-between items-center text-xs animate-in fade-in slide-in-from-top-1';
+            item.innerHTML = `
+                <div>
+                    <div class="font-extrabold text-white">${name}</div>
+                    <span class="text-[10px] text-protein font-bold">+${protein}g P • ${calories} kcal</span>
+                </div>
+                <span class="text-[10px] text-primary font-bold">${timeStr} (Just added)</span>
+            `;
+            list.prepend(item);
+        }
+
+        function addWater(amount) {
+            currentWater += amount;
+            updateWaterDisplay();
+        }
+
+        function resetWater() {
+            currentWater = 0;
+            updateWaterDisplay();
+        }
+
+        function updateWaterDisplay() {
+            document.getElementById('water-display-num').innerHTML = currentWater.toLocaleString() + ' <span class="text-xs text-zinc-500 font-bold">ml</span>';
+            document.getElementById('disp-water-ml').innerText = currentWater.toLocaleString() + ' ml';
+            const pct = Math.min(100, Math.round((currentWater / waterGoal) * 100));
+            document.getElementById('water-fill-bar').style.width = pct + '%';
+            document.getElementById('water-pct-num').innerText = pct + '%';
+        }
+
+        function startDemoWorkout() {
+            const btn = document.getElementById('btn-start-workout');
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Session Active (Push Day A)</span>';
+            btn.className = 'w-full py-3.5 bg-zinc-800 text-primary border border-primary/30 font-black rounded-2xl flex items-center justify-center gap-2 transition-all';
+            document.getElementById('disp-workout-min').innerText = '15 / 45m';
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

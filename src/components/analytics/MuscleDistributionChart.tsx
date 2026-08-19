@@ -79,21 +79,23 @@ export function MuscleDistributionChart({ logs, exercises }: MuscleDistributionC
                 <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
                     <button
                         onClick={() => setChartType('bar')}
-                        className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             chartType === 'bar' ? 'bg-primary text-black' : 'text-zinc-400 hover:text-white'
                         }`}
                         title="Bar Chart"
+                        aria-label="View bar chart"
                     >
-                        <BarChart3 size={14} />
+                        <BarChart3 size={16} />
                     </button>
                     <button
                         onClick={() => setChartType('pie')}
-                        className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             chartType === 'pie' ? 'bg-primary text-black' : 'text-zinc-400 hover:text-white'
                         }`}
                         title="Pie Chart"
+                        aria-label="View pie chart"
                     >
-                        <PieIcon size={14} />
+                        <PieIcon size={16} />
                     </button>
                 </div>
             </div>

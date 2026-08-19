@@ -94,6 +94,7 @@ export function Nutrition() {
                 today={today}
                 onOpenAddModal={() => setShowAddModal(true)}
                 onDeleteEntry={deleteNutritionEntry}
+                onAddEntry={handleAddEntry}
             />
 
             <AddFoodModal

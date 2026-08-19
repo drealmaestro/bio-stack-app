@@ -3,13 +3,15 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText, Timer, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import { useActiveWorkoutStore } from '../store/useActiveWorkoutStore';
 import { Dialog } from './ui/dialog';
 import { RestTimerWidget } from './workout/RestTimerWidget';
 
 export function Layout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const { resetStore, user, activeWorkout } = useStore();
+    const { resetStore, user } = useStore();
+    const activeWorkout = useActiveWorkoutStore((state) => state.activeWorkout);
     const location = useLocation();
     const mainRef = useRef<HTMLElement>(null);
 
@@ -60,7 +62,7 @@ export function Layout() {
                         <NavLink
                             to="/profile"
                             className={({ isActive }) => cn(
-                                "w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm transition-all",
+                                "w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-black text-sm transition-all",
                                 isActive
                                     ? "bg-primary text-black"
                                     : "bg-primary/20 text-primary hover:bg-primary/30"
@@ -77,7 +79,7 @@ export function Layout() {
                             )}
                         </NavLink>
                         <button
-                            className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white"
+                            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors text-white cursor-pointer"
                             onClick={() => setIsMenuOpen(true)}
                             aria-label="Open menu"
                         >
@@ -93,7 +95,7 @@ export function Layout() {
                 )}>
                     <button
                         onClick={() => setIsMenuOpen(false)}
-                        className="absolute top-6 right-6 p-2 text-zinc-400 hover:text-white"
+                        className="absolute top-6 right-6 w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-zinc-400 hover:text-white cursor-pointer"
                         aria-label="Close menu"
                     >
                         <X size={28} />
@@ -238,6 +240,6 @@ export function Layout() {
 }
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "flex flex-col items-center gap-0 p-1.5 rounded-xl transition-all duration-300 tap-active relative group",
+    "flex flex-col items-center justify-center gap-0 min-w-[44px] min-h-[44px] p-1 rounded-xl transition-all duration-300 tap-active relative group",
     isActive ? "text-primary scale-105" : "text-zinc-500 hover:text-zinc-300"
 );

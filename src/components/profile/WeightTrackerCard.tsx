@@ -34,7 +34,7 @@ export function WeightTrackerCard({
                 </div>
                 <button
                     onClick={onToggleAddWeight}
-                    className="flex items-center gap-1 text-xs text-primary font-bold hover:text-primary/80 transition-colors"
+                    className="min-h-[44px] flex items-center gap-1 text-xs text-primary font-bold hover:text-primary/80 transition-colors cursor-pointer"
                 >
                     <Plus size={14} /> Log Weight
                 </button>

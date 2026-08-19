@@ -1,15 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "../store/useStore";
+import { useActiveWorkoutStore } from "../store/useActiveWorkoutStore";
 import { nanoid } from "nanoid";
 import confetti from "canvas-confetti";
 import type { SetLog } from "../types";
 
 export function useActiveWorkoutSession() {
+    const { templates, exercises, logs, addLog } = useStore();
     const {
-        templates, exercises, logs, addLog,
         activeWorkout, startWorkout, cancelWorkout,
         toggleSetComplete, updateSetWeight, updateSetReps, updateSetRpe
-    } = useStore();
+    } = useActiveWorkoutStore();
 
     const [now, setNow] = useState(Date.now());
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);

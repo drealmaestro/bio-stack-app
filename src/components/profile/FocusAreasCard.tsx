@@ -18,7 +18,7 @@ export function FocusAreasCard({ goalOptions, selectedGoals, onToggleGoal }: Foc
                             key={goal}
                             onClick={() => onToggleGoal(goal)}
                             className={cn(
-                                "flex items-center gap-1.5 py-2 px-4 rounded-full text-sm font-semibold border transition-all duration-300",
+                                "min-h-[44px] flex items-center gap-1.5 py-2 px-4 rounded-full text-sm font-semibold border transition-all duration-300 cursor-pointer",
                                 isSelected
                                     ? "bg-primary/20 border-primary shadow-[0_0_15px_-3px_rgba(0,212,255,0.4)] text-primary scale-105"
                                     : "bg-white/5 border-white/10 text-zinc-400 hover:border-white/20 hover:bg-white/10"

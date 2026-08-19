@@ -57,7 +57,7 @@ export function PersonalInfoCard({ formData, experienceOptions, onUpdateForm }: 
                             key={level}
                             onClick={() => onUpdateForm({ experience_level: level })}
                             className={cn(
-                                "flex-1 py-2 rounded-xl text-xs font-bold border transition-all",
+                                "min-h-[44px] flex-1 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center cursor-pointer",
                                 formData.experience_level === level
                                     ? "bg-primary text-black border-primary"
                                     : "border-white/10 text-zinc-400 hover:border-white/20"

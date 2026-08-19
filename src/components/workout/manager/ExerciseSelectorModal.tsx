@@ -67,7 +67,7 @@ export function ExerciseSelectorModal({
                     <button
                         key={m}
                         onClick={() => onMuscleChange(m)}
-                        className={`shrink-0 text-xs font-bold px-3 py-1 rounded-full border transition-colors ${pickerMuscle === m
+                        className={`min-h-[44px] shrink-0 text-xs font-bold px-3 py-1 rounded-full border transition-colors flex items-center justify-center cursor-pointer ${pickerMuscle === m
                             ? "bg-primary text-black border-primary"
                             : "border-white/10 text-zinc-400 hover:border-white/20"
                             }`}

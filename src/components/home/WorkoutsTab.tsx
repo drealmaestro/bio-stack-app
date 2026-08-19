@@ -1,8 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "../../store/useStore";
+import { useActiveWorkoutStore } from "../../store/useActiveWorkoutStore";
 import { Link, useNavigate } from "react-router-dom";
 import { Play, Coffee, ChevronRight, Trophy } from "lucide-react";
 import { SamsungActivityHeart } from "../ui/samsung-activity-heart";
+import { DailyReadinessCard } from "./DailyReadinessCard";
+import { Dialog } from "../ui/dialog";
 import { getEffectiveNutritionGoals } from "../../lib/nutritionGoals";
 import type { TargetMuscle } from "../../types";
 
@@ -22,8 +25,13 @@ const WORKOUT_TARGET_MINUTES = 45;
 const WATER_TARGET_ML = 2000;
 
 export function WorkoutsTab({ todayStr }: { todayStr: string }) {
-    const { user, templates, exercises, logs, startWorkout, activeWorkout, nutritionLogs, waterIntake } = useStore();
+    const { user, templates, exercises, logs, nutritionLogs, waterIntake, logSleep } = useStore();
+    const { activeWorkout, startWorkout } = useActiveWorkoutStore();
     const navigate = useNavigate();
+
+    const [showSleepModal, setShowSleepModal] = useState(false);
+    const [sleepHrs, setSleepHrs] = useState("7");
+    const [sleepMins, setSleepMins] = useState("30");
 
     const now = new Date();
     const todayDayIndex = now.getDay();
@@ -70,26 +78,26 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             {/* Overview Card with Concentric Activity Heart */}
             <div className="bg-gradient-to-br from-[#16161a] to-[#0e0e12] border border-white/5 rounded-3xl p-5 shadow-xl relative overflow-hidden flex items-center justify-between gap-4">
-                <div className="space-y-4">
+                <div className="space-y-4 flex-1 min-w-0">
                     <div className="space-y-1">
                         <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Daily Movement</span>
                         <h3 className="text-xl font-black text-white leading-tight">Activity Status</h3>
                     </div>
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-steps" />
-                            <span className="text-zinc-400 font-medium">Workout:</span>
-                            <span className="font-extrabold text-white">{activeMinutesToday} / {WORKOUT_TARGET_MINUTES} min</span>
+                            <div className="w-2 h-2 rounded-full bg-steps shrink-0" />
+                            <span className="text-zinc-400 font-medium truncate">Workout:</span>
+                            <span className="font-extrabold text-white ml-auto shrink-0">{activeMinutesToday} / {WORKOUT_TARGET_MINUTES} min</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-active" />
-                            <span className="text-zinc-400 font-medium">Hydration:</span>
-                            <span className="font-extrabold text-white">{todayWater} / {WATER_TARGET_ML.toLocaleString()} ml</span>
+                            <div className="w-2 h-2 rounded-full bg-active shrink-0" />
+                            <span className="text-zinc-400 font-medium truncate">Hydration:</span>
+                            <span className="font-extrabold text-white ml-auto shrink-0">{todayWater} / {WATER_TARGET_ML.toLocaleString()} ml</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs">
-                            <div className="w-2 h-2 rounded-full bg-calories" />
-                            <span className="text-zinc-400 font-medium">Nutrition:</span>
-                            <span className="font-extrabold text-white">{Math.round(todayCalories)} / {nutritionGoals.calories} kcal</span>
+                            <div className="w-2 h-2 rounded-full bg-calories shrink-0" />
+                            <span className="text-zinc-400 font-medium truncate">Nutrition:</span>
+                            <span className="font-extrabold text-white ml-auto shrink-0">{Math.round(todayCalories)} / {nutritionGoals.calories} kcal</span>
                         </div>
                     </div>
                 </div>
@@ -103,6 +111,14 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                     />
                 </div>
             </div>
+
+            {/* Daily Readiness & 1-Tap Quick Action Widget */}
+            <DailyReadinessCard
+                todayStr={todayStr}
+                isRestDay={isRestDay}
+                activeMinutesToday={activeMinutesToday}
+                onOpenSleepModal={() => setShowSleepModal(true)}
+            />
 
             {/* Scheduled Protocol Widget */}
             <div className="space-y-3">
@@ -123,9 +139,9 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                         </div>
                         <button
                             onClick={() => { if (!activeWorkout) startWorkout(todayTemplate.id); navigate("/active"); }}
-                            className="w-full py-3 bg-primary hover:bg-[#2fb27f] text-black font-black rounded-2xl flex items-center justify-center gap-1.5 transition-all tap-active shadow-lg shadow-primary/15"
+                            className="w-full min-h-[48px] py-3 bg-primary hover:bg-[#2fb27f] text-black font-black rounded-2xl flex items-center justify-center gap-1.5 transition-all tap-active shadow-lg shadow-primary/15 cursor-pointer"
                         >
-                            <Play size={14} fill="currentColor" /> {activeWorkout ? "Resume Session" : "Start Workout"}
+                            <Play size={15} fill="currentColor" /> {activeWorkout ? "Resume Session" : "Start Workout"}
                         </button>
                     </div>
                 ) : (
@@ -157,7 +173,7 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
             <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
                     <h3 className="section-label">Workout Routines</h3>
-                    <Link to="/workouts" className="text-xs font-bold text-primary flex items-center gap-0.5">
+                    <Link to="/workouts" className="text-xs font-bold text-primary flex items-center gap-0.5 min-h-[44px] items-center">
                         Edit <ChevronRight size={12} />
                     </Link>
                 </div>
@@ -172,15 +188,61 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                             </div>
                             <button
                                 onClick={() => { if (!activeWorkout) startWorkout(t.id); navigate("/active"); }}
-                                className="w-8 h-8 rounded-full bg-white/5 text-zinc-300 flex items-center justify-center hover:bg-primary hover:text-black transition-all"
+                                className="w-11 h-11 rounded-full bg-white/5 text-zinc-300 flex items-center justify-center hover:bg-primary hover:text-black transition-all cursor-pointer"
                                 aria-label={`Start ${t.name}`}
                             >
-                                <Play fill="currentColor" size={10} className="ml-0.5" />
+                                <Play fill="currentColor" size={12} className="ml-0.5" />
                             </button>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Sleep Logger Dialog */}
+            <Dialog
+                open={showSleepModal}
+                title="Log Sleep"
+                onClose={() => setShowSleepModal(false)}
+            >
+                <div className="space-y-4">
+                    <h3 className="text-base font-black text-white">How long did you sleep?</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-zinc-500 uppercase">Hours</label>
+                            <input
+                                type="number"
+                                min={0}
+                                max={16}
+                                value={sleepHrs}
+                                onChange={e => setSleepHrs(e.target.value)}
+                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-zinc-500 uppercase">Minutes</label>
+                            <input
+                                type="number"
+                                min={0}
+                                max={59}
+                                value={sleepMins}
+                                onChange={e => setSleepMins(e.target.value)}
+                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold"
+                            />
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            const totalMins = (parseInt(sleepHrs) || 0) * 60 + (parseInt(sleepMins) || 0);
+                            logSleep(todayStr, totalMins);
+                            setShowSleepModal(false);
+                            navigator.vibrate?.(30);
+                        }}
+                        className="w-full min-h-[44px] py-2.5 bg-sleep hover:opacity-90 active:scale-95 text-white font-black text-sm rounded-xl transition-all shadow-md cursor-pointer"
+                    >
+                        Save Sleep Record
+                    </button>
+                </div>
+            </Dialog>
         </div>
     );
 }

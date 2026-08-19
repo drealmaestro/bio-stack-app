@@ -105,7 +105,7 @@ export function RoutineCard({
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1 ml-2 shrink-0">
+                    <div className="flex items-center gap-1.5 ml-2 shrink-0">
                         <Link
                             to="/active"
                             onClick={(e) => {
@@ -113,22 +113,24 @@ export function RoutineCard({
                                 onStartWorkout(template.id);
                             }}
                             className={cn(
-                                "w-9 h-9 rounded-xl flex items-center justify-center transition-transform",
+                                "w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-transform",
                                 activeWorkout
                                     ? "bg-zinc-800 text-zinc-600 cursor-not-allowed"
                                     : "bg-primary text-black hover:scale-105"
                             )}
                             title={activeWorkout ? "Finish or cancel current session first" : "Start workout"}
+                            aria-label={`Start ${template.name}`}
                         >
                             <Play size={16} fill="currentColor" />
                         </Link>
                         <button
                             onClick={onToggleEditor}
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isOpen
+                            className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer ${isOpen
                                 ? "bg-primary/20 text-primary"
                                 : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
                                 }`}
                             title="Edit exercises"
+                            aria-label={`Edit ${template.name} exercises`}
                         >
                             {isOpen ? <ChevronDown size={18} /> : <Edit3 size={16} />}
                         </button>

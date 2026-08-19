@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import type { ActiveWorkoutState } from '../../types';
-import { saveOfflineWorkout } from '../../utils/indexedDB';
+import { useActiveWorkoutStore } from '../useActiveWorkoutStore';
 
 export interface ActiveWorkoutSlice {
     activeWorkout: ActiveWorkoutState | null;
@@ -14,137 +14,67 @@ export interface ActiveWorkoutSlice {
     skipRest: () => void;
 }
 
-export const createActiveWorkoutSlice: StateCreator<ActiveWorkoutSlice, [], [], ActiveWorkoutSlice> = (set) => ({
-    activeWorkout: null,
+let subscribed = false;
 
-    startWorkout: (templateId) => {
-        const workout: ActiveWorkoutState = {
-            templateId,
-            startTime: Date.now(),
-            completedSets: [],
-            setWeights: {},
-            setReps: {},
-            setRpes: {},
-            restEndTime: null,
-            originalRestDuration: 0,
-        };
-        // Optimistic UI update
-        set({ activeWorkout: workout });
-        // Background offline storage sync
-        saveOfflineWorkout(workout).catch(() => {});
-    },
+function ensureSubscribed(set: (partial: Partial<ActiveWorkoutSlice>) => void) {
+    if (!subscribed && typeof useActiveWorkoutStore !== 'undefined' && useActiveWorkoutStore?.subscribe) {
+        subscribed = true;
+        useActiveWorkoutStore.subscribe((state) => {
+            set({ activeWorkout: state.activeWorkout });
+        });
+    }
+}
 
-    cancelWorkout: () => set({ activeWorkout: null }),
+export const createActiveWorkoutSlice: StateCreator<ActiveWorkoutSlice, [], [], ActiveWorkoutSlice> = (set) => {
+    return {
+        activeWorkout: typeof useActiveWorkoutStore !== 'undefined' ? useActiveWorkoutStore.getState()?.activeWorkout ?? null : null,
 
-    toggleSetComplete: (exerciseIdx, setNum, restSeconds) => set((state) => {
-        if (!state.activeWorkout) return state;
-        const key = `${exerciseIdx}-${setNum}`;
-        const { completedSets } = state.activeWorkout;
-        const exists = completedSets.includes(key);
+        startWorkout: (templateId) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().startWorkout(templateId);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-        let newCompletedSets;
-        let newRestEndTime = state.activeWorkout.restEndTime;
-        let newOriginalRestDuration = state.activeWorkout.originalRestDuration;
+        cancelWorkout: () => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().cancelWorkout();
+            set({ activeWorkout: null });
+        },
 
-        if (exists) {
-            newCompletedSets = completedSets.filter(k => k !== key);
-        } else {
-            newCompletedSets = [...completedSets, key];
-            if (restSeconds > 0) {
-                newRestEndTime = Date.now() + (restSeconds * 1000);
-                newOriginalRestDuration = restSeconds;
-            }
-        }
+        toggleSetComplete: (exerciseIdx, setNum, restSeconds) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().toggleSetComplete(exerciseIdx, setNum, restSeconds);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-        const updatedWorkout = {
-            ...state.activeWorkout,
-            completedSets: newCompletedSets,
-            restEndTime: newRestEndTime,
-            originalRestDuration: newOriginalRestDuration,
-        };
+        updateSetWeight: (exerciseIdx, setNum, weight) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().updateSetWeight(exerciseIdx, setNum, weight);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-        // Asynchronous background persistence (optimistic UI response)
-        saveOfflineWorkout(updatedWorkout).catch(() => {});
+        updateSetReps: (exerciseIdx, setNum, reps) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().updateSetReps(exerciseIdx, setNum, reps);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-        return {
-            activeWorkout: updatedWorkout,
-        };
-    }),
+        updateSetRpe: (exerciseIdx, setNum, rpe) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().updateSetRpe(exerciseIdx, setNum, rpe);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-    updateSetWeight: (exerciseIdx, setNum, weight) => set((state) => {
-        if (!state.activeWorkout) return state;
-        const key = `${exerciseIdx}-${setNum}`;
-        const updatedWorkout = {
-            ...state.activeWorkout,
-            setWeights: {
-                ...state.activeWorkout.setWeights,
-                [key]: weight,
-            },
-        };
+        addRestTime: (seconds) => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().addRestTime(seconds);
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
 
-        saveOfflineWorkout(updatedWorkout).catch(() => {});
-
-        return {
-            activeWorkout: updatedWorkout,
-        };
-    }),
-
-    updateSetReps: (exerciseIdx, setNum, reps) => set((state) => {
-        if (!state.activeWorkout) return state;
-        const key = `${exerciseIdx}-${setNum}`;
-        const updatedWorkout = {
-            ...state.activeWorkout,
-            setReps: {
-                ...state.activeWorkout.setReps,
-                [key]: reps,
-            },
-        };
-
-        saveOfflineWorkout(updatedWorkout).catch(() => {});
-
-        return {
-            activeWorkout: updatedWorkout,
-        };
-    }),
-
-    updateSetRpe: (exerciseIdx, setNum, rpe) => set((state) => {
-        if (!state.activeWorkout) return state;
-        const key = `${exerciseIdx}-${setNum}`;
-        const updatedWorkout = {
-            ...state.activeWorkout,
-            setRpes: {
-                ...(state.activeWorkout.setRpes || {}),
-                [key]: rpe,
-            },
-        };
-
-        saveOfflineWorkout(updatedWorkout).catch(() => {});
-
-        return {
-            activeWorkout: updatedWorkout,
-        };
-    }),
-
-    addRestTime: (seconds) => set((state) => {
-        if (!state.activeWorkout) return state;
-        const currentRestEnd = state.activeWorkout.restEndTime || Date.now();
-        return {
-            activeWorkout: {
-                ...state.activeWorkout,
-                restEndTime: currentRestEnd + (seconds * 1000),
-                originalRestDuration: state.activeWorkout.originalRestDuration + seconds,
-            },
-        };
-    }),
-
-    skipRest: () => set((state) => {
-        if (!state.activeWorkout) return state;
-        return {
-            activeWorkout: {
-                ...state.activeWorkout,
-                restEndTime: null,
-                originalRestDuration: 0,
-            },
-        };
-    }),
-});
+        skipRest: () => {
+            ensureSubscribed(set);
+            useActiveWorkoutStore.getState().skipRest();
+            set({ activeWorkout: useActiveWorkoutStore.getState().activeWorkout });
+        },
+    };
+};

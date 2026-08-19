@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Download, RefreshCw } from 'lucide-react';
-import { useStore } from '../store/useStore';
+import { useActiveWorkoutStore } from '../store/useActiveWorkoutStore';
 
 export default function ReloadPrompt() {
     const [countdown, setCountdown] = useState(3);
-    const activeWorkout = useStore((state) => state.activeWorkout);
+    const activeWorkout = useActiveWorkoutStore((state) => state.activeWorkout);
 
     const {
         offlineReady: [offlineReady, setOfflineReady],

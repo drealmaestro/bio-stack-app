@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStore } from "../../store/useStore";
-import { Droplet, Brain, Moon, Footprints, BedDouble, UtensilsCrossed } from "lucide-react";
+import { Droplet, Moon, Footprints, BedDouble, UtensilsCrossed } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Dialog } from "../ui/dialog";
+import { BoxBreathingPacer } from "./BoxBreathingPacer";
 
 const WATER_TARGET_ML = 2000;
 const SLEEP_TARGET_MINS = 7 * 60;
@@ -18,44 +19,12 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
     const [sleepHrs, setSleepHrs] = useState("7");
     const [sleepMins, setSleepMins] = useState("30");
 
-    // Box breathing
-    const [isBreathing, setIsBreathing] = useState(false);
-    const [breathPhase, setBreathPhase] = useState<"Idle" | "Inhale" | "Hold" | "Exhale" | "Hold Ex">("Idle");
-    const [breathSeconds, setBreathSeconds] = useState(0);
-
-    useEffect(() => {
-        if (!isBreathing) {
-            setBreathPhase("Idle");
-            return;
-        }
-        setBreathPhase("Inhale");
-        setBreathSeconds(4);
-
-        let currentSeconds = 4;
-        let currentPhase: "Inhale" | "Hold" | "Exhale" | "Hold Ex" = "Inhale";
-
-        const interval = setInterval(() => {
-            currentSeconds--;
-            if (currentSeconds <= 0) {
-                currentPhase =
-                    currentPhase === "Inhale" ? "Hold" :
-                    currentPhase === "Hold" ? "Exhale" :
-                    currentPhase === "Exhale" ? "Hold Ex" : "Inhale";
-                currentSeconds = 4;
-                setBreathPhase(currentPhase);
-            }
-            setBreathSeconds(currentSeconds);
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [isBreathing]);
-
     const dayIndex = new Date().getDay();
     const isRestDay = dayIndex === 0 || dayIndex === 3; // Sunday & Wednesday
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500 pb-12">
-            {/* Coach's Recovery Protocol — static guidance, no wearable data needed */}
+            {/* Coach's Recovery Protocol — static guidance, zero fabricated metrics */}
             <div className="bg-card border border-primary/20 p-5 rounded-3xl space-y-3 shadow-md">
                 <div className="space-y-0.5">
                     <span className="text-[10px] font-black text-primary uppercase tracking-widest block">
@@ -87,7 +56,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
             <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-4 shadow-md">
                 <div className="flex justify-between items-center">
                     <div className="space-y-0.5">
-                        <span className="text-[10px] font-black text-carbs uppercase tracking-widest block">Hydration</span>
+                        <span className="text-[10px] font-black text-sky-400 uppercase tracking-widest block">Hydration</span>
                         <h4 className="text-lg font-black text-white">Water Intake</h4>
                     </div>
                     <div className="text-right">
@@ -98,7 +67,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
 
                 <div className="h-6 w-full rounded-2xl bg-black/40 border border-white/5 overflow-hidden relative">
                     <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-carbs rounded-2xl transition-all duration-700 ease-out flex items-center justify-end pr-3"
+                        className="h-full bg-gradient-to-r from-blue-500 to-sky-400 rounded-2xl transition-all duration-700 ease-out flex items-center justify-end pr-3"
                         style={{ width: `${Math.min((todayWater / WATER_TARGET_ML) * 100, 100)}%` }}
                     >
                         {todayWater > 0 && (
@@ -113,22 +82,26 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                     {[250, 500, 750].map(amount => (
                         <button
                             key={amount}
-                            onClick={() => logWaterIntake(todayStr, amount)}
-                            className="py-2 bg-white/5 hover:bg-blue-500/10 hover:border-blue-500/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-carbs flex items-center justify-center gap-1 transition-all"
+                            type="button"
+                            onClick={() => { logWaterIntake(todayStr, amount); navigator.vibrate?.(30); }}
+                            className="min-h-[44px] py-2 bg-white/5 hover:bg-sky-500/10 hover:border-sky-500/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-sky-400 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                            aria-label={`Add ${amount}ml water`}
                         >
-                            <Droplet size={11} className="fill-current" /> +{amount}
+                            <Droplet size={12} className="fill-current" /> +{amount}
                         </button>
                     ))}
                     <button
-                        onClick={() => resetWater(todayStr)}
-                        className="py-2 bg-white/5 hover:bg-red-500/10 hover:border-red-500/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-zinc-400 flex items-center justify-center gap-1 transition-all"
+                        type="button"
+                        onClick={() => { resetWater(todayStr); navigator.vibrate?.(20); }}
+                        className="min-h-[44px] py-2 bg-white/5 hover:bg-red-500/10 hover:border-red-500/20 active:scale-95 border border-white/5 rounded-xl text-xs font-black text-zinc-400 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                        aria-label="Reset water intake"
                     >
                         Reset
                     </button>
                 </div>
             </div>
 
-            {/* Sleep — simple manual hours, no invented stages or scores */}
+            {/* Sleep — simple manual hours, zero invented stages or scores */}
             <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-4 shadow-md">
                 <div className="flex justify-between items-center">
                     <div className="space-y-0.5">
@@ -136,6 +109,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                         <h4 className="text-lg font-black text-white">Last Night's Sleep</h4>
                     </div>
                     <button
+                        type="button"
                         onClick={() => {
                             const h = Math.floor(todaySleepDur / 60) || 7;
                             const m = todaySleepDur % 60;
@@ -143,7 +117,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                             setSleepMins(String(m));
                             setShowSleepModal(true);
                         }}
-                        className="text-xs font-black text-sleep bg-sleep/10 px-3 py-1 rounded-full hover:bg-sleep/20 transition-all"
+                        className="text-xs font-black text-sleep bg-sleep/10 px-4 py-2 min-h-[44px] rounded-full hover:bg-sleep/20 transition-all cursor-pointer flex items-center"
                     >
                         Log Sleep
                     </button>
@@ -160,7 +134,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                                 : "Not logged"}
                         </div>
                         <span className={cn(
-                            "text-[10px] font-bold",
+                            "text-[10px] font-bold block mt-0.5",
                             todaySleepDur === 0 ? "text-zinc-500" :
                             todaySleepDur >= SLEEP_TARGET_MINS ? "text-primary" : "text-warning"
                         )}>
@@ -174,36 +148,8 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                 </div>
             </div>
 
-            {/* Box Breathing */}
-            <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-3 shadow-md">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <Brain size={16} className="text-primary" />
-                        <span className="text-xs font-black text-white">Box Breathing Relief</span>
-                    </div>
-                    {isBreathing && (
-                        <span className="text-[10px] font-black text-primary animate-pulse">
-                            {breathPhase} ({breathSeconds}s)
-                        </span>
-                    )}
-                </div>
-                <div className="flex items-center justify-between bg-black/20 p-3.5 rounded-2xl border border-white/5">
-                    <p className="text-[11px] text-zinc-400 leading-relaxed max-w-[200px]">
-                        {isBreathing
-                            ? "Follow the rhythm. Inhale, hold, exhale, hold — 4 seconds each."
-                            : "A simple 4-4-4-4 cycle to calm your nervous system before sleep or after a hard day."
-                        }
-                    </p>
-                    <button
-                        onClick={() => setIsBreathing(!isBreathing)}
-                        className={cn("px-4 py-2 text-xs font-black rounded-xl transition-all tap-active",
-                            isBreathing ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-primary text-black shadow-md shadow-primary/10"
-                        )}
-                    >
-                        {isBreathing ? "Stop" : "Begin"}
-                    </button>
-                </div>
-            </div>
+            {/* Box Breathing Pacer */}
+            <BoxBreathingPacer />
 
             {/* Sleep Logger Dialog */}
             <Dialog
@@ -222,7 +168,7 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                                 max={16}
                                 value={sleepHrs}
                                 onChange={e => setSleepHrs(e.target.value)}
-                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold"
+                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold min-h-[44px]"
                             />
                         </div>
                         <div className="space-y-1">
@@ -233,17 +179,19 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                                 max={59}
                                 value={sleepMins}
                                 onChange={e => setSleepMins(e.target.value)}
-                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold"
+                                className="w-full bg-black/40 border border-white/5 focus:border-sleep rounded-xl px-3 py-2 text-sm text-white font-bold min-h-[44px]"
                             />
                         </div>
                     </div>
                     <button
+                        type="button"
                         onClick={() => {
                             const totalMins = (parseInt(sleepHrs) || 0) * 60 + (parseInt(sleepMins) || 0);
                             logSleep(todayStr, totalMins);
                             setShowSleepModal(false);
+                            navigator.vibrate?.(30);
                         }}
-                        className="w-full py-2.5 bg-sleep hover:opacity-90 active:scale-95 text-white font-black text-sm rounded-xl transition-all shadow-md"
+                        className="w-full min-h-[44px] py-3 bg-sleep hover:opacity-90 active:scale-95 text-white font-black text-sm rounded-xl transition-all shadow-md cursor-pointer"
                     >
                         Save Sleep Record
                     </button>

@@ -29,13 +29,13 @@ export function Home() {
             TABS.find(t => t.id === activeTab)?.bg
         )}>
             {/* Top Navigation Pill Tabs */}
-            <div className="sticky top-0 z-45 bg-zinc-950/75 backdrop-blur-md border-b border-white/5 py-3 px-2 flex justify-around">
+            <div className="sticky top-0 z-45 bg-zinc-950/75 backdrop-blur-md border-b border-white/5 py-2 px-2 flex justify-around">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={cn(
-                            "px-4 py-1.5 rounded-full text-xs font-black capitalize transition-all duration-300 tap-active",
+                            "px-4 py-2 min-h-[44px] min-w-[44px] rounded-full text-xs font-black capitalize transition-all duration-300 tap-active flex items-center justify-center cursor-pointer",
                             activeTab === tab.id
                                 ? "bg-white text-zinc-950 shadow-md scale-105"
                                 : "text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10"

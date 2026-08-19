@@ -66,7 +66,7 @@ export function AddFoodModal({ open, onClose, onAddEntry }: AddFoodModalProps) {
                 <h3 className="text-lg font-black text-white">Add Food</h3>
                 <button
                     onClick={handleClose}
-                    className="text-zinc-400 hover:text-white"
+                    className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-zinc-400 hover:text-white cursor-pointer"
                     aria-label="Close add food"
                 >
                     <X size={20} />
@@ -83,7 +83,7 @@ export function AddFoodModal({ open, onClose, onAddEntry }: AddFoodModalProps) {
                         <button
                             key={preset.id}
                             onClick={() => handleAddPreset(preset)}
-                            className="shrink-0 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 rounded-xl p-2.5 text-left transition-all tap-active max-w-[150px]"
+                            className="shrink-0 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 rounded-xl p-2.5 text-left transition-all tap-active max-w-[150px] cursor-pointer"
                         >
                             <div className="text-xs font-black text-amber-300 truncate">{preset.name}</div>
                             <div className="text-[10px] text-zinc-300 font-bold mt-0.5">{preset.calories} kcal</div>
@@ -104,7 +104,7 @@ export function AddFoodModal({ open, onClose, onAddEntry }: AddFoodModalProps) {
                     placeholder="Search foods..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 min-h-[44px]"
                     autoFocus
                 />
             </div>
@@ -117,7 +117,11 @@ export function AddFoodModal({ open, onClose, onAddEntry }: AddFoodModalProps) {
                             <div className="font-bold text-white">{selectedFood.name}</div>
                             <div className="text-xs text-muted-foreground">{selectedFood.serving_label} per serving</div>
                         </div>
-                        <button onClick={() => setSelectedFood(null)} className="text-zinc-500">
+                        <button
+                            onClick={() => setSelectedFood(null)}
+                            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-zinc-500 hover:text-white cursor-pointer"
+                            aria-label="Deselect food"
+                        >
                             <X size={16} />
                         </button>
                     </div>
@@ -125,12 +129,14 @@ export function AddFoodModal({ open, onClose, onAddEntry }: AddFoodModalProps) {
                         <span className="text-sm text-muted-foreground">Servings:</span>
                         <button
                             onClick={() => setServings(s => Math.max(0.5, s - 0.5))}
-                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center"
+                            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/10 text-white font-bold flex items-center justify-center cursor-pointer hover:bg-white/20 active:scale-95"
+                            aria-label="Decrease servings"
                         >−</button>
                         <span className="text-lg font-black text-white w-8 text-center">{servings}</span>
                         <button
                             onClick={() => setServings(s => s + 0.5)}
-                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center"
+                            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/10 text-white font-bold flex items-center justify-center cursor-pointer hover:bg-white/20 active:scale-95"
+                            aria-label="Increase servings"
                         >+</button>
                         <div className="ml-auto text-right">
                             <div className="text-primary font-black">{Math.round(selectedFood.calories * servings)} kcal</div>
