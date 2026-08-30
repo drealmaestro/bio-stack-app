@@ -170,26 +170,24 @@ export function Layout() {
 
                 {/* Bottom Navigation Bar */}
                 {location.pathname !== '/active' && (
-                    <nav className="bg-slate-900/85 backdrop-blur-2xl absolute bottom-6 left-5 right-5 h-16 rounded-2xl flex items-center justify-around z-50 shadow-[0_12px_40px_rgba(0,0,0,0.8)] px-2 border border-slate-800/80">
+                    <nav className="bg-slate-900/90 backdrop-blur-2xl absolute bottom-5 left-4 right-4 h-[68px] rounded-2xl flex items-center justify-around z-50 shadow-[0_12px_40px_rgba(0,0,0,0.85)] px-2 border border-slate-800/90">
                         <NavLink to="/" className={navLinkClass} end>
                             {({ isActive }) => (
                                 <>
-                                    <div className="relative flex flex-col items-center">
-                                        <Home size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
+                                        <Home size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
                                     </div>
-                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Home</span>
+                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Home</span>
                                 </>
                             )}
                         </NavLink>
                         <NavLink to="/workouts" className={navLinkClass}>
                             {({ isActive }) => (
                                 <>
-                                    <div className="relative flex flex-col items-center">
-                                        <Dumbbell size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
+                                        <Dumbbell size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
                                     </div>
-                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Train</span>
+                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Train</span>
                                 </>
                             )}
                         </NavLink>
@@ -200,15 +198,15 @@ export function Layout() {
                                 to="/active"
                                 aria-label={isSessionLocked ? "Active workout session" : "Start workout"}
                                 className={({ isActive }) => cn(
-                                    "flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-sky-400 text-black shadow-lg shadow-primary/25 transition-all active:scale-90 border-4 border-slate-900",
+                                    "flex items-center justify-center w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-primary to-sky-400 text-black shadow-xl shadow-primary/30 transition-all active:scale-90 border-[3.5px] border-slate-900",
                                     isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-slate-950" : "hover:scale-105",
                                     isSessionLocked && !isActive ? "animate-pulse ring-2 ring-primary ring-offset-2 ring-offset-slate-950" : ""
                                 )}
                             >
                                 {isSessionLocked ? (
-                                    <Timer size={18} className="text-black font-extrabold" />
+                                    <Timer size={22} className="text-black font-black" />
                                 ) : (
-                                    <Play size={18} fill="currentColor" className="ml-0.5" />
+                                    <Play size={22} fill="currentColor" className="ml-0.5" />
                                 )}
                             </NavLink>
                         </div>
@@ -216,22 +214,20 @@ export function Layout() {
                         <NavLink to="/nutrition" className={navLinkClass}>
                             {({ isActive }) => (
                                 <>
-                                    <div className="relative flex flex-col items-center">
-                                        <Salad size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
+                                        <Salad size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
                                     </div>
-                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Fuel</span>
+                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Fuel</span>
                                 </>
                             )}
                         </NavLink>
                         <NavLink to="/history" className={navLinkClass}>
                             {({ isActive }) => (
                                 <>
-                                    <div className="relative flex flex-col items-center">
-                                        <ScrollText size={18} className={cn("transition-transform duration-300", isActive ? "-translate-y-1 text-primary" : "")} />
-                                        <div className={cn("absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary transition-all duration-300", isActive ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
+                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
+                                        <ScrollText size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
                                     </div>
-                                    <span className="text-[10px] mt-0.5 font-bold tracking-tight">Log</span>
+                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Log</span>
                                 </>
                             )}
                         </NavLink>
@@ -243,6 +239,6 @@ export function Layout() {
 }
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "flex flex-col items-center justify-center gap-0 min-w-[44px] min-h-[44px] p-1 rounded-xl transition-all duration-300 tap-active relative group",
-    isActive ? "text-primary scale-105" : "text-zinc-500 hover:text-zinc-300"
+    "flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-all duration-300 tap-active relative group",
+    isActive ? "text-primary" : "text-zinc-400 hover:text-white"
 );

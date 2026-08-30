@@ -66,7 +66,7 @@ export function RestTimerWidget({ className }: RestTimerWidgetProps) {
                             Tap for workout <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
                         </span>
                     </div>
-                    <div className="text-lg font-black text-white font-mono tracking-tight leading-none mt-0.5">
+                    <div className="text-2xl font-black text-white font-mono tracking-tight leading-none mt-0.5">
                         {formatTime(restSecondsRemaining)}
                     </div>
                 </div>

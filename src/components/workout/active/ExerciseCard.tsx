@@ -87,11 +87,11 @@ export function ExerciseCard({
         : undefined;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
             <div className="flex justify-between items-center px-1">
-                <h3 className="text-sm font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span className="text-primary bg-primary/10 w-6 h-6 rounded-full flex items-center justify-center shrink-0">
-                        {getMuscleIcon(muscle, 12)}
+                <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
+                    <span className="text-primary bg-primary/10 w-7 h-7 rounded-full flex items-center justify-center shrink-0">
+                        {getMuscleIcon(muscle, 14)}
                     </span>
                     <span className="truncate">{exerciseName}</span>
                     {intensity && (
@@ -113,7 +113,7 @@ export function ExerciseCard({
                         title="Warm-up Calculator"
                         aria-label="Open warm-up calculator"
                     >
-                        <Flame size={10} /> Warm-Up
+                        <Flame size={11} /> Warm-Up
                     </button>
                     <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                         {exercise.rest_seconds}s Rest
@@ -149,9 +149,9 @@ export function ExerciseCard({
             <Card className="bg-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
                 <CardContent className="p-0">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[10px] items-center text-zinc-500 font-extrabold uppercase tracking-widest text-center border-b border-white/5">
+                    <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3.2rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[11px] items-center text-zinc-400 font-black uppercase tracking-wider text-center border-b border-white/5">
                         <div>Set</div>
-                        <div>kg</div>
+                        <div>Weight</div>
                         <div>Reps</div>
                         <div>RPE</div>
                         <div>Done</div>

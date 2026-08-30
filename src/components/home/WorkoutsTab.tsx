@@ -97,18 +97,18 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
 
                 <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/5 text-center">
                     <div className="bg-black/40 p-2.5 rounded-2xl border border-white/5">
-                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Session</span>
-                        <span className="text-sm font-black text-primary">
-                            {activeWorkout ? "15 / 45m" : `${activeMinutesToday} / ${WORKOUT_TARGET_MINUTES}m`}
+                        <span className="text-[10px] text-zinc-400 font-extrabold block uppercase tracking-wider">Session</span>
+                        <span className="text-base font-black text-primary">
+                            {activeWorkout ? "15/45m" : `${activeMinutesToday}/${WORKOUT_TARGET_MINUTES}m`}
                         </span>
                     </div>
                     <div className="bg-black/40 p-2.5 rounded-2xl border border-white/5">
-                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Water</span>
-                        <span className="text-sm font-black text-sky-400">{todayWater.toLocaleString()} ml</span>
+                        <span className="text-[10px] text-zinc-400 font-extrabold block uppercase tracking-wider">Water</span>
+                        <span className="text-base font-black text-sky-400">{todayWater.toLocaleString()} ml</span>
                     </div>
                     <div className="bg-black/40 p-2.5 rounded-2xl border border-white/5">
-                        <span className="text-[9px] text-zinc-500 font-bold block uppercase">Protein</span>
-                        <span className="text-sm font-black text-purple-400">{todayProtein || 112} / {nutritionGoals.protein_g || 150}g</span>
+                        <span className="text-[10px] text-zinc-400 font-extrabold block uppercase tracking-wider">Protein</span>
+                        <span className="text-base font-black text-purple-400">{todayProtein || 112}/{nutritionGoals.protein_g || 150}g</span>
                     </div>
                 </div>
             </div>
@@ -119,7 +119,7 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                     <div className="flex justify-between items-start">
                         <div className="space-y-1">
                             <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Today's Schedule</span>
-                            <h4 className="text-xl font-black text-white leading-tight">Active Recovery Day</h4>
+                            <h4 className="text-2xl font-black text-white leading-tight">Active Recovery Day</h4>
                         </div>
                         <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-xl border border-amber-400/20">
                             {DAY_NAMES[todayDayIndex]}
@@ -133,15 +133,15 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                     {nextTemplate && (
                         <div className="pt-2 border-t border-white/5 flex items-center justify-between">
                             <div className="space-y-0.5">
-                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Next Up ({DAY_NAMES[nextTrainingDayIndex]}):</span>
-                                <span className="text-xs font-black text-white">{nextTemplate.name}</span>
+                                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">Next Up ({DAY_NAMES[nextTrainingDayIndex]}):</span>
+                                <span className="text-sm font-black text-white">{nextTemplate.name}</span>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => { startWorkout(nextTemplate.id); navigate("/active"); }}
-                                className="px-3.5 py-2 bg-white/5 hover:bg-primary hover:text-black border border-white/10 rounded-xl text-xs font-black text-zinc-300 flex items-center gap-1.5 transition-all tap-active cursor-pointer min-h-[44px]"
+                                className="px-4 py-2 bg-white/5 hover:bg-primary hover:text-black border border-white/10 rounded-xl text-xs font-black text-zinc-300 flex items-center gap-1.5 transition-all tap-active cursor-pointer min-h-[44px]"
                             >
-                                <Play size={12} fill="currentColor" /> Train Today
+                                <Play size={13} fill="currentColor" /> Train Today
                             </button>
                         </div>
                     )}
@@ -151,9 +151,9 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                     <div className="flex justify-between items-start">
                         <div className="space-y-1">
                             <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Today's Scheduled Target</span>
-                            <h4 className="text-xl font-black text-white leading-tight">{displayTemplate.name}</h4>
+                            <h4 className="text-2xl font-black text-white leading-tight">{displayTemplate.name}</h4>
                         </div>
-                        <span className="text-[10px] font-bold text-zinc-400 bg-white/5 px-2.5 py-1 rounded-xl border border-white/5">
+                        <span className="text-[11px] font-bold text-zinc-300 bg-white/5 px-2.5 py-1 rounded-xl border border-white/5">
                             {displayTemplate.exercises.length} Exercises
                         </span>
                     </div>
@@ -169,9 +169,9 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                     {/* Target Overload Box */}
                     <div className="p-3 rounded-2xl bg-black/40 border border-primary/20 flex items-center justify-between text-xs">
                         <span className="text-zinc-300 font-bold flex items-center gap-1.5">
-                            <Sparkles size={13} className="text-primary" /> Target overload:
+                            <Sparkles size={14} className="text-primary" /> Target overload:
                         </span>
-                        <span className="text-primary font-black">
+                        <span className="text-primary font-black text-sm">
                             +2.5 kg on Compound Sets
                         </span>
                     </div>
@@ -180,18 +180,18 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
                         type="button"
                         onClick={() => { if (!activeWorkout) startWorkout(displayTemplate.id); navigate("/active"); }}
                         className={activeWorkout
-                            ? "w-full min-h-[48px] py-3.5 bg-zinc-800 text-primary border border-primary/30 font-black rounded-2xl flex items-center justify-center gap-2 transition-all tap-active cursor-pointer"
-                            : "w-full min-h-[48px] py-3.5 bg-primary hover:bg-[#32be85] text-black font-black rounded-2xl flex items-center justify-center gap-2 transition-all tap-active shadow-lg shadow-primary/20 cursor-pointer"
+                            ? "w-full min-h-[50px] py-3.5 bg-zinc-800 text-primary border border-primary/30 text-base font-black rounded-2xl flex items-center justify-center gap-2 transition-all tap-active cursor-pointer"
+                            : "w-full min-h-[50px] py-3.5 bg-primary hover:bg-[#32be85] text-black text-base font-black rounded-2xl flex items-center justify-center gap-2 transition-all tap-active shadow-lg shadow-primary/20 cursor-pointer"
                         }
                     >
                         {activeWorkout ? (
                             <>
-                                <Check size={16} className="text-primary" />
+                                <Check size={18} className="text-primary" />
                                 <span>Session Active ({displayTemplate.name})</span>
                             </>
                         ) : (
                             <>
-                                <Play size={16} fill="currentColor" />
+                                <Play size={18} fill="currentColor" />
                                 <span>Start {displayTemplate.name}</span>
                             </>
                         )}
@@ -202,43 +202,43 @@ export function WorkoutsTab({ todayStr }: { todayStr: string }) {
             {/* Week Progress & Active Streak Side-by-Side */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="bg-card border border-white/5 p-4 rounded-3xl space-y-1 shadow-md">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block flex items-center gap-1">
-                        <Trophy size={11} className="text-amber-400" /> Completed
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block flex items-center gap-1">
+                        <Trophy size={12} className="text-amber-400" /> Completed
                     </span>
                     <div className="text-2xl font-black text-white">{workoutsThisWeek || 2} sessions</div>
-                    <span className="text-[9px] text-zinc-500 block">this calendar week</span>
+                    <span className="text-[10px] text-zinc-400 block">this calendar week</span>
                 </div>
                 <div className="bg-card border border-white/5 p-4 rounded-3xl space-y-1 shadow-md">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Active Streak</span>
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Active Streak</span>
                     <div className="text-2xl font-black text-orange-400">🔥 {streak} Days</div>
-                    <span className="text-[9px] text-zinc-400 font-bold block">Peak consistency</span>
+                    <span className="text-[10px] text-zinc-400 font-bold block">Peak consistency</span>
                 </div>
             </div>
 
-            {/* List of All 5 Weekly Routines */}
+            {/* List of All Weekly Routines */}
             <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-3 shadow-xl">
                 <div className="flex justify-between items-center px-1">
-                    <h3 className="section-label">Weekly Training Routines</h3>
+                    <h3 className="text-sm font-black text-zinc-300 uppercase tracking-wider">Weekly Training Routines</h3>
                     <Link to="/workouts" className="text-xs font-bold text-primary flex items-center gap-0.5 min-h-[44px] items-center">
-                        Edit <ChevronRight size={12} />
+                        Edit <ChevronRight size={14} />
                     </Link>
                 </div>
                 <div className="grid gap-2">
                     {templates.map(t => (
                         <div key={t.id} className="bg-black/30 p-3.5 border border-white/5 rounded-2xl flex justify-between items-center hover:border-primary/20 transition-colors">
                             <div className="space-y-0.5">
-                                <div className="font-black text-sm text-white">{t.name}</div>
-                                <span className="text-[10px] text-zinc-400 font-bold block">
+                                <div className="font-black text-base text-white">{t.name}</div>
+                                <span className="text-[11px] text-zinc-400 font-bold block">
                                     {t.scheduled_days?.map(d => DAY_NAMES[d]).join(", ") || "Custom"} • {t.exercises.length} exercises
                                 </span>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => { if (!activeWorkout) startWorkout(t.id); navigate("/active"); }}
-                                className="w-10 h-10 rounded-full bg-white/5 text-zinc-300 flex items-center justify-center hover:bg-primary hover:text-black transition-all cursor-pointer min-h-[44px] min-w-[44px]"
+                                className="w-11 h-11 rounded-full bg-white/5 text-zinc-300 flex items-center justify-center hover:bg-primary hover:text-black transition-all cursor-pointer min-h-[44px] min-w-[44px]"
                                 aria-label={`Start ${t.name}`}
                             >
-                                <Play fill="currentColor" size={11} className="ml-0.5" />
+                                <Play fill="currentColor" size={13} className="ml-0.5" />
                             </button>
                         </div>
                     ))}

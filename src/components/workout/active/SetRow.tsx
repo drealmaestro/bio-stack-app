@@ -48,11 +48,11 @@ export function SetRow({
         >
             {/* Set number */}
             <div className="flex flex-col items-center justify-center">
-                <div className="w-7 h-7 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-xs font-bold text-zinc-400">
+                <div className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-xs font-black text-zinc-200 shadow-sm">
                     {setNum}
                 </div>
                 {lastSet && (
-                    <span className="text-[8px] text-zinc-500 mt-0.5 leading-none">
+                    <span className="text-[9px] text-zinc-400 font-bold mt-0.5 leading-none">
                         {lastSet.weight}x{lastSet.reps}
                     </span>
                 )}
@@ -60,22 +60,22 @@ export function SetRow({
 
             {/* Weight display */}
             <div className="text-center">
-                <div className="h-10 px-2 flex items-center justify-center bg-black/30 border border-white/5 text-white font-mono text-sm font-bold rounded-xl">
+                <div className="h-10 px-1.5 flex items-center justify-center bg-black/40 border border-white/10 text-white font-mono text-base font-black rounded-xl">
                     {currentWeight > 0 ? `${currentWeight} kg` : (lastSet ? `${lastSet.weight} kg` : '-')}
                 </div>
             </div>
 
             {/* Reps display */}
             <div className="text-center">
-                <div className="h-10 px-2 flex items-center justify-center bg-black/30 border border-white/5 text-white font-mono text-sm font-bold rounded-xl">
-                    {currentReps} <span className="text-[10px] text-zinc-500 ml-1">reps</span>
+                <div className="h-10 px-1.5 flex items-center justify-center bg-black/40 border border-white/10 text-white font-mono text-base font-black rounded-xl">
+                    {currentReps}
                 </div>
             </div>
 
             {/* RPE badge */}
             <div className="text-center">
                 <div className={cn(
-                    "h-10 px-1 flex items-center justify-center border font-mono text-xs font-bold rounded-xl transition-colors",
+                    "h-10 px-1 flex items-center justify-center border font-mono text-xs font-black rounded-xl transition-colors",
                     rpeBadgeColor(currentRpe)
                 )}>
                     {currentRpe ? `@${currentRpe}` : '-'}
@@ -93,13 +93,13 @@ export function SetRow({
                         if (!isCompleted) navigator.vibrate?.(50);
                     }}
                     className={cn(
-                        "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer",
+                        "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer",
                         isCompleted
-                            ? "bg-primary text-black shadow-md shadow-primary/20 scale-105"
-                            : "bg-white/5 border border-white/5 text-zinc-600 hover:bg-white/10 hover:text-zinc-400"
+                            ? "bg-primary text-black shadow-lg shadow-primary/25 scale-105"
+                            : "bg-white/5 border border-white/10 text-zinc-500 hover:bg-white/15 hover:text-white"
                     )}
                 >
-                    <Check size={18} strokeWidth={3} />
+                    <Check size={20} strokeWidth={3.5} />
                 </button>
             </div>
         </div>
