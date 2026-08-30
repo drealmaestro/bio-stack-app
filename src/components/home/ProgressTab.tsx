@@ -51,19 +51,19 @@ export function ProgressTab({ todayStr: _todayStr }: { todayStr: string }) {
                 <div className="flex justify-between items-start">
                     <div>
                         <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Weekly Growth Volume</span>
-                        <h4 className="text-lg font-black text-white">Target Sweet Spot (10–16 Sets)</h4>
+                        <h4 className="text-xl font-black text-white">Target Sweet Spot (10–16 Sets)</h4>
                     </div>
-                    <span className="text-[9px] text-zinc-500 font-bold text-right uppercase tracking-wider">Sets Logged</span>
+                    <span className="text-[10px] text-zinc-400 font-bold text-right uppercase tracking-wider">Sets Logged</span>
                 </div>
 
                 <div className="space-y-3.5 text-xs">
                     {volumeRows.map((row) => (
                         <div key={row.muscle} className="space-y-1.5">
                             <div className="flex justify-between items-center font-bold">
-                                <span className="text-zinc-200 font-black">{row.muscle}</span>
+                                <span className="text-zinc-200 text-sm font-black">{row.muscle}</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-white font-black">{row.sets} / {row.target} sets</span>
-                                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${row.badgeColor}`}>
+                                    <span className="text-white text-sm font-black">{row.sets} / {row.target} sets</span>
+                                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${row.badgeColor}`}>
                                         {row.badge}
                                     </span>
                                 </div>
@@ -82,12 +82,12 @@ export function ProgressTab({ todayStr: _todayStr }: { todayStr: string }) {
             {/* Body Weight Trend Progress Card */}
             <div className="bg-card border border-white/5 p-5 rounded-3xl space-y-3 shadow-xl">
                 <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Body Weight Trend</span>
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Body Weight Trend</span>
                     <span className="text-xs font-black text-primary">-1.2 kg this month</span>
                 </div>
 
                 <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-white">{latestWeight} kg</span>
+                    <span className="text-4xl font-black text-white">{latestWeight} kg</span>
                     <span className="text-xs text-zinc-400 font-bold">Goal: {targetWeight} kg</span>
                 </div>
 

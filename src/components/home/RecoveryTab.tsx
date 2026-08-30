@@ -28,8 +28,8 @@ export function RecoveryTab({ todayStr }: { todayStr: string }) {
                         <h4 className="text-xl font-black text-white">Water Intake</h4>
                     </div>
                     <div className="text-right">
-                        <div className="text-xl font-black text-white">{todayWater.toLocaleString()} <span className="text-xs text-zinc-500 font-bold">ml</span></div>
-                        <span className="text-[10px] text-zinc-500 font-bold">Target: {WATER_TARGET_ML.toLocaleString()} ml</span>
+                        <div className="text-2xl font-black text-white">{todayWater.toLocaleString()} <span className="text-xs text-sky-400 font-bold">ml</span></div>
+                        <span className="text-[10px] text-zinc-400 font-bold">Target: {WATER_TARGET_ML.toLocaleString()} ml</span>
                     </div>
                 </div>
 

@@ -47,7 +47,7 @@ export function RoutineCard({
                 <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                            <h3 className="font-black text-lg text-white leading-tight truncate">
+                            <h3 className="font-black text-xl text-white leading-tight truncate">
                                 {template.name}
                             </h3>
                         </div>
@@ -55,57 +55,57 @@ export function RoutineCard({
                         {/* Coaching badges */}
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                             {template.focus_goal && (
-                                <span className="text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md">
+                                <span className="text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md">
                                     {template.focus_goal}
                                 </span>
                             )}
                             {template.difficulty && (
-                                <span className="text-[9px] font-black uppercase tracking-wider bg-white/5 text-zinc-300 border border-white/10 px-2 py-0.5 rounded-md">
+                                <span className="text-[10px] font-black uppercase tracking-wider bg-white/5 text-zinc-300 border border-white/10 px-2 py-0.5 rounded-md">
                                     {template.difficulty}
                                 </span>
                             )}
                             {template.target_duration && (
-                                <span className="text-[9px] font-bold bg-white/5 text-zinc-400 px-2 py-0.5 rounded-md flex items-center gap-1">
-                                    <Clock size={9} /> {template.target_duration}m
+                                <span className="text-[10px] font-bold bg-white/5 text-zinc-400 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <Clock size={10} /> {template.target_duration}m
                                 </span>
                             )}
                         </div>
 
                         {template.description && (
-                            <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                            <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
                                 {template.description}
                             </p>
                         )}
 
                         <div className="flex flex-wrap gap-1.5 mt-2.5">
                             {muscleGroups.slice(0, 4).map(m => (
-                                <span key={m} className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[m]}`}>
-                                    {getMuscleIcon(m, 9)} {m}
+                                <span key={m} className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${MUSCLE_COLORS[m]}`}>
+                                    {getMuscleIcon(m, 10)} {m}
                                 </span>
                             ))}
                             {muscleGroups.length > 4 && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-500">
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-400">
                                     +{muscleGroups.length - 4}
                                 </span>
                             )}
                         </div>
 
-                        <div className="flex gap-3 mt-2.5 text-[11px] text-zinc-500 border-t border-white/[0.03] pt-2">
+                        <div className="flex gap-3 mt-2.5 text-xs text-zinc-400 border-t border-white/[0.05] pt-2 font-bold">
                             <span className="flex items-center gap-1">
-                                <Dumbbell size={10} /> {template.exercises.length} exercises
+                                <Dumbbell size={12} className="text-primary" /> {template.exercises.length} exercises
                             </span>
                             <span className="flex items-center gap-1">
-                                <CheckCircle2 size={10} /> {sessionCount} sessions
+                                <CheckCircle2 size={12} /> {sessionCount} sessions
                             </span>
                             {lastSessionDate && (
                                 <span className="flex items-center gap-1">
-                                    <Clock size={10} /> Last: {lastSessionDate}
+                                    <Clock size={12} /> Last: {lastSessionDate}
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 ml-2 shrink-0">
+                    <div className="flex items-center gap-2 ml-2 shrink-0">
                         <Link
                             to="/active"
                             onClick={(e) => {
@@ -113,26 +113,26 @@ export function RoutineCard({
                                 onStartWorkout(template.id);
                             }}
                             className={cn(
-                                "w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-transform",
+                                "w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-transform shadow-md",
                                 activeWorkout
                                     ? "bg-zinc-800 text-zinc-600 cursor-not-allowed"
-                                    : "bg-primary text-black hover:scale-105"
+                                    : "bg-primary text-black hover:scale-105 active:scale-95 shadow-primary/20"
                             )}
                             title={activeWorkout ? "Finish or cancel current session first" : "Start workout"}
                             aria-label={`Start ${template.name}`}
                         >
-                            <Play size={16} fill="currentColor" />
+                            <Play size={18} fill="currentColor" className="ml-0.5" />
                         </Link>
                         <button
                             onClick={onToggleEditor}
                             className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all cursor-pointer ${isOpen
-                                ? "bg-primary/20 text-primary"
-                                : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                                ? "bg-primary/20 text-primary border border-primary/30"
+                                : "bg-white/5 text-zinc-300 hover:text-white hover:bg-white/10 border border-white/5"
                                 }`}
                             title="Edit exercises"
                             aria-label={`Edit ${template.name} exercises`}
                         >
-                            {isOpen ? <ChevronDown size={18} /> : <Edit3 size={16} />}
+                            {isOpen ? <ChevronDown size={20} /> : <Edit3 size={18} />}
                         </button>
                     </div>
                 </div>
