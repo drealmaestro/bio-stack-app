@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { X, Check, Target, Scale, Repeat, Copy, History } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { cn } from '../../../lib/utils';
-import { NumericKeypad } from '../../ui/NumericKeypad';
-import { RpeSlider } from '../../ui/RpeSlider';
+﻿import { useState, useEffect } from "react";
+import { X, Check, Target, Scale, Repeat } from "lucide-react";
+import confetti from "canvas-confetti";
+import { cn } from "../../../lib/utils";
+import { NumericKeypad } from "../../ui/NumericKeypad";
+import { RpeSlider } from "../../ui/RpeSlider";
+import { SetAutoFillChips } from "./SetAutoFillChips";
+import type { SmartRecommendation } from "../../../utils/progressiveOverload";
 
 export interface SetLoggingBottomSheetProps {
     isOpen: boolean;
@@ -18,6 +20,7 @@ export interface SetLoggingBottomSheetProps {
     targetReps?: number;
     lastSet?: { weight: number; reps: number };
     previousSet?: { weight: number; reps: number };
+    recommendation?: SmartRecommendation | null;
     onSave: (data: { weight: number; reps: number; rpe?: number }) => void;
     onToggleComplete: () => void;
 }
@@ -35,10 +38,11 @@ export function SetLoggingBottomSheet({
     targetReps,
     lastSet,
     previousSet,
+    recommendation,
     onSave,
     onToggleComplete,
 }: SetLoggingBottomSheetProps) {
-    const [activeTab, setActiveTab] = useState<'weight' | 'reps'>('weight');
+    const [activeTab, setActiveTab] = useState<"weight" | "reps">("weight");
     const [weightVal, setWeightVal] = useState<number>(weight);
     const [repsVal, setRepsVal] = useState<number>(reps);
     const [rpeVal, setRpeVal] = useState<number>(rpe || 7);
@@ -54,7 +58,7 @@ export function SetLoggingBottomSheet({
     if (!isOpen) return null;
 
     const handleKeypadChange = (val: number) => {
-        if (activeTab === 'weight') {
+        if (activeTab === "weight") {
             setWeightVal(val);
             onSave({ weight: val, reps: repsVal, rpe: rpeVal });
         } else {
@@ -78,19 +82,17 @@ export function SetLoggingBottomSheet({
     const handleComplete = () => {
         onSave({ weight: weightVal, reps: repsVal, rpe: rpeVal });
         onToggleComplete();
-
         navigator.vibrate?.([30, 50]);
         try {
             confetti({
                 particleCount: 30,
                 spread: 60,
                 origin: { y: 0.8 },
-                colors: ['#22c55e', '#eab308', '#3b82f6', '#ec4899']
+                colors: ["#22c55e", "#eab308", "#3b82f6", "#ec4899"]
             });
         } catch {
             // Ignore confetti errors if canvas unmounted
         }
-
         onClose();
     };
 
@@ -143,40 +145,23 @@ export function SetLoggingBottomSheet({
 
                 {/* Main Content Area */}
                 <div className="p-5 overflow-y-auto space-y-4 flex-1">
-                    {/* Fast Auto-Fill / Set Duplication Chips */}
-                    {(previousSet || lastSet) && (
-                        <div className="flex gap-2 items-center overflow-x-auto pb-1 scrollbar-none">
-                            {previousSet && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleApplySetValues(previousSet.weight, previousSet.reps)}
-                                    className="shrink-0 bg-primary/10 hover:bg-primary/20 border border-primary/25 rounded-xl px-3 py-2 text-xs font-bold text-primary flex items-center gap-1.5 transition-all tap-active cursor-pointer min-h-[44px]"
-                                >
-                                    <Copy size={12} />
-                                    <span>Copy Set {setIndex - 1} ({previousSet.weight}kg × {previousSet.reps})</span>
-                                </button>
-                            )}
-                            {lastSet && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleApplySetValues(lastSet.weight, lastSet.reps)}
-                                    className="shrink-0 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-zinc-300 flex items-center gap-1.5 transition-all tap-active cursor-pointer min-h-[44px]"
-                                >
-                                    <History size={12} className="text-zinc-400" />
-                                    <span>Last Session ({lastSet.weight}kg × {lastSet.reps})</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
+                    {/* Fast Auto-Fill / Set Duplication & Smart Rec Chips */}
+                    <SetAutoFillChips
+                        recommendation={recommendation}
+                        previousSet={previousSet}
+                        previousSetIndex={setIndex - 1}
+                        lastSessionSet={lastSet}
+                        onApply={handleApplySetValues}
+                    />
 
                     {/* Input Field Selector Tabs */}
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             type="button"
-                            onClick={() => setActiveTab('weight')}
+                            onClick={() => setActiveTab("weight")}
                             className={cn(
                                 "p-3 rounded-2xl border text-left transition-all tap-active flex items-center justify-between cursor-pointer min-h-[64px]",
-                                activeTab === 'weight'
+                                activeTab === "weight"
                                     ? "bg-primary/10 border-primary/50 ring-1 ring-primary/30"
                                     : "bg-black/30 border-white/5 hover:bg-white/5"
                             )}
@@ -193,10 +178,10 @@ export function SetLoggingBottomSheet({
 
                         <button
                             type="button"
-                            onClick={() => setActiveTab('reps')}
+                            onClick={() => setActiveTab("reps")}
                             className={cn(
                                 "p-3 rounded-2xl border text-left transition-all tap-active flex items-center justify-between cursor-pointer min-h-[64px]",
-                                activeTab === 'reps'
+                                activeTab === "reps"
                                     ? "bg-primary/10 border-primary/50 ring-1 ring-primary/30"
                                     : "bg-black/30 border-white/5 hover:bg-white/5"
                             )}
@@ -214,7 +199,7 @@ export function SetLoggingBottomSheet({
 
                     {/* Tactile Keypad */}
                     <NumericKeypad
-                        value={activeTab === 'weight' ? weightVal : repsVal}
+                        value={activeTab === "weight" ? weightVal : repsVal}
                         onChange={handleKeypadChange}
                     />
 

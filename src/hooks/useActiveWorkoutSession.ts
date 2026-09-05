@@ -1,12 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useStore } from "../store/useStore";
 import { useActiveWorkoutStore } from "../store/useActiveWorkoutStore";
 import { nanoid } from "nanoid";
 import confetti from "canvas-confetti";
-import type { SetLog } from "../types";
+import type { SetLog, TargetMuscle } from "../types";
+import { calculateDailyReadiness, type ReadinessEvaluation } from "../utils/readinessMath";
+import {
+    calculateProgressiveOverload,
+    type SmartRecommendation,
+    type SetPerformance,
+} from "../utils/progressiveOverload";
 
 export function useActiveWorkoutSession() {
-    const { templates, exercises, logs, addLog } = useStore();
+    const { templates, exercises, logs, addLog, sleepDuration, waterIntake } = useStore();
     const {
         activeWorkout, startWorkout, cancelWorkout,
         toggleSetComplete, updateSetWeight, updateSetReps, updateSetRpe
@@ -30,42 +36,180 @@ export function useActiveWorkoutSession() {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
         };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
     }, [activeWorkout]);
 
     const activeTemplate = activeWorkout ? templates.find(t => t.id === activeWorkout.templateId) : null;
     const elapsedSeconds = activeWorkout ? Math.floor((now - activeWorkout.startTime) / 1000) : 0;
 
-    const getExerciseName = (id: string) => exercises.find(e => e.id === id)?.name || "Unknown";
+    const getExerciseName = useCallback((id: string) => exercises.find(e => e.id === id)?.name || "Unknown", [exercises]);
 
+    // 1. Daily Readiness Integration (Physiological score 0-100)
+    const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+    const todaySleep = sleepDuration?.[todayStr] || 0;
+    const todayWater = waterIntake?.[todayStr] || 0;
+
+    const dailyReadiness: ReadinessEvaluation = useMemo(() => {
+        const activeSecs = logs
+            .filter(l => l.timestamp?.startsWith(todayStr))
+            .reduce((sum, l) => sum + (l.duration_seconds || 0), 0);
+        const activeMinutesToday = Math.round(activeSecs / 60);
+
+        return calculateDailyReadiness({
+            sleepMinutes: todaySleep,
+            waterMl: todayWater,
+            isRestDay: false,
+            activeMinutesToday,
+        });
+    }, [todaySleep, todayWater, logs, todayStr]);
+
+    const todayReadiness = dailyReadiness;
+
+    // 2. Cross-Template Fallback for Exercise History
+    const lastSetsByExercise = useMemo(() => {
+        if (!activeWorkout || !activeTemplate) return {};
+
+        const sortedLogs = [...logs].sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        const templateLogs = sortedLogs.filter(l => l.template_id === activeWorkout.templateId);
+
+        const map: Record<string, SetLog[]> = {};
+
+        activeTemplate.exercises.forEach(ex => {
+            const exerciseId = ex.exercise_id;
+
+            // Tier 1: Current template logs
+            const inTemplateLog = templateLogs.find(l =>
+                l.completed_exercises?.some(s => s.exercise_id === exerciseId && (s.weight_kg > 0 || s.reps_completed > 0))
+            );
+
+            if (inTemplateLog) {
+                map[exerciseId] = inTemplateLog.completed_exercises.filter(s => s.exercise_id === exerciseId);
+                return;
+            }
+
+            // Tier 2: Cross-template fallback
+            const crossTemplateLog = sortedLogs.find(l =>
+                l.completed_exercises?.some(s => s.exercise_id === exerciseId && (s.weight_kg > 0 || s.reps_completed > 0))
+            );
+
+            if (crossTemplateLog) {
+                map[exerciseId] = crossTemplateLog.completed_exercises.filter(s => s.exercise_id === exerciseId);
+            } else {
+                map[exerciseId] = [];
+            }
+        });
+
+        return map;
+    }, [activeWorkout?.templateId, activeTemplate, logs]);
+
+    // 3. Synchronized Last Session Data
     const lastSessionData = useMemo(() => {
         if (!activeWorkout) return null;
-        const previousLogs = logs
-            .filter(l => l.template_id === activeWorkout.templateId)
-            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        if (!previousLogs.length) return null;
-        const lastLog = previousLogs[0];
         const map: Record<string, Record<number, { weight: number; reps: number }>> = {};
-        lastLog.completed_exercises.forEach(set => {
-            if (!map[set.exercise_id]) map[set.exercise_id] = {};
-            map[set.exercise_id][set.set_number] = { weight: set.weight_kg, reps: set.reps_completed };
-        });
-        return map;
-    }, [activeWorkout?.templateId, logs]);
+        let hasData = false;
 
-    const lastSetsByExercise = useMemo(() => {
-        if (!activeWorkout) return {};
-        const previousLogs = logs
-            .filter(l => l.template_id === activeWorkout.templateId)
-            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        if (!previousLogs.length) return {};
-        const map: Record<string, SetLog[]> = {};
-        previousLogs[0].completed_exercises.forEach(set => {
-            (map[set.exercise_id] ??= []).push(set);
+        Object.entries(lastSetsByExercise).forEach(([exerciseId, sets]) => {
+            if (sets.length > 0) {
+                map[exerciseId] = {};
+                sets.forEach(set => {
+                    map[exerciseId][set.set_number] = {
+                        weight: set.weight_kg,
+                        reps: set.reps_completed,
+                    };
+                });
+                hasData = true;
+            }
         });
-        return map;
-    }, [activeWorkout?.templateId, logs]);
+
+        return hasData ? map : null;
+    }, [activeWorkout, lastSetsByExercise]);
+
+    // 4. Dynamic Progressive Overload Calculation
+    const smartRecommendations = useMemo(() => {
+        if (!activeWorkout || !activeTemplate) return {};
+
+        const recs: Record<string, SmartRecommendation> = {};
+        const hasLoggedReadiness = (todaySleep > 0) || (todayWater > 0);
+        const readinessScore = hasLoggedReadiness ? dailyReadiness.score : undefined;
+
+        activeTemplate.exercises.forEach(ex => {
+            const exData = exercises.find(e => e.id === ex.exercise_id);
+            const exerciseName = exData?.name || getExerciseName(ex.exercise_id);
+            const muscle: TargetMuscle = exData?.target_muscle || "Other";
+            const rawSets = lastSetsByExercise[ex.exercise_id] || [];
+
+            const lastSets: SetPerformance[] = rawSets.map(s => ({
+                weight_kg: s.weight_kg,
+                reps_completed: s.reps_completed,
+                rpe: s.rpe,
+                set_number: s.set_number,
+            }));
+
+            recs[ex.exercise_id] = calculateProgressiveOverload({
+                exerciseId: ex.exercise_id,
+                exerciseName,
+                targetSets: ex.target_sets,
+                targetReps: ex.target_reps,
+                muscle,
+                lastSets,
+                readinessScore,
+            });
+        });
+
+        return recs;
+    }, [activeWorkout, activeTemplate, exercises, lastSetsByExercise, dailyReadiness.score, getExerciseName, todaySleep, todayWater]);
+
+    const getRecommendation = useCallback((exerciseId: string): SmartRecommendation | null => {
+        return smartRecommendations[exerciseId] ?? null;
+    }, [smartRecommendations]);
+
+    // 5. 1-Tap Apply Handler
+    const applyRecommendation = useCallback((
+        exerciseIndex: number,
+        arg2?: number | SmartRecommendation,
+        arg3?: number
+    ) => {
+        if (!activeWorkout || !activeTemplate) return;
+        const targetEx = activeTemplate.exercises[exerciseIndex];
+        if (!targetEx) return;
+
+        let rec: SmartRecommendation | undefined;
+        let setNum: number | undefined;
+
+        if (typeof arg2 === "number") {
+            setNum = arg2;
+            rec = smartRecommendations[targetEx.exercise_id];
+        } else if (arg2 && typeof arg2 === "object") {
+            rec = arg2;
+            setNum = arg3;
+        } else {
+            rec = smartRecommendations[targetEx.exercise_id];
+            setNum = arg3;
+        }
+
+        if (!rec) return;
+
+        if (setNum !== undefined) {
+            const key = `${exerciseIndex}-${setNum}`;
+            if (!activeWorkout.completedSets.includes(key)) {
+                updateSetWeight(exerciseIndex, setNum, rec.suggestedWeightKg);
+                updateSetReps(exerciseIndex, setNum, rec.suggestedReps);
+                navigator.vibrate?.(30);
+            }
+        } else {
+            for (let i = 1; i <= targetEx.target_sets; i++) {
+                const key = `${exerciseIndex}-${i}`;
+                if (!activeWorkout.completedSets.includes(key)) {
+                    updateSetWeight(exerciseIndex, i, rec.suggestedWeightKg);
+                    updateSetReps(exerciseIndex, i, rec.suggestedReps);
+                }
+            }
+            navigator.vibrate?.(30);
+        }
+    }, [activeWorkout, activeTemplate, smartRecommendations, updateSetWeight, updateSetReps]);
 
     const prMap = useMemo(() => {
         const map: Record<string, number> = {};
@@ -169,6 +313,11 @@ export function useActiveWorkoutSession() {
         setExpandedTempo,
         lastSessionData,
         lastSetsByExercise,
+        dailyReadiness,
+        todayReadiness,
+        smartRecommendations,
+        getRecommendation,
+        applyRecommendation,
         prMap,
         startWorkout,
         cancelWorkout,

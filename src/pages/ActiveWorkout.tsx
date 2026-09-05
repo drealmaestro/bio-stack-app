@@ -16,7 +16,7 @@ export function ActiveWorkout() {
         showCancelConfirm, setShowCancelConfirm, showFinishConfirm, setShowFinishConfirm,
         showSummary, setShowSummary, summaryData, setSummaryData,
         showStrategy, setShowStrategy, expandedTempo, setExpandedTempo,
-        lastSessionData, lastSetsByExercise,
+        lastSessionData, lastSetsByExercise, smartRecommendations,
         startWorkout, cancelWorkout, toggleSetComplete, updateSetWeight, updateSetReps, updateSetRpe,
         getExerciseName, handleFinish
     } = useActiveWorkoutSession();
@@ -77,6 +77,7 @@ export function ActiveWorkout() {
                         lastSessionData={lastSessionData}
                         lastSetsByExercise={lastSetsByExercise}
                         expandedTempo={expandedTempo}
+                        smartRecommendation={smartRecommendations?.[exercise.exercise_id]}
                         onToggleTempo={setExpandedTempo}
                         updateSetWeight={updateSetWeight}
                         updateSetReps={updateSetReps}
