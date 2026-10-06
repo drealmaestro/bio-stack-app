@@ -12,6 +12,7 @@ import { MuscleVolumeCard } from "../components/profile/MuscleVolumeCard";
 import { PersonalInfoCard } from "../components/profile/PersonalInfoCard";
 import { NutritionGoalsCard } from "../components/profile/NutritionGoalsCard";
 import { FocusAreasCard } from "../components/profile/FocusAreasCard";
+import { MediaStorageWidget } from "../components/workout/media/MediaStorageWidget";
 
 const GOAL_OPTIONS = [
     "Chest Development", "Tricep Hypertrophy", "Bicep Hypertrophy",
@@ -190,6 +191,8 @@ export function Profile() {
                 selectedGoals={formData.goals}
                 onToggleGoal={toggleGoal}
             />
+
+            <MediaStorageWidget />
 
             <div className="space-y-4">
                 <Button

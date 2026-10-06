@@ -4,6 +4,7 @@ import { Dumbbell, Clock, CheckCircle2, Play, ChevronDown, Edit3 } from "lucide-
 import { cn } from "../../../lib/utils";
 import { getMuscleIcon } from "../../../lib/muscleIcons";
 import type { WorkoutTemplate, TargetMuscle, ActiveWorkoutState } from "../../../types";
+import { RoutineMediaDownloadButton } from "../media/RoutineMediaDownloadButton";
 
 const MUSCLE_COLORS: Record<TargetMuscle, string> = {
     Chest: "text-orange-400 bg-orange-400/10",
@@ -102,6 +103,10 @@ export function RoutineCard({
                                     <Clock size={12} /> Last: {lastSessionDate}
                                 </span>
                             )}
+                        </div>
+
+                        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.05]">
+                            <RoutineMediaDownloadButton exerciseIds={template.exercises.map(e => e.exercise_id)} />
                         </div>
                     </div>
 

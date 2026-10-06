@@ -1,11 +1,14 @@
-﻿import { useState, useEffect } from "react";
-import { X, Check, Target, Scale, Repeat } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Check, Target } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "../../../lib/utils";
 import { NumericKeypad } from "../../ui/NumericKeypad";
 import { RpeSlider } from "../../ui/RpeSlider";
 import { SetAutoFillChips } from "./SetAutoFillChips";
+import { SetLoggingValueTabs } from "./SetLoggingValueTabs";
+import { SetLoggingPacerBar } from "./SetLoggingPacerBar";
 import type { SmartRecommendation } from "../../../utils/progressiveOverload";
+import type { Exercise, TargetMuscle } from "../../../types";
 
 export interface SetLoggingBottomSheetProps {
     isOpen: boolean;
@@ -21,6 +24,9 @@ export interface SetLoggingBottomSheetProps {
     lastSet?: { weight: number; reps: number };
     previousSet?: { weight: number; reps: number };
     recommendation?: SmartRecommendation | null;
+    tempo?: string;
+    targetMuscle?: TargetMuscle;
+    exercise?: Exercise | null;
     onSave: (data: { weight: number; reps: number; rpe?: number }) => void;
     onToggleComplete: () => void;
 }
@@ -39,6 +45,9 @@ export function SetLoggingBottomSheet({
     lastSet,
     previousSet,
     recommendation,
+    tempo,
+    targetMuscle,
+    exercise,
     onSave,
     onToggleComplete,
 }: SetLoggingBottomSheetProps) {
@@ -79,19 +88,26 @@ export function SetLoggingBottomSheet({
         navigator.vibrate?.(30);
     };
 
+    const handleTempoRepsUpdate = (newReps: number) => {
+        setRepsVal(newReps);
+        onSave({ weight: weightVal, reps: newReps, rpe: rpeVal });
+    };
+
     const handleComplete = () => {
         onSave({ weight: weightVal, reps: repsVal, rpe: rpeVal });
-        onToggleComplete();
-        navigator.vibrate?.([30, 50]);
-        try {
-            confetti({
-                particleCount: 30,
-                spread: 60,
-                origin: { y: 0.8 },
-                colors: ["#22c55e", "#eab308", "#3b82f6", "#ec4899"]
-            });
-        } catch {
-            // Ignore confetti errors if canvas unmounted
+        if (!isCompleted) {
+            onToggleComplete();
+            navigator.vibrate?.([30, 50]);
+            try {
+                confetti({
+                    particleCount: 30,
+                    spread: 60,
+                    origin: { y: 0.8 },
+                    colors: ["#22c55e", "#eab308", "#3b82f6", "#ec4899"]
+                });
+            } catch {
+                // Ignore confetti errors if canvas unmounted
+            }
         }
         onClose();
     };
@@ -106,7 +122,7 @@ export function SetLoggingBottomSheet({
 
             {/* Bottom Sheet Drawer */}
             <div className={cn(
-                "fixed inset-x-0 bottom-0 z-50 max-h-[85vh] h-auto bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 rounded-t-[2.5rem] shadow-2xl flex flex-col transition-transform duration-300 ease-out",
+                "fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] h-auto bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 rounded-t-[2.5rem] shadow-2xl flex flex-col transition-transform duration-300 ease-out",
                 isOpen ? "translate-y-0" : "translate-y-full"
             )}>
                 {/* Drag Handle */}
@@ -144,8 +160,8 @@ export function SetLoggingBottomSheet({
                 </div>
 
                 {/* Main Content Area */}
-                <div className="p-5 overflow-y-auto space-y-4 flex-1">
-                    {/* Fast Auto-Fill / Set Duplication & Smart Rec Chips */}
+                <div className="p-5 overflow-y-auto space-y-4 flex-1 overscroll-contain">
+                    {/* Fast Auto-Fill & Smart Rec Chips */}
                     <SetAutoFillChips
                         recommendation={recommendation}
                         previousSet={previousSet}
@@ -154,48 +170,23 @@ export function SetLoggingBottomSheet({
                         onApply={handleApplySetValues}
                     />
 
-                    {/* Input Field Selector Tabs */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab("weight")}
-                            className={cn(
-                                "p-3 rounded-2xl border text-left transition-all tap-active flex items-center justify-between cursor-pointer min-h-[64px]",
-                                activeTab === "weight"
-                                    ? "bg-primary/10 border-primary/50 ring-1 ring-primary/30"
-                                    : "bg-black/30 border-white/5 hover:bg-white/5"
-                            )}
-                        >
-                            <div>
-                                <span className="text-[10px] font-extrabold uppercase text-zinc-400 flex items-center gap-1">
-                                    <Scale className="w-3 h-3" /> Weight (kg)
-                                </span>
-                                <div className="text-2xl font-mono font-black text-white mt-0.5">
-                                    {weightVal} <span className="text-xs font-normal text-zinc-400">kg</span>
-                                </div>
-                            </div>
-                        </button>
+                    {/* Compact Tempo Pacing Coach & Visual Cue Drawer */}
+                    <SetLoggingPacerBar
+                        exerciseName={exerciseName}
+                        tempo={tempo}
+                        targetReps={targetReps}
+                        targetMuscle={targetMuscle}
+                        exercise={exercise}
+                        onRepsUpdate={handleTempoRepsUpdate}
+                    />
 
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab("reps")}
-                            className={cn(
-                                "p-3 rounded-2xl border text-left transition-all tap-active flex items-center justify-between cursor-pointer min-h-[64px]",
-                                activeTab === "reps"
-                                    ? "bg-primary/10 border-primary/50 ring-1 ring-primary/30"
-                                    : "bg-black/30 border-white/5 hover:bg-white/5"
-                            )}
-                        >
-                            <div>
-                                <span className="text-[10px] font-extrabold uppercase text-zinc-400 flex items-center gap-1">
-                                    <Repeat className="w-3 h-3" /> Reps
-                                </span>
-                                <div className="text-2xl font-mono font-black text-white mt-0.5">
-                                    {repsVal} <span className="text-xs font-normal text-zinc-400">reps</span>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
+                    {/* Value Selection Tabs */}
+                    <SetLoggingValueTabs
+                        activeTab={activeTab}
+                        onSelectTab={setActiveTab}
+                        weight={weightVal}
+                        reps={repsVal}
+                    />
 
                     {/* Tactile Keypad */}
                     <NumericKeypad

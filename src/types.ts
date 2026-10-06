@@ -134,3 +134,23 @@ export interface DailyInsights {
     distance_km: number;
 }
 
+// --- Exercise Media & Cache Storage ---
+
+export interface ExerciseMediaMeta {
+    exercise_id: string;
+    url: string;
+    size_bytes: number;
+    mime_type: 'image/webp' | 'image/avif' | 'image/svg+xml';
+    cached_at: string;
+    version: number;
+}
+
+export interface MediaStorageReport {
+    cachedCount: number;
+    totalCount: number;
+    usedBytes: number;
+    usedMb: number;
+    quotaBytes?: number;
+    isOnline: boolean;
+}
+

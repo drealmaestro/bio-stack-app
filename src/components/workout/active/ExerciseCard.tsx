@@ -1,16 +1,15 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "../../ui/card";
-import { getMuscleIcon } from "../../../lib/muscleIcons";
-import { cn } from "../../../lib/utils";
 import { suggestNextWeight } from "../../../lib/progression";
 import { calculateProgressiveOverload, type SmartRecommendation } from "../../../utils/progressiveOverload";
 import { ProgressionCoachBanner } from "./ProgressionCoachBanner";
-import { TempoGuideCard } from "./TempoGuideCard";
+import { ExerciseCardHeader } from "./ExerciseCardHeader";
+import { ExerciseTempoIntegration } from "./ExerciseTempoIntegration";
+import { ExerciseCardMediaDrawer } from "./ExerciseCardMediaDrawer";
 import { SetRow } from "./SetRow";
 import { SetLoggingBottomSheet } from "./SetLoggingBottomSheet";
 import { WarmUpCalculatorModal } from "./WarmUpCalculatorModal";
-import { Flame } from "lucide-react";
-import type { Exercise, ExerciseSet, ActiveWorkoutState, SetLog } from "../../../types";
+import type { Exercise, ExerciseSet, ActiveWorkoutState, SetLog, TargetMuscle } from "../../../types";
 
 export interface ExerciseCardProps {
     exercise: ExerciseSet;
@@ -77,41 +76,24 @@ export function ExerciseCard({
     } : undefined;
 
     const firstUncompletedSetNum = Array.from({ length: exercise.target_sets })
-        .map((_, i) => i + 1).find(num => !activeWorkout.completedSets.includes(`${index}-${num}`));
+        .map((_, i) => i + 1).find(num => !activeWorkout.completedSets.includes(`${index}-${num}`)) || 1;
+
+    const currentExercise: Exercise = exData || {
+        id: exercise.exercise_id,
+        name: exerciseName,
+        target_muscle: (muscle as TargetMuscle) || "Other",
+        instructions: "",
+    };
 
     return (
         <div className="space-y-2.5">
-            <div className="flex justify-between items-center px-1">
-                <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-                    <span className="text-primary bg-primary/10 w-7 h-7 rounded-full flex items-center justify-center shrink-0">
-                        {getMuscleIcon(muscle, 14)}
-                    </span>
-                    <span className="truncate">{exerciseName}</span>
-                    {intensity && (
-                        <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0",
-                            intensity === "Heavy" ? "bg-red-500/10 text-red-400 border border-red-500/15" :
-                            intensity === "Moderate" ? "bg-blue-500/10 text-blue-400 border border-blue-500/15" :
-                            "bg-green-500/10 text-green-400 border border-green-500/15"
-                        )}>
-                            {intensity}
-                        </span>
-                    )}
-                </h3>
-                <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                        type="button"
-                        onClick={() => setShowWarmUpModal(true)}
-                        className="text-[10px] font-black text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all tap-active cursor-pointer min-h-[44px]"
-                        title="Warm-up Calculator"
-                        aria-label="Open warm-up calculator"
-                    >
-                        <Flame size={11} /> Warm-Up
-                    </button>
-                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                        {exercise.rest_seconds}s Rest
-                    </span>
-                </div>
-            </div>
+            <ExerciseCardHeader
+                exerciseName={exerciseName}
+                muscle={muscle}
+                intensity={intensity}
+                restSeconds={exercise.rest_seconds}
+                onOpenWarmUp={() => setShowWarmUpModal(true)}
+            />
 
             {/* Progression Coach */}
             <ProgressionCoachBanner
@@ -132,13 +114,21 @@ export function ExerciseCard({
                 }}
             />
 
-            {/* Coach Tip / Tempo */}
-            <TempoGuideCard
+            {/* Interactive Tempo Metronome & Coach Guide */}
+            <ExerciseTempoIntegration
                 tempo={exData?.tempo}
                 coachTips={exData?.coach_tips}
                 targetMuscle={muscle}
+                exerciseName={exerciseName}
+                targetReps={exercise.target_reps}
                 isExpanded={expandedTempo === exercise.exercise_id}
                 onToggleTempo={() => onToggleTempo(expandedTempo === exercise.exercise_id ? null : exercise.exercise_id)}
+                onRepsUpdate={(reps) => updateSetReps(index, firstUncompletedSetNum, reps)}
+            />
+
+            {/* Collapsible Exercise Animation & Form Cues */}
+            <ExerciseCardMediaDrawer
+                exercise={currentExercise}
             />
 
             <Card className="bg-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
@@ -204,6 +194,9 @@ export function ExerciseCard({
                     lastSet={lastExData?.[activeSheetSetNum]}
                     previousSet={previousSetInfo}
                     recommendation={smartRec}
+                    tempo={exData?.tempo}
+                    targetMuscle={muscle as TargetMuscle}
+                    exercise={currentExercise}
                     onSave={({ weight, reps, rpe }) => {
                         updateSetWeight(index, activeSheetSetNum, weight);
                         updateSetReps(index, activeSheetSetNum, reps);
