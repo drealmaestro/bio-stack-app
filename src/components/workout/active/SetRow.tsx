@@ -1,4 +1,4 @@
-﻿import { Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { RecommendationBadge } from "./RecommendationBadge";
 import type { SmartRecommendation } from "../../../utils/progressiveOverload";
@@ -40,12 +40,13 @@ export function SetRow({
     onOpenSheet,
     onApplyRecommendation
 }: SetRowProps) {
+    const isFailed = currentRpe >= 10;
+
     const rpeBadgeColor = (rpe: number) => {
-        if (!rpe) return "text-zinc-500 bg-white/5 border-white/5";
-        if (rpe >= 9.5) return "text-red-400 bg-red-500/10 border-red-500/20";
-        if (rpe >= 8.5) return "text-orange-400 bg-orange-500/10 border-orange-500/20";
-        if (rpe >= 7.5) return "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
-        return "text-blue-400 bg-blue-500/10 border-blue-500/20";
+        if (!rpe) return "text-[#8e95a5] bg-[#1a1e26] border-[#262b36]";
+        if (rpe >= 10) return "text-[#ff3b30] bg-[#1f1112] border-[#ff3b30]";
+        if (rpe >= 9) return "text-[#ff9500] bg-[#221710] border-[#ff9500]/40";
+        return "text-[#ccff00] bg-[#243305] border-[#ccff00]/40";
     };
 
     const handleApplyRec = (weight: number, reps: number) => {
@@ -59,48 +60,55 @@ export function SetRow({
     };
 
     return (
-        <div className={cn("border-t border-white/5 transition-colors", isCompleted ? "bg-primary/5" : "")}>
+        <div className={cn(
+            "border-t border-[#262b36] transition-colors",
+            isCompleted && "bg-[#121a10]/70",
+            isFailed && !isCompleted && "bg-[#1f1112]/50"
+        )}>
             <div
                 onClick={() => onOpenSheet?.()}
-                className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3.2rem] gap-1.5 px-3 py-2.5 items-center cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.06] tap-active min-h-[52px]"
+                className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 items-center cursor-pointer hover:bg-white/[0.02] active:bg-white/[0.05] min-h-[50px]"
             >
-                {/* Set number */}
+                {/* Monospace Tabular Set Index (01, 02) */}
                 <div className="flex flex-col items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-xs font-black text-zinc-200 shadow-sm">
+                    <span className={cn(
+                        "font-display font-black text-sm tracking-wider tabular-nums",
+                        isCompleted ? "text-[#ccff00]" : "text-[#8e95a5]"
+                    )}>
                         {setNum}
-                    </div>
+                    </span>
                     {lastSet && (
-                        <span className="text-[9px] text-zinc-400 font-bold mt-0.5 leading-none">
-                            {lastSet.weight}x{lastSet.reps}
+                        <span className="text-[9px] font-mono text-[#8e95a5]/70 leading-none">
+                            {lastSet.weight}×{lastSet.reps}
                         </span>
                     )}
                 </div>
 
-                {/* Weight display */}
+                {/* Weight Input Box */}
                 <div className="text-center">
-                    <div className="h-10 px-1.5 flex items-center justify-center bg-black/40 border border-white/10 text-white font-mono text-base font-black rounded-xl">
+                    <div className="h-9 px-1 flex items-center justify-center bg-[#1a1e26] border border-[#262b36] text-[#e2e5eb] font-display text-base font-bold rounded">
                         {currentWeight > 0 ? `${currentWeight} kg` : (lastSet ? `${lastSet.weight} kg` : "-")}
                     </div>
                 </div>
 
-                {/* Reps display */}
+                {/* Reps Input Box */}
                 <div className="text-center">
-                    <div className="h-10 px-1.5 flex items-center justify-center bg-black/40 border border-white/10 text-white font-mono text-base font-black rounded-xl">
+                    <div className="h-9 px-1 flex items-center justify-center bg-[#1a1e26] border border-[#262b36] text-[#e2e5eb] font-display text-base font-bold rounded">
                         {currentReps}
                     </div>
                 </div>
 
-                {/* RPE badge */}
+                {/* RPE Box */}
                 <div className="text-center">
                     <div className={cn(
-                        "h-10 px-1 flex items-center justify-center border font-mono text-xs font-black rounded-xl transition-colors",
+                        "h-9 px-1 flex items-center justify-center border font-mono text-xs font-bold rounded transition-colors",
                         rpeBadgeColor(currentRpe)
                     )}>
                         {currentRpe ? `@${currentRpe}` : "-"}
                     </div>
                 </div>
 
-                {/* Completion toggle button */}
+                {/* Tactile Completion Check Button */}
                 <div className="flex justify-center">
                     <button
                         type="button"
@@ -111,23 +119,25 @@ export function SetRow({
                             if (!isCompleted) navigator.vibrate?.(50);
                         }}
                         className={cn(
-                            "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer",
-                            isCompleted ? "bg-primary text-black shadow-lg shadow-primary/25 scale-105" : "bg-white/5 border border-white/10 text-zinc-500 hover:bg-white/15 hover:text-white"
+                            "w-10 h-10 rounded flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer",
+                            isCompleted
+                                ? "bg-[#ccff00] text-[#0d0f12] shadow-[0_0_12px_rgba(204,255,0,0.3)]"
+                                : "bg-[#1a1e26] border border-[#262b36] text-[#8e95a5] hover:border-[#ccff00] hover:text-[#ccff00]"
                         )}
                     >
-                        <Check size={20} strokeWidth={3.5} />
+                        <Check size={18} strokeWidth={3.5} />
                     </button>
                 </div>
             </div>
 
             {/* Smart Recommendation Banner on Upcoming Uncompleted Set */}
             {!isCompleted && isUpcoming && recommendation && (
-                <div className="px-3 pb-2 pt-0.5 flex items-center justify-between gap-2 border-t border-white/[0.04] bg-white/[0.01]">
+                <div className="px-3 pb-2 pt-0.5 flex items-center justify-between gap-2 border-t border-[#262b36]/40 bg-[#14171d]/50">
                     <RecommendationBadge
                         recommendation={recommendation}
                         onApply={handleApplyRec}
                     />
-                    <span className="text-[10px] text-zinc-400 font-medium truncate max-w-[190px]" title={recommendation.reason}>
+                    <span className="text-[10px] text-[#8e95a5] font-mono truncate max-w-[190px]" title={recommendation.reason}>
                         {recommendation.reason}
                     </span>
                 </div>

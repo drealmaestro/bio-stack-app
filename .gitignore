@@ -28,3 +28,6 @@ dist-ssr
 # Agent logs & workspaces
 .agents/*
 !.agents/AGENTS.md
+
+stitch_downloads/
+stitch_assets/

@@ -1,5 +1,3 @@
-import { Button } from "../../ui/button";
-
 interface ActiveWorkoutHeaderProps {
     templateName: string;
     elapsedSeconds: number;
@@ -14,22 +12,23 @@ export function ActiveWorkoutHeader({
     onCancel
 }: ActiveWorkoutHeaderProps) {
     return (
-        <div className="bg-card border border-white/5 rounded-3xl p-5 mb-6 flex justify-between items-center shadow-md relative z-10">
+        <div className="stitch-card-2 p-4 mb-4 flex justify-between items-center border-[#343b4a] relative z-10">
             <div>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest block mb-0.5">{templateName}</span>
-                <div className="text-3xl font-extrabold text-white font-mono tracking-tighter tabular-nums leading-none">
+                <span className="text-[10px] font-mono font-bold text-[#ccff00] uppercase tracking-widest block mb-0.5">
+                    {templateName}
+                </span>
+                <div className="text-4xl font-display font-black text-white tracking-tight tabular-nums leading-none">
                     {formatTime(elapsedSeconds)}
                 </div>
             </div>
 
-            <Button
-                variant="ghost"
-                size="sm"
+            <button
+                type="button"
                 onClick={onCancel}
-                className="text-destructive h-auto py-1.5 px-3.5 bg-destructive/10 hover:bg-destructive/20 rounded-full text-xs font-extrabold uppercase tracking-widest border border-destructive/10"
+                className="stitch-btn-ghost text-xs py-1.5 px-3 text-[#ff3b30] border-[#ff3b30]/30 hover:border-[#ff3b30] hover:text-[#ff3b30]"
             >
-                Cancel
-            </Button>
+                ABORT
+            </button>
         </div>
     );
 }

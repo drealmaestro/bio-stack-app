@@ -1,4 +1,3 @@
-import { Button } from "../../ui/button";
 import { Trophy, Clock, Check, TrendingUp } from "lucide-react";
 import { AnimatedNumber } from "../../ui/AnimatedNumber";
 
@@ -15,62 +14,66 @@ interface WorkoutSummaryModalProps {
 
 export function WorkoutSummaryModal({ summaryData, formatTime, onClose }: WorkoutSummaryModalProps) {
     return (
-        <div className="animate-in zoom-in-95 duration-500 flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-6 ring-2 ring-primary/30">
-                <Trophy size={40} className="text-primary" />
+        <div className="animate-in fade-in duration-300 flex flex-col items-center justify-center min-h-[60vh] text-center px-2 py-6">
+            <div className="w-16 h-16 rounded bg-[#1a1e26] border border-[#ccff00] flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(204,255,0,0.25)]">
+                <Trophy size={32} className="text-[#ccff00]" />
             </div>
-            <h2 className="text-3xl font-black text-white mb-1">Workout Complete!</h2>
-            <p className="text-zinc-400 mb-8">Great session. Here's how you did.</p>
+            <h2 className="text-2xl font-display font-black text-white uppercase tracking-tight mb-1">
+                SESSION COMPLETED & LOGGED
+            </h2>
+            <p className="text-xs font-mono text-[#8e95a5] uppercase tracking-wider mb-6">
+                HYPERTROPHY TELEMETRY UPDATED
+            </p>
 
-            <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-6">
-                <div className="glass-card p-4 rounded-2xl text-center">
-                    <Clock size={18} className="mx-auto text-primary mb-1" />
-                    <div className="text-xl font-black text-white">
+            <div className="grid grid-cols-3 gap-2 w-full max-w-sm mb-4">
+                <div className="stitch-card-1 p-3 text-center">
+                    <Clock size={16} className="mx-auto text-[#ccff00] mb-1" />
+                    <div className="text-xl font-display font-black text-white tabular-nums">
                         <AnimatedNumber
                             value={summaryData.durationSecs}
                             formatter={(val) => formatTime(Math.floor(val))}
                         />
                     </div>
-                    <div className="text-xs text-zinc-400">Duration</div>
+                    <div className="text-[9px] font-mono text-[#8e95a5] uppercase mt-0.5">TIME</div>
                 </div>
-                <div className="glass-card p-4 rounded-2xl text-center">
-                    <Check size={18} className="mx-auto text-primary mb-1" />
-                    <div className="text-xl font-black text-white">
+                <div className="stitch-card-1 p-3 text-center">
+                    <Check size={16} className="mx-auto text-[#ccff00] mb-1" />
+                    <div className="text-xl font-display font-black text-[#ccff00] tabular-nums">
                         <AnimatedNumber value={summaryData.sets} />
                     </div>
-                    <div className="text-xs text-zinc-400">Sets</div>
+                    <div className="text-[9px] font-mono text-[#8e95a5] uppercase mt-0.5">SETS</div>
                 </div>
-                <div className="glass-card p-4 rounded-2xl text-center">
-                    <TrendingUp size={18} className="mx-auto text-primary mb-1" />
-                    <div className="text-xl font-black text-white">
+                <div className="stitch-card-1 p-3 text-center">
+                    <TrendingUp size={16} className="mx-auto text-[#ccff00] mb-1" />
+                    <div className="text-xl font-display font-black text-white tabular-nums">
                         <AnimatedNumber
                             value={summaryData.volume}
                             formatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(1)}t` : `${Math.round(val)}kg`}
                         />
                     </div>
-                    <div className="text-xs text-zinc-400">Volume</div>
+                    <div className="text-[9px] font-mono text-[#8e95a5] uppercase mt-0.5">LOAD</div>
                 </div>
             </div>
 
             {summaryData.prs.length > 0 && (
-                <div className="w-full max-w-sm glass-card p-4 rounded-2xl border border-primary/30 bg-primary/5 mb-6">
-                    <div className="text-xs font-bold text-primary uppercase tracking-widest mb-2 flex items-center justify-center gap-1">
-                        <Trophy size={12} /> New Personal Records
+                <div className="w-full max-w-sm stitch-card-1 p-3 mb-6 border-[#ccff00]/40 bg-[#14171d]">
+                    <div className="text-[10px] font-mono font-bold text-[#ccff00] uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1">
+                        <Trophy size={11} /> NEW PERSONAL RECORDS LOGGED
                     </div>
                     {summaryData.prs.map((pr, i) => (
-                        <div key={i} className="text-sm text-white font-bold py-1">
+                        <div key={i} className="text-xs font-display font-black text-white uppercase py-0.5">
                             {pr}
                         </div>
                     ))}
                 </div>
             )}
 
-            <Button
+            <button
                 onClick={onClose}
-                className="w-full max-w-sm h-14 rounded-2xl font-black text-lg bg-primary text-black"
+                className="w-full max-w-sm py-3.5 stitch-btn-primary text-base font-display font-black tracking-wider shadow-[0_0_15px_rgba(204,255,0,0.2)]"
             >
-                Done
-            </Button>
+                RETURN TO SCHEDULE
+            </button>
         </div>
     );
 }

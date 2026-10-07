@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Home, Dumbbell, Play, Menu, X, Trash2, Salad, ScrollText, Timer, User } from 'lucide-react';
+import { Dumbbell, Play, Trash2, Calendar, BarChart3, Timer, User, Menu, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useActiveWorkoutStore } from '../store/useActiveWorkoutStore';
@@ -14,22 +14,16 @@ export function Layout() {
     const activeWorkout = useActiveWorkoutStore((state) => state.activeWorkout);
     const location = useLocation();
     const mainRef = useRef<HTMLElement>(null);
-
     const isSessionLocked = !!activeWorkout;
 
-    // Scroll to top on route change to defeat browser scroll-restoration races
     useEffect(() => {
         const resetScroll = () => {
-            if (mainRef.current) {
-                mainRef.current.scrollTop = 0;
-            }
+            if (mainRef.current) mainRef.current.scrollTop = 0;
         };
         resetScroll();
         const rAF = requestAnimationFrame(resetScroll);
         return () => cancelAnimationFrame(rAF);
     }, [location.pathname]);
-
-    const [scrolled, setScrolled] = useState(false);
 
     const handleReset = () => {
         resetStore();
@@ -37,197 +31,139 @@ export function Layout() {
         window.location.href = "/";
     };
 
-    const handleScroll = (e: React.UIEvent<HTMLElement>) => {
-        setScrolled(e.currentTarget.scrollTop > 20);
-    };
-
     return (
-        <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-zinc-950 flex md:items-center justify-center md:p-6 lg:p-12 w-full">
-            <div className="w-full max-w-[400px] bg-background flex flex-col h-[100dvh] max-h-[100dvh] md:h-auto md:min-h-[850px] md:max-h-[90vh] relative overflow-hidden md:rounded-[3rem] md:border-[12px] border-zinc-900 md:shadow-[0_0_80px_-10px_rgba(60,207,148,0.15),0_0_0_1px_rgba(255,255,255,0.05)] md:ring-1 ring-white/10 mx-auto md:[transform:translate3d(0,0,0)]">
-                {/* Header */}
-                <header className={cn(
-                    "absolute top-0 left-0 right-0 z-50 h-16 px-5 flex justify-between items-center transition-all duration-300",
-                    scrolled ? "bg-slate-900/85 backdrop-blur-xl border-b border-slate-800/80 shadow-lg shadow-black/40" : "bg-transparent"
-                )}>
+        <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#0d0f12] flex items-center justify-center w-full">
+            <div className="w-full max-w-[420px] bg-[#0d0f12] flex flex-col h-[100dvh] max-h-[100dvh] relative overflow-hidden mx-auto border-x border-[#1a1e26]/50">
+                {/* Stitch Kinetic Header */}
+                <header className="absolute top-0 left-0 right-0 z-40 h-14 px-4 flex justify-between items-center bg-[#0d0f12]/95 backdrop-blur-md border-b border-[#1a1e26]">
                     <NavLink to="/" className="flex items-center gap-2 group cursor-pointer select-none">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-sky-400 flex items-center justify-center group-hover:scale-105 transition-transform shadow-md shadow-primary/25">
-                            <span className="font-black text-black text-xs tracking-tight">M</span>
+                        <div className="w-6 h-6 rounded bg-[#ccff00] flex items-center justify-center">
+                            <span className="font-display font-black text-[#0d0f12] text-xs">HT</span>
                         </div>
-                        <h1 className="text-sm font-black tracking-tight text-white group-hover:text-primary transition-colors">
-                            el <span className="text-primary font-black group-hover:text-white transition-colors">Maestro</span>
+                        <h1 className="text-sm font-black tracking-wider text-[#e2e5eb] font-display uppercase">
+                            HYPERTROPHY <span className="text-[#ccff00]">TRACKER</span>
                         </h1>
                     </NavLink>
+                    
                     <div className="flex items-center gap-2">
-                        <div className="text-[10px] font-black uppercase tracking-wider text-primary px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
-                            {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
+                        {/* Offline-Sync Telemetry Badge */}
+                        <div className="hidden xs:flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#14171d] border border-[#262b36]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00] animate-pulse" />
+                            <span className="text-[9px] font-bold text-[#8e95a5] uppercase tracking-wider font-mono">LOCAL CACHE</span>
                         </div>
-                        {/* Profile avatar → direct navigation to profile */}
                         <NavLink
                             to="/profile"
                             className={({ isActive }) => cn(
-                                "w-9 h-9 min-w-[36px] min-h-[36px] rounded-full flex items-center justify-center font-black text-xs transition-all border",
-                                isActive
-                                    ? "bg-primary text-black border-primary"
-                                    : "bg-primary/20 text-primary border-primary/30 hover:bg-primary/30"
+                                "w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-all border",
+                                isActive ? "bg-[#ccff00] text-[#0d0f12] border-[#ccff00]" : "bg-[#14171d] text-[#8e95a5] border-[#262b36] hover:text-[#e2e5eb]"
                             )}
                             title="Profile"
-                            aria-label="Open profile"
                         >
-                            {() => (
-                                user?.name ? (
-                                    <span>{user.name[0].toUpperCase()}</span>
-                                ) : (
-                                    <User size={14} />
-                                )
-                            )}
+                            {user?.name ? user.name[0].toUpperCase() : <User size={13} />}
                         </NavLink>
                         <button
-                            className="p-2 rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors text-white cursor-pointer min-h-[44px] min-w-[44px]"
+                            className="p-1.5 rounded hover:bg-[#1a1e26] transition-colors text-[#8e95a5] hover:text-white"
                             onClick={() => setIsMenuOpen(true)}
-                            aria-label="Open menu"
+                            aria-label="Menu"
                         >
-                            <Menu size={20} />
+                            <Menu size={18} />
                         </button>
                     </div>
                 </header>
 
-                {/* Mobile Menu Overlay */}
+                {/* Mobile Drawer Menu */}
                 <div className={cn(
-                    "absolute inset-0 bg-black/95 z-60 backdrop-blur-xl transition-all duration-300 flex flex-col items-center justify-center space-y-8",
+                    "absolute inset-0 bg-[#0d0f12]/95 z-50 backdrop-blur-xl transition-all duration-300 flex flex-col justify-between p-6",
                     isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                 )}>
-                    <button
-                        onClick={() => setIsMenuOpen(false)}
-                        className="absolute top-6 right-6 w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-zinc-400 hover:text-white cursor-pointer"
-                        aria-label="Close menu"
-                    >
-                        <X size={28} />
-                    </button>
-
-                    <nav className="flex flex-col items-center gap-6 text-2xl font-black">
-                        {[
-                            { to: '/', label: 'Home' },
-                            { to: '/workouts', label: 'Workouts' },
-                            { to: '/nutrition', label: 'Nutrition' },
-                            { to: '/history', label: 'History' },
-                            { to: '/profile', label: 'Profile' },
-                        ].map(({ to, label }) => (
-                            <NavLink
-                                key={to}
-                                to={to}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={({ isActive }) => isActive ? 'text-primary' : 'text-white hover:text-primary/80 transition-colors'}
-                            >
-                                {label}
-                            </NavLink>
-                        ))}
-                    </nav>
-
-                    <div className="absolute bottom-10 flex flex-col items-center gap-3">
-                        <button
-                            onClick={() => setShowResetConfirm(true)}
-                            className="flex items-center gap-2 text-destructive font-medium text-sm border border-destructive/20 px-4 py-2 rounded-full hover:bg-destructive/10"
-                        >
-                            <Trash2 size={16} /> Reset All Data
+                    <div className="flex justify-between items-center border-b border-[#262b36] pb-4">
+                        <span className="font-display font-black text-[#ccff00] tracking-wider uppercase">Menu</span>
+                        <button onClick={() => setIsMenuOpen(false)} className="p-2 text-[#8e95a5] hover:text-white">
+                            <X size={20} />
                         </button>
-                        <div className="text-[10px] font-extrabold text-zinc-600 uppercase tracking-widest mt-1">
-                            v1.4.0 (Action & UI/UX Engine)
-                        </div>
                     </div>
+                    <div className="space-y-4 my-auto">
+                        <NavLink to="/" onClick={() => setIsMenuOpen(false)} className="block py-3 px-4 rounded bg-[#14171d] border border-[#262b36] text-lg font-display font-bold text-[#e2e5eb] hover:border-[#ccff00]">
+                            01. SCHEDULE & SPLIT OVERVIEW
+                        </NavLink>
+                        <NavLink to="/workouts" onClick={() => setIsMenuOpen(false)} className="block py-3 px-4 rounded bg-[#14171d] border border-[#262b36] text-lg font-display font-bold text-[#e2e5eb] hover:border-[#ccff00]">
+                            02. ROUTINE LIBRARY & MESOCYCLES
+                        </NavLink>
+                        <NavLink to="/active" onClick={() => setIsMenuOpen(false)} className="block py-3 px-4 rounded bg-[#14171d] border border-[#262b36] text-lg font-display font-bold text-[#e2e5eb] hover:border-[#ccff00]">
+                            03. ACTIVE WORKOUT PLAYER
+                        </NavLink>
+                        <NavLink to="/history" onClick={() => setIsMenuOpen(false)} className="block py-3 px-4 rounded bg-[#14171d] border border-[#262b36] text-lg font-display font-bold text-[#e2e5eb] hover:border-[#ccff00]">
+                            04. VOLUME & PR ANALYTICS
+                        </NavLink>
+                    </div>
+                    <button
+                        onClick={() => { setIsMenuOpen(false); setShowResetConfirm(true); }}
+                        className="w-full py-3 rounded border border-[#ff3b30]/30 text-[#ff3b30] flex items-center justify-center gap-2 font-display font-bold text-sm"
+                    >
+                        <Trash2 size={16} /> RESET LOCAL DATA
+                    </button>
                 </div>
 
                 {/* Reset Confirmation Dialog */}
-                <Dialog
-                    open={showResetConfirm}
-                    title="Reset all data"
-                    onClose={() => setShowResetConfirm(false)}
-                >
-                    <h3 className="text-lg font-black text-white">Reset All Data?</h3>
-                    <p className="text-sm text-zinc-400">This will permanently delete all workouts, logs, nutrition and your profile. Cannot be undone.</p>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => setShowResetConfirm(false)}
-                            className="flex-1 py-2.5 rounded-xl border border-white/10 text-white text-sm font-bold hover:bg-white/5 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleReset}
-                            className="flex-1 py-2.5 rounded-xl bg-destructive text-white text-sm font-bold hover:bg-red-700 transition-colors"
-                        >
-                            Reset Everything
-                        </button>
+                <Dialog open={showResetConfirm} onClose={() => setShowResetConfirm(false)} title="Reset App Data">
+                    <p className="text-xs text-[#8e95a5] mb-4">Reset all local training history and mesocycle state? This cannot be undone.</p>
+                    <div className="flex gap-2">
+                        <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-2 rounded stitch-btn-ghost text-xs">CANCEL</button>
+                        <button onClick={handleReset} className="flex-1 py-2 rounded bg-[#ff3b30] text-white font-display font-black text-xs">CONFIRM RESET</button>
                     </div>
                 </Dialog>
 
-                {/* Main Content */}
-                <main ref={mainRef} key={location.pathname} onScroll={handleScroll} className="flex-1 pt-20 pb-32 px-4 w-full overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-300 scroll-smooth">
+                {/* Main Content Area */}
+                <main ref={mainRef} className="flex-1 pt-16 pb-20 px-3 w-full overflow-y-auto scroll-smooth">
                     <Outlet />
                 </main>
 
-                {/* Floating Persistent Rest Timer Widget */}
-                <RestTimerWidget className={location.pathname === '/active' ? 'bottom-6' : 'bottom-24'} />
+                {/* Floating Rest Timer Widget */}
+                {location.pathname !== '/active' && <RestTimerWidget className="bottom-20" />}
 
-                {/* Bottom Navigation Bar */}
+                {/* Stitch Grounded Bottom Navigation Bar */}
                 {location.pathname !== '/active' && (
-                    <nav className="bg-slate-900/90 backdrop-blur-2xl absolute bottom-5 left-4 right-4 h-[68px] rounded-2xl flex items-center justify-around z-50 shadow-[0_12px_40px_rgba(0,0,0,0.85)] px-2 border border-slate-800/90">
-                        <NavLink to="/" className={navLinkClass} end>
+                    <nav className="bg-[#0d0f12] absolute bottom-0 left-0 right-0 h-16 border-t border-[#1a1e26] flex items-center justify-around z-40 px-1">
+                        <NavLink to="/" className={navItemClass} end>
                             {({ isActive }) => (
                                 <>
-                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
-                                        <Home size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
-                                    </div>
-                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Home</span>
-                                </>
-                            )}
-                        </NavLink>
-                        <NavLink to="/workouts" className={navLinkClass}>
-                            {({ isActive }) => (
-                                <>
-                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
-                                        <Dumbbell size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
-                                    </div>
-                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Train</span>
+                                    {isActive && <div className="absolute top-0 left-2 right-2 h-[2px] bg-[#ccff00]" />}
+                                    <Calendar size={18} className={cn("transition-colors", isActive ? "text-[#ccff00]" : "text-[#8e95a5]")} />
+                                    <span className={cn("text-[10px] tracking-wider uppercase font-body mt-0.5", isActive ? "font-bold text-[#ccff00]" : "text-[#8e95a5]")}>SCHEDULE</span>
                                 </>
                             )}
                         </NavLink>
 
-                        {/* Center floating Play / Active Session button */}
-                        <div className="relative -top-5">
-                            <NavLink
-                                to="/active"
-                                aria-label={isSessionLocked ? "Active workout session" : "Start workout"}
-                                className={({ isActive }) => cn(
-                                    "flex items-center justify-center w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-primary to-sky-400 text-black shadow-xl shadow-primary/30 transition-all active:scale-90 border-[3.5px] border-slate-900",
-                                    isActive ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-slate-950" : "hover:scale-105",
-                                    isSessionLocked && !isActive ? "animate-pulse ring-2 ring-primary ring-offset-2 ring-offset-slate-950" : ""
-                                )}
-                            >
-                                {isSessionLocked ? (
-                                    <Timer size={22} className="text-black font-black" />
-                                ) : (
-                                    <Play size={22} fill="currentColor" className="ml-0.5" />
-                                )}
-                            </NavLink>
-                        </div>
-
-                        <NavLink to="/nutrition" className={navLinkClass}>
+                        <NavLink to="/workouts" className={navItemClass}>
                             {({ isActive }) => (
                                 <>
-                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
-                                        <Salad size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
-                                    </div>
-                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Fuel</span>
+                                    {isActive && <div className="absolute top-0 left-2 right-2 h-[2px] bg-[#ccff00]" />}
+                                    <Dumbbell size={18} className={cn("transition-colors", isActive ? "text-[#ccff00]" : "text-[#8e95a5]")} />
+                                    <span className={cn("text-[10px] tracking-wider uppercase font-body mt-0.5", isActive ? "font-bold text-[#ccff00]" : "text-[#8e95a5]")}>ROUTINES</span>
                                 </>
                             )}
                         </NavLink>
-                        <NavLink to="/history" className={navLinkClass}>
+
+                        <NavLink to="/active" className={cn(navItemClass, "relative")}>
                             {({ isActive }) => (
                                 <>
-                                    <div className={cn("p-1 rounded-xl transition-all duration-300", isActive && "bg-primary/15 text-primary scale-110")}>
-                                        <ScrollText size={21} className={cn("transition-colors", isActive ? "text-primary" : "text-zinc-400")} />
+                                    {isActive && <div className="absolute top-0 left-2 right-2 h-[2px] bg-[#ccff00]" />}
+                                    <div className={cn("p-1.5 rounded transition-all", isSessionLocked ? "bg-[#ccff00] text-[#0d0f12] animate-pulse" : isActive ? "text-[#ccff00]" : "text-[#8e95a5]")}>
+                                        {isSessionLocked ? <Timer size={18} /> : <Play size={18} fill={isActive ? "#ccff00" : "none"} />}
                                     </div>
-                                    <span className={cn("text-[11px] mt-0.5 tracking-tight", isActive ? "font-black text-primary" : "font-bold text-zinc-400")}>Log</span>
+                                    <span className={cn("text-[10px] tracking-wider uppercase font-body mt-0.5", isActive || isSessionLocked ? "font-bold text-[#ccff00]" : "text-[#8e95a5]")}>
+                                        {isSessionLocked ? "SESSION" : "ACTIVE"}
+                                    </span>
+                                </>
+                            )}
+                        </NavLink>
+
+                        <NavLink to="/history" className={navItemClass}>
+                            {({ isActive }) => (
+                                <>
+                                    {isActive && <div className="absolute top-0 left-2 right-2 h-[2px] bg-[#ccff00]" />}
+                                    <BarChart3 size={18} className={cn("transition-colors", isActive ? "text-[#ccff00]" : "text-[#8e95a5]")} />
+                                    <span className={cn("text-[10px] tracking-wider uppercase font-body mt-0.5", isActive ? "font-bold text-[#ccff00]" : "text-[#8e95a5]")}>ANALYTICS</span>
                                 </>
                             )}
                         </NavLink>
@@ -238,7 +174,7 @@ export function Layout() {
     );
 }
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) => cn(
-    "flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-all duration-300 tap-active relative group",
-    isActive ? "text-primary" : "text-zinc-400 hover:text-white"
+const navItemClass = ({ isActive }: { isActive: boolean }) => cn(
+    "flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200 select-none",
+    isActive ? "text-[#ccff00]" : "text-[#8e95a5] hover:text-[#e2e5eb]"
 );

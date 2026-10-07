@@ -1,6 +1,5 @@
 import { Flame } from "lucide-react";
 import { getMuscleIcon } from "../../../lib/muscleIcons";
-import { cn } from "../../../lib/utils";
 import type { TargetMuscle } from "../../../types";
 
 export interface ExerciseCardHeaderProps {
@@ -20,18 +19,16 @@ export function ExerciseCardHeader({
 }: ExerciseCardHeaderProps) {
     return (
         <div className="flex justify-between items-center px-1">
-            <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-                <span className="text-primary bg-primary/10 w-7 h-7 rounded-full flex items-center justify-center shrink-0">
+            <h3 className="text-lg font-display font-black text-white uppercase tracking-tight flex items-center gap-2 truncate">
+                <span className="text-[#ccff00] bg-[#1a1e26] border border-[#262b36] w-7 h-7 rounded flex items-center justify-center shrink-0">
                     {getMuscleIcon(muscle as TargetMuscle, 14)}
                 </span>
                 <span className="truncate">{exerciseName}</span>
+                <span className="stitch-badge-target text-[9px] shrink-0">
+                    {muscle}
+                </span>
                 {intensity && (
-                    <span className={cn(
-                        "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0",
-                        intensity === "Heavy" ? "bg-red-500/10 text-red-400 border border-red-500/15" :
-                        intensity === "Moderate" ? "bg-blue-500/10 text-blue-400 border border-blue-500/15" :
-                        "bg-green-500/10 text-green-400 border border-green-500/15"
-                    )}>
+                    <span className="stitch-badge-neutral text-[9px] shrink-0">
                         {intensity}
                     </span>
                 )}
@@ -40,13 +37,13 @@ export function ExerciseCardHeader({
                 <button
                     type="button"
                     onClick={onOpenWarmUp}
-                    className="text-[10px] font-black text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all tap-active cursor-pointer min-h-[44px]"
+                    className="stitch-badge-neutral uppercase hover:border-[#ccff00] flex items-center justify-center gap-1 transition-all cursor-pointer min-h-[36px]"
                     title="Warm-up Calculator"
                     aria-label="Open warm-up calculator"
                 >
-                    <Flame size={11} /> Warm-Up
+                    <Flame size={11} className="text-[#ff9500]" /> Warm-Up
                 </button>
-                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                <span className="stitch-badge-neutral font-mono text-[9px]">
                     {restSeconds}s Rest
                 </span>
             </div>

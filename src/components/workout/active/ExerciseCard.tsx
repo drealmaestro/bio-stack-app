@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent } from "../../ui/card";
 import { suggestNextWeight } from "../../../lib/progression";
 import { calculateProgressiveOverload, type SmartRecommendation } from "../../../utils/progressiveOverload";
 import { ProgressionCoachBanner } from "./ProgressionCoachBanner";
@@ -131,9 +130,9 @@ export function ExerciseCard({
                 exercise={currentExercise}
             />
 
-            <Card className="bg-card border border-white/5 rounded-3xl overflow-hidden shadow-sm">
-                <CardContent className="p-0">
-                    <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3.2rem] gap-1.5 px-3 py-3 bg-white/[0.02] text-[11px] items-center text-zinc-400 font-black uppercase tracking-wider text-center border-b border-white/5">
+            <div className="stitch-card-2 border-[#343b4a] rounded overflow-hidden">
+                <div>
+                    <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 bg-[#14171d] text-[10px] items-center text-[#8e95a5] font-mono font-bold uppercase tracking-wider text-center border-b border-[#262b36]">
                         <div>Set</div>
                         <div>Weight</div>
                         <div>Reps</div>
@@ -175,8 +174,8 @@ export function ExerciseCard({
                             />
                         );
                     })}
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Set Logging Bottom Sheet Drawer */}
             {activeSheetSetNum !== null && (

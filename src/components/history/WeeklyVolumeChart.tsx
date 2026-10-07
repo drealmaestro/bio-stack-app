@@ -52,7 +52,7 @@ export function WeeklyVolumeChart({ volumeData }: WeeklyVolumeChartProps) {
                             tickFormatter={(v) => `${Math.round(v / 1000)}k`}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                        <Bar dataKey="volume" fill="hsl(51 100% 50%)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="volume" fill="#ccff00" radius={[6, 6, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </CardContent>

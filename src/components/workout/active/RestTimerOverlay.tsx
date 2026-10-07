@@ -1,4 +1,3 @@
-import { Button } from "../../ui/button";
 import { ProgressRing } from "../../ui/progress-ring";
 
 interface RestTimerOverlayProps {
@@ -20,43 +19,51 @@ export function RestTimerOverlay({
 }: RestTimerOverlayProps) {
     if (!isResting) return null;
 
+    const isOvertime = restSecondsRemaining <= 0;
+
     return (
         <div
             role="status"
             aria-live="polite"
-            className="fixed inset-0 z-60 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
+            className="fixed inset-0 z-60 bg-[#0d0f12]/95 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-200"
         >
-            <div className="text-zinc-400 font-bold uppercase tracking-widest mb-8">Resting</div>
+            <div className="flex items-center gap-2 mb-6">
+                <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-ping" />
+                <span className="text-[#8e95a5] font-mono font-bold text-xs uppercase tracking-widest">
+                    {isOvertime ? "Rest Overrun" : "Resting"}
+                </span>
+            </div>
 
             <ProgressRing
-                size={200}
-                strokeWidth={8}
+                size={220}
+                strokeWidth={10}
                 progress={restProgress}
-                color="#3ccf94"
-                trackColor="rgba(255,255,255,0.03)"
+                color={isOvertime ? "#ff3b30" : "#ccff00"}
+                trackColor="#1a1e26"
             >
                 <div className="flex flex-col items-center">
-                    <span className="text-5xl font-extrabold text-primary font-mono tabular-nums tracking-tighter">
+                    <span className="text-6xl font-display font-black text-white tabular-nums tracking-tight">
                         {formatTime(restSecondsRemaining)}
                     </span>
-                    <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-1">remaining</span>
+                    <span className="text-[10px] font-mono text-[#8e95a5] uppercase tracking-wider mt-1">
+                        RECOVERY TELEMETRY
+                    </span>
                 </div>
             </ProgressRing>
 
-            <div className="flex gap-4 mt-8">
-                <Button
-                    variant="outline"
+            <div className="flex gap-3 mt-8">
+                <button
                     onClick={() => onAddRestTime(30)}
-                    className="rounded-full h-12 px-6 border-white/20 text-white hover:bg-white/10"
+                    className="stitch-btn-ghost px-6 py-3 text-sm min-h-[48px]"
                 >
-                    +30s
-                </Button>
-                <Button
+                    +30S REST
+                </button>
+                <button
                     onClick={onSkipRest}
-                    className="rounded-full h-12 px-8 bg-white text-black hover:bg-zinc-200 font-bold"
+                    className="stitch-btn-primary px-8 py-3 text-sm min-h-[48px] shadow-[0_0_15px_rgba(204,255,0,0.25)]"
                 >
-                    SKIP
-                </Button>
+                    RESUME SET
+                </button>
             </div>
         </div>
     );

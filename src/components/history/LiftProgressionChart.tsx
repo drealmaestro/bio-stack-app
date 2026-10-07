@@ -104,9 +104,9 @@ export function LiftProgressionChart({
                             <Line
                                 type="monotone"
                                 dataKey="estimated1RM"
-                                stroke="#3ccf94"
+                                stroke="#ccff00"
                                 strokeWidth={3}
-                                dot={{ fill: '#3ccf94', r: 4 }}
+                                dot={{ fill: '#ccff00', r: 4 }}
                                 activeDot={{ r: 6 }}
                                 name="Estimated 1RM"
                             />

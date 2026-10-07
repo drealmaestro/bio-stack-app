@@ -55,8 +55,8 @@ export function WorkoutManager() {
             {/* Top Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-2xl font-black text-white">My Plans</h2>
-                    <p className="text-xs text-zinc-500 mt-0.5">{templates.length} active routines</p>
+                    <h2 className="text-2xl font-black text-white font-display tracking-tight uppercase">Hypertrophy Protocols</h2>
+                    <p className="text-xs text-primary font-bold tracking-wider uppercase mt-0.5">{templates.length} Active Routines</p>
                 </div>
                 {!isCreating && editingId === null && (
                     <Button onClick={() => setIsCreating(true)} size="sm" className="gap-2">

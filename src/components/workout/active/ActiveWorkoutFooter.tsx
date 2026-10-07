@@ -1,4 +1,3 @@
-import { Button } from "../../ui/button";
 import { CheckCircle } from "lucide-react";
 
 interface ActiveWorkoutFooterProps {
@@ -7,13 +6,14 @@ interface ActiveWorkoutFooterProps {
 
 export function ActiveWorkoutFooter({ onFinish }: ActiveWorkoutFooterProps) {
     return (
-        <div className="w-full mt-8 px-1 pb-12 relative z-10">
-            <Button
+        <div className="w-full mt-6 pb-10 relative z-10">
+            <button
                 onClick={onFinish}
-                className="w-full h-14 rounded-3xl font-black text-base tracking-wider bg-primary hover:bg-primary/90 text-black hover:scale-[1.01] transition-transform active:scale-95 shadow-lg shadow-primary/20 uppercase"
+                className="w-full h-14 stitch-btn-primary text-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.25)]"
             >
-                <CheckCircle className="mr-2" size={20} /> FINISH WORKOUT
-            </Button>
+                <CheckCircle size={22} fill="#0d0f12" className="text-[#ccff00]" />
+                <span>COMPLETE & LOG SESSION</span>
+            </button>
         </div>
     );
 }

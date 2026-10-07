@@ -1,5 +1,3 @@
-import { Card, CardContent } from "../ui/card";
-
 interface HistoryStatsRowProps {
     sessionsCount: number;
     totalVolume: number;
@@ -8,29 +6,33 @@ interface HistoryStatsRowProps {
 
 export function HistoryStatsRow({ sessionsCount, totalVolume, avgDuration }: HistoryStatsRowProps) {
     return (
-        <div className="grid grid-cols-3 gap-3">
-            <Card className="glass-card">
-                <CardContent className="p-3.5 text-center">
-                    <div className="text-3xl font-black text-primary">{sessionsCount}</div>
-                    <div className="text-[11px] font-black text-zinc-400 uppercase tracking-wider mt-0.5">Sessions</div>
-                </CardContent>
-            </Card>
-            <Card className="glass-card">
-                <CardContent className="p-3.5 text-center">
-                    <div className="text-3xl font-black text-white">
-                        {totalVolume >= 1000
-                            ? `${(totalVolume / 1000).toFixed(1)}t`
-                            : `${Math.round(totalVolume)}kg`}
-                    </div>
-                    <div className="text-[11px] font-black text-zinc-400 uppercase tracking-wider mt-0.5">Total Vol</div>
-                </CardContent>
-            </Card>
-            <Card className="glass-card">
-                <CardContent className="p-3.5 text-center">
-                    <div className="text-3xl font-black text-white">{avgDuration}m</div>
-                    <div className="text-[11px] font-black text-zinc-400 uppercase tracking-wider mt-0.5">Avg Time</div>
-                </CardContent>
-            </Card>
+        <div className="grid grid-cols-3 gap-2">
+            <div className="stitch-card-1 p-3 text-center">
+                <div className="text-3xl font-display font-black text-[#ccff00] tabular-nums tracking-tight">
+                    {sessionsCount}
+                </div>
+                <div className="text-[10px] font-mono font-bold text-[#8e95a5] uppercase tracking-wider mt-0.5">
+                    SESSIONS
+                </div>
+            </div>
+            <div className="stitch-card-1 p-3 text-center">
+                <div className="text-3xl font-display font-black text-white tabular-nums tracking-tight">
+                    {totalVolume >= 1000
+                        ? `${(totalVolume / 1000).toFixed(1)}t`
+                        : `${Math.round(totalVolume)}kg`}
+                </div>
+                <div className="text-[10px] font-mono font-bold text-[#8e95a5] uppercase tracking-wider mt-0.5">
+                    TOTAL LOAD
+                </div>
+            </div>
+            <div className="stitch-card-1 p-3 text-center">
+                <div className="text-3xl font-display font-black text-white tabular-nums tracking-tight">
+                    {avgDuration}m
+                </div>
+                <div className="text-[10px] font-mono font-bold text-[#8e95a5] uppercase tracking-wider mt-0.5">
+                    AVG DURATION
+                </div>
+            </div>
         </div>
     );
 }

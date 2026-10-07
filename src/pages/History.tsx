@@ -117,7 +117,10 @@ export function HistoryLog() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 pb-8">
-            <h2 className="text-2xl font-bold text-white">Workout History & Analytics</h2>
+            <div>
+                <h2 className="text-2xl font-black text-white font-display tracking-tight uppercase">Volume & PR Analytics</h2>
+                <p className="text-xs text-primary font-bold tracking-wider uppercase mt-0.5">Hypertrophy Progress Engine</p>
+            </div>
 
             {logs.length === 0 ? (
                 <div className="text-center text-muted-foreground py-16 border border-dashed border-white/10 rounded-2xl">
@@ -138,7 +141,7 @@ export function HistoryLog() {
                             data={emaTrendPoints}
                             title={`${getExerciseName(selectedExerciseId)} - 1RM Strength Trend (EMA)`}
                             unit="kg"
-                            color="#10b981"
+                            color="#ccff00"
                         />
                     )}
 

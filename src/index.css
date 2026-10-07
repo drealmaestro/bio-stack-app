@@ -1,53 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-    --font-sans: 'One UI Sans', 'SamsungOne', 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'One UI Sans', 'SamsungOne', 'Plus Jakarta Sans', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-headline: 'Barlow Condensed', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
 
-    --color-background: #000000;
-    --color-foreground: #f4f4f9;
+    --color-background: #0d0f12;
+    --color-foreground: #e2e5eb;
 
-    --color-card: #121216;
-    --color-card-foreground: #f4f4f9;
+    --color-canvas: #0d0f12;
+    --color-surface-1: #14171d;
+    --color-surface-2: #1a1e26;
+    --color-surface-3: #222733;
 
-    --color-popover: #121216;
-    --color-popover-foreground: #f4f4f9;
+    --color-card: #14171d;
+    --color-card-foreground: #e2e5eb;
 
-    --color-primary: #3ccf94;
-    --color-primary-foreground: #000000;
+    --color-popover: #222733;
+    --color-popover-foreground: #e2e5eb;
 
-    --color-secondary: #24252a;
-    --color-secondary-foreground: #f4f4f9;
+    --color-primary: #ccff00;
+    --color-primary-foreground: #0d0f12;
 
-    --color-muted: #24252a;
-    --color-muted-foreground: #8e8e93;
+    --color-secondary: #1a1e26;
+    --color-secondary-foreground: #e2e5eb;
 
-    --color-accent: #24252a;
-    --color-accent-foreground: #f4f4f9;
+    --color-muted: #1a1e26;
+    --color-muted-foreground: #8e95a5;
+
+    --color-accent: #ccff00;
+    --color-accent-foreground: #0d0f12;
 
     --color-destructive: #ff3b30;
     --color-destructive-foreground: #ffffff;
 
-    --color-border: rgba(255, 255, 255, 0.05);
-    --color-input: #24252a;
-    --color-ring: #3ccf94;
+    --color-border: #262b36;
+    --color-input: #1a1e26;
+    --color-ring: #ccff00;
 
-    --color-success: #3ccf94;
-    --color-warning: #ff9f0a;
-    --color-protein: #a78bfa;
-    --color-carbs: #36b4ff;
-    --color-fat: #ff793f;
-    
-    --color-steps: #3ccf94;
-    --color-active: #36b4ff;
-    --color-calories: #ff5975;
-    --color-sleep: #9b5de5;
-    --color-water: #00f5d4;
+    --color-success: #ccff00;
+    --color-warning: #ff9500;
+    --color-volt: #ccff00;
+    --color-failure: #ff3b30;
 
-    --radius-lg: 1.5rem;
-    --radius-md: 1rem;
-    --radius-sm: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-md: 0.5rem;
+    --radius-sm: 0.25rem;
 }
 
 @layer base {
@@ -63,24 +63,25 @@
 
     body {
         font-family: var(--font-sans);
-        @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary h-[100dvh] max-h-[100dvh] overflow-hidden;
+        @apply bg-[#0d0f12] text-[#e2e5eb] antialiased selection:bg-primary/20 selection:text-primary h-[100dvh] max-h-[100dvh] overflow-hidden;
+        background-color: #0d0f12;
         background-image:
-            radial-gradient(circle at 50% 0%, rgba(60, 207, 148, 0.12) 0%, transparent 50%),
-            radial-gradient(circle at 100% 40%, rgba(54, 180, 255, 0.06) 0%, transparent 40%),
-            radial-gradient(circle at 0% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 50% 100%, rgba(255, 89, 117, 0.03) 0%, transparent 40%);
+            radial-gradient(circle at 50% 0%, rgba(204, 255, 0, 0.05) 0%, transparent 40%),
+            radial-gradient(circle at 100% 40%, rgba(204, 255, 0, 0.02) 0%, transparent 30%),
+            radial-gradient(circle at 0% 80%, rgba(255, 59, 48, 0.02) 0%, transparent 40%);
         font-variant-numeric: tabular-nums;
     }
 
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-display);
         font-weight: 800;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
     }
 
     ::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
+        width: 4px;
+        height: 4px;
     }
     
     ::-webkit-scrollbar-track {
@@ -88,177 +89,138 @@
     }
     
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.12);
-    }
-    
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        opacity: 0.5;
-        cursor: pointer;
-    }
-    
-    input[type="date"]::-webkit-calendar-picker-indicator:hover {
-        opacity: 0.8;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
     }
 }
 
-@utility glass {
-    @apply bg-[#0e0e12]/75 backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
-}
-
-@utility glass-card {
-    background-color: rgba(18, 18, 22, 0.7);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1.75rem; /* 28px */
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    @apply shadow-[0_8px_30px_rgba(0,0,0,0.5)];
+/* Stitch Kinetic Obsidian Utilities */
+@utility stitch-card-1 {
+    background-color: #14171d;
+    border: 1px solid #262b36;
+    border-radius: 0.375rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.08);
-        background-color: rgba(22, 22, 28, 0.85);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.01);
+        border-color: #343b4a;
+    }
+}
+
+@utility stitch-card-2 {
+    background-color: #1a1e26;
+    border: 1px solid #343b4a;
+    border-radius: 0.375rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility stitch-card-active {
+    background-color: #1a1e26;
+    border: 1px solid #ccff00;
+    box-shadow: inset 0 0 12px rgba(204, 255, 0, 0.12), 0 0 16px rgba(204, 255, 0, 0.15);
+    border-radius: 0.375rem;
+}
+
+@utility stitch-btn-primary {
+    background-color: #ccff00;
+    color: #0d0f12;
+    font-family: var(--font-display);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 0.25rem;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:active {
+        transform: scale(0.98);
+        background-color: #b5e600;
+    }
+}
+
+@utility stitch-btn-ghost {
+    background-color: transparent;
+    border: 1px solid #262b36;
+    color: #e2e5eb;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 0.25rem;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+        border-color: #ccff00;
+        color: #ccff00;
     }
 
     &:active {
-        transform: scale(0.985) translateY(-0.5px);
+        transform: scale(0.98);
     }
 }
 
-@utility glass-premium {
-    background: linear-gradient(135deg, rgba(22, 22, 28, 0.8) 0%, rgba(14, 14, 18, 0.9) 100%);
-    backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 2rem; /* 32px */
-    box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.05);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-    &:hover {
-        border-color: rgba(60, 207, 148, 0.2);
-        box-shadow: 
-            0 20px 45px rgba(0, 0, 0, 0.7),
-            inset 0 1px 1px rgba(255, 255, 255, 0.08),
-            0 0 20px rgba(60, 207, 148, 0.05);
-    }
-}
-
-@utility glass-panel {
-    background-color: rgba(14, 14, 18, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1.75rem; /* 28px */
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@utility glass-button {
-    @apply flex items-center justify-center bg-white/5 border border-white/5 rounded-2xl transition-all duration-300;
-    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-
-    &:hover {
-        @apply bg-white/10 border-primary/20 text-primary;
-    }
-
-    &:active {
-        @apply scale-95;
-    }
-}
-
-@utility insight-card {
-    background-color: rgba(18, 18, 22, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: 1.5rem; /* 24px */
-    padding: 1rem;
+@utility stitch-stepper {
+    min-width: 48px;
+    min-height: 48px;
+    background-color: #1a1e26;
+    color: #e2e5eb;
+    border: 1px solid #262b36;
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    @apply shadow-lg;
-
-    &:hover {
-        border-color: rgba(255, 255, 255, 0.06);
-        background-color: rgba(22, 22, 28, 0.8);
-        transform: translateY(-1px);
-    }
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.125rem;
+    user-select: none;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:active {
-        transform: scale(0.99) translateY(0);
+        background-color: #222733;
+        border-color: #ccff00;
+        color: #ccff00;
+        transform: scale(0.96);
     }
 }
 
-@utility macro-pill {
-    @apply text-[10px] font-black px-2.5 py-1 rounded-xl uppercase tracking-wider;
+@utility stitch-badge-target {
+    background-color: #243305;
+    color: #ccff00;
+    border: 1px solid rgba(204, 255, 0, 0.3);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
 }
 
-@utility section-label {
-    @apply text-[10px] font-black uppercase tracking-widest text-zinc-500;
+@utility stitch-badge-neutral {
+    background-color: #1a1e26;
+    color: #8e95a5;
+    border: 1px solid #262b36;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+@utility stitch-set-completed {
+    background-color: #121a10;
+    border-color: rgba(204, 255, 0, 0.35);
+}
+
+@utility stitch-set-failed {
+    background-color: #1f1112;
+    border-color: rgba(255, 59, 48, 0.5);
 }
 
 @utility tap-active {
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:active {
         transform: scale(0.97);
     }
 }
-
-/* ── Samsung Health v7 Redesign Animations ── */
-
-@keyframes pulse-beat {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4)); }
-    15% { transform: scale(1.12); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)); }
-    30% { transform: scale(1.02); filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6)); }
-    45% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7)); }
-}
-
-@keyframes wave-fill {
-    0% { transform: translateY(0) scaleY(1); }
-    50% { transform: translateY(-3px) scaleY(1.04); }
-    100% { transform: translateY(0) scaleY(1); }
-}
-
-@keyframes float-gentle {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-@utility animate-pulse-beat {
-    animation: pulse-beat var(--pulse-duration, 0.8s) infinite ease-in-out;
-}
-
-@utility animate-wave {
-    animation: wave-fill 3s infinite ease-in-out;
-}
-
-@utility animate-float {
-    animation: float-gentle 4s infinite ease-in-out;
-}
-
-/* Custom premium color backgrounds per health pillar */
-@utility bg-pillar-activity {
-    @apply bg-gradient-to-b from-[#10241b] to-background;
-}
-
-@utility bg-pillar-sleep {
-    @apply bg-gradient-to-b from-[#0f1026] to-background;
-}
-
-@utility bg-pillar-vitals {
-    @apply bg-gradient-to-b from-[#241014] to-background;
-}
-
-@utility bg-pillar-nutrition {
-    @apply bg-gradient-to-b from-[#221710] to-background;
-}
-
-@utility bg-pillar-mindfulness {
-    @apply bg-gradient-to-b from-[#181024] to-background;
-}

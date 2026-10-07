@@ -32,26 +32,26 @@ export function RestTimerWidget({ className }: RestTimerWidgetProps) {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleWidgetClick(); }}
             className={cn(
-                "absolute bottom-24 left-4 right-4 z-50 bg-slate-900/90 backdrop-blur-xl border border-primary/30 shadow-[0_12px_40px_rgba(0,0,0,0.8)] rounded-2xl p-3.5 flex items-center justify-between cursor-pointer group hover:border-primary/50 transition-all duration-300 animate-in slide-in-from-bottom-4",
+                "absolute bottom-20 left-3 right-3 z-50 bg-[#1a1e26] border border-[#ccff00] shadow-[0_8px_32px_rgba(0,0,0,0.8),inset_0_0_12px_rgba(204,255,0,0.12)] rounded p-3 flex items-center justify-between cursor-pointer group transition-all duration-200 animate-in slide-in-from-bottom-2",
                 className
             )}
         >
             {/* Left Section: Timer & Progress */}
-            <div className="flex items-center gap-3">
-                <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-primary/15 border border-primary/20 text-primary group-hover:scale-105 transition-transform">
-                    <Timer size={20} className="animate-pulse" />
+            <div className="flex items-center gap-2.5">
+                <div className="relative flex items-center justify-center w-10 h-10 rounded bg-[#14171d] border border-[#262b36] text-[#ccff00]">
+                    <Timer size={18} className="animate-pulse" />
                     {/* Ring progress border effect */}
                     <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
                         <path
                             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="rgba(60,207,148,0.2)"
+                            stroke="#14171d"
                             strokeWidth="3"
                         />
                         <path
                             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="#3ccf94"
+                            stroke="#ccff00"
                             strokeWidth="3"
                             strokeDasharray={`${restProgress * 100}, 100`}
                             className="transition-all duration-500"
@@ -61,29 +61,29 @@ export function RestTimerWidget({ className }: RestTimerWidgetProps) {
 
                 <div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-primary">Resting</span>
-                        <span className="text-[9px] text-zinc-400 font-bold flex items-center gap-0.5">
-                            Tap for workout <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                        <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-[#ccff00]">Resting</span>
+                        <span className="text-[9px] text-[#8e95a5] font-mono flex items-center gap-0.5">
+                            TAP TO VIEW <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
                         </span>
                     </div>
-                    <div className="text-2xl font-black text-white font-mono tracking-tight leading-none mt-0.5">
+                    <div className="text-xl font-display font-black text-white tabular-nums tracking-tight leading-none mt-0.5">
                         {formatTime(restSecondsRemaining)}
                     </div>
                 </div>
             </div>
 
             {/* Right Section: Action Controls */}
-            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
                         addRestTime(30);
                     }}
-                    className="flex items-center justify-center gap-1 bg-white/10 hover:bg-white/20 active:scale-95 text-white font-black text-xs px-3 py-2 rounded-xl border border-white/10 transition-all min-h-[44px] min-w-[44px] cursor-pointer"
+                    className="stitch-btn-ghost px-2.5 py-1.5 text-[11px] min-h-[38px] flex items-center gap-1"
                     title="Add 30 seconds"
                     aria-label="Add 30 seconds to rest timer"
                 >
-                    <Plus size={12} />
+                    <Plus size={11} />
                     <span>30s</span>
                 </button>
 
@@ -92,11 +92,11 @@ export function RestTimerWidget({ className }: RestTimerWidgetProps) {
                         e.stopPropagation();
                         skipRest();
                     }}
-                    className="flex items-center justify-center gap-1 bg-primary/20 hover:bg-primary/30 active:scale-95 text-primary font-black text-xs px-3.5 py-2 rounded-xl border border-primary/30 transition-all min-h-[44px] min-w-[44px] cursor-pointer"
+                    className="stitch-btn-primary px-3 py-1.5 text-[11px] min-h-[38px] flex items-center gap-1 shadow-[0_0_10px_rgba(204,255,0,0.2)]"
                     title="Skip rest timer"
                     aria-label="Skip rest timer"
                 >
-                    <SkipForward size={12} />
+                    <SkipForward size={11} />
                     <span>Skip</span>
                 </button>
             </div>
