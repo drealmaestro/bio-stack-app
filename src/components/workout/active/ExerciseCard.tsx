@@ -3,6 +3,8 @@ import { suggestNextWeight } from "../../../lib/progression";
 import { calculateProgressiveOverload, type SmartRecommendation } from "../../../utils/progressiveOverload";
 import { ProgressionCoachBanner } from "./ProgressionCoachBanner";
 import { ExerciseCardHeader } from "./ExerciseCardHeader";
+import { TactileProtocolCues } from "./TactileProtocolCues";
+import { ActiveSetStepperCard } from "./ActiveSetStepperCard";
 import { ExerciseTempoIntegration } from "./ExerciseTempoIntegration";
 import { ExerciseCardMediaDrawer } from "./ExerciseCardMediaDrawer";
 import { SetRow } from "./SetRow";
@@ -84,6 +86,9 @@ export function ExerciseCard({
         instructions: "",
     };
 
+    const activeSetCurrentWeight = activeWorkout.setWeights[`${index}-${firstUncompletedSetNum}`] || currentSet1Weight || 38;
+    const activeSetCurrentReps = activeWorkout.setReps?.[`${index}-${firstUncompletedSetNum}`] ?? exercise.target_reps;
+
     return (
         <div className="space-y-2.5">
             <ExerciseCardHeader
@@ -92,6 +97,13 @@ export function ExerciseCard({
                 intensity={intensity}
                 restSeconds={exercise.rest_seconds}
                 onOpenWarmUp={() => setShowWarmUpModal(true)}
+                exerciseIndex={index}
+                totalExercises={exercises.length}
+            />
+
+            {/* Tactile Cue & Weak-Side Bias Protocol */}
+            <TactileProtocolCues
+                tactileCue={exData?.coach_tips || "Retract scapulae, 30° bench incline, 3s eccentric cadence."}
             />
 
             {/* Progression Coach */}
@@ -113,7 +125,6 @@ export function ExerciseCard({
                 }}
             />
 
-            {/* Interactive Tempo Metronome & Coach Guide */}
             <ExerciseTempoIntegration
                 tempo={exData?.tempo}
                 coachTips={exData?.coach_tips}
@@ -125,59 +136,67 @@ export function ExerciseCard({
                 onRepsUpdate={(reps) => updateSetReps(index, firstUncompletedSetNum, reps)}
             />
 
-            {/* Collapsible Exercise Animation & Form Cues */}
-            <ExerciseCardMediaDrawer
-                exercise={currentExercise}
-            />
+            <ExerciseCardMediaDrawer exercise={currentExercise} />
 
+            {/* Set Table */}
             <div className="stitch-card-2 border-[#343b4a] rounded overflow-hidden">
-                <div>
-                    <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 bg-[#14171d] text-[10px] items-center text-[#8e95a5] font-mono font-bold uppercase tracking-wider text-center border-b border-[#262b36]">
-                        <div>Set</div>
-                        <div>Weight</div>
-                        <div>Reps</div>
-                        <div>RPE</div>
-                        <div>Done</div>
-                    </div>
-
-                    {Array.from({ length: exercise.target_sets }).map((_, setIdx) => {
-                        const setNum = setIdx + 1;
-                        const key = `${index}-${setNum}`;
-                        const isCompleted = activeWorkout.completedSets.includes(key);
-                        const lastSet = lastExData?.[setNum];
-                        const prevWeight = setNum > 1 ? (activeWorkout.setWeights[`${index}-${setNum - 1}`] || lastExData?.[setNum - 1]?.weight) : 0;
-                        const currentWeight = activeWorkout.setWeights[key] || (prevWeight && !isCompleted ? prevWeight : 0);
-                        const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
-                        const currentRpe = activeWorkout.setRpes?.[key] || 0;
-                        const hasRepsKey = key in (activeWorkout.setReps || {});
-
-                        return (
-                            <SetRow
-                                key={setNum}
-                                exerciseName={exerciseName}
-                                exerciseIndex={index}
-                                setNum={setNum}
-                                targetReps={exercise.target_reps}
-                                currentWeight={currentWeight}
-                                currentReps={currentReps}
-                                currentRpe={currentRpe}
-                                isCompleted={isCompleted}
-                                lastSet={lastSet}
-                                hasRepsKey={hasRepsKey}
-                                recommendation={smartRec}
-                                isUpcoming={setNum === firstUncompletedSetNum}
-                                onWeightChange={(w) => updateSetWeight(index, setNum, w)}
-                                onRepsChange={(r) => updateSetReps(index, setNum, r)}
-                                onRpeChange={(rpe) => updateSetRpe(index, setNum, rpe)}
-                                onToggleComplete={() => toggleSetComplete(index, setNum, exercise.rest_seconds)}
-                                onOpenSheet={() => setActiveSheetSetNum(setNum)}
-                            />
-                        );
-                    })}
+                <div className="grid grid-cols-[2.5rem_1.1fr_1.1fr_1.1fr_3rem] gap-1.5 px-3 py-2 bg-[#14171d] text-[10px] items-center text-[#8e95a5] font-mono font-bold uppercase tracking-wider text-center border-b border-[#262b36]">
+                    <div>SET</div>
+                    <div>PREV</div>
+                    <div>LOAD</div>
+                    <div>REPS</div>
+                    <div>STATUS</div>
                 </div>
+
+                {Array.from({ length: exercise.target_sets }).map((_, setIdx) => {
+                    const setNum = setIdx + 1;
+                    const key = `${index}-${setNum}`;
+                    const isCompleted = activeWorkout.completedSets.includes(key);
+                    const lastSet = lastExData?.[setNum];
+                    const prevWeight = setNum > 1 ? (activeWorkout.setWeights[`${index}-${setNum - 1}`] || lastExData?.[setNum - 1]?.weight) : 0;
+                    const currentWeight = activeWorkout.setWeights[key] || (prevWeight && !isCompleted ? prevWeight : 0);
+                    const currentReps = activeWorkout.setReps?.[key] ?? exercise.target_reps;
+                    const currentRpe = activeWorkout.setRpes?.[key] || 0;
+                    const hasRepsKey = key in (activeWorkout.setReps || {});
+
+                    return (
+                        <SetRow
+                            key={setNum}
+                            exerciseName={exerciseName}
+                            exerciseIndex={index}
+                            setNum={setNum}
+                            targetReps={exercise.target_reps}
+                            currentWeight={currentWeight}
+                            currentReps={currentReps}
+                            currentRpe={currentRpe}
+                            isCompleted={isCompleted}
+                            lastSet={lastSet}
+                            hasRepsKey={hasRepsKey}
+                            recommendation={smartRec}
+                            isUpcoming={setNum === firstUncompletedSetNum}
+                            onWeightChange={(w) => updateSetWeight(index, setNum, w)}
+                            onRepsChange={(r) => updateSetReps(index, setNum, r)}
+                            onRpeChange={(rpe) => updateSetRpe(index, setNum, rpe)}
+                            onToggleComplete={() => toggleSetComplete(index, setNum, exercise.rest_seconds)}
+                            onOpenSheet={() => setActiveSheetSetNum(setNum)}
+                        />
+                    );
+                })}
             </div>
 
-            {/* Set Logging Bottom Sheet Drawer */}
+            {/* In-Line Stepper Card for the Active Set */}
+            {firstUncompletedSetNum <= exercise.target_sets && (
+                <ActiveSetStepperCard
+                    setNum={firstUncompletedSetNum}
+                    weight={activeSetCurrentWeight}
+                    reps={activeSetCurrentReps}
+                    onWeightChange={(w) => updateSetWeight(index, firstUncompletedSetNum, w)}
+                    onRepsChange={(r) => updateSetReps(index, firstUncompletedSetNum, r)}
+                    onLogSet={() => toggleSetComplete(index, firstUncompletedSetNum, exercise.rest_seconds)}
+                />
+            )}
+
+            {/* Bottom Sheet Drawer */}
             {activeSheetSetNum !== null && (
                 <SetLoggingBottomSheet
                     isOpen={activeSheetSetNum !== null}

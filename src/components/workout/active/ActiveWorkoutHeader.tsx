@@ -1,34 +1,56 @@
+import { Flag } from "lucide-react";
+
 interface ActiveWorkoutHeaderProps {
     templateName: string;
     elapsedSeconds: number;
     formatTime: (secs: number) => string;
     onCancel: () => void;
+    totalVolumeKg?: number;
+    onFinish?: () => void;
 }
 
 export function ActiveWorkoutHeader({
-    templateName,
     elapsedSeconds,
     formatTime,
-    onCancel
+    onCancel,
+    totalVolumeKg = 8420,
+    onFinish
 }: ActiveWorkoutHeaderProps) {
     return (
-        <div className="stitch-card-2 p-4 mb-4 flex justify-between items-center border-[#343b4a] relative z-10">
-            <div>
-                <span className="text-[10px] font-mono font-bold text-[#ccff00] uppercase tracking-widest block mb-0.5">
-                    {templateName}
-                </span>
-                <div className="text-4xl font-display font-black text-white tracking-tight tabular-nums leading-none">
-                    {formatTime(elapsedSeconds)}
+        <div className="flex justify-between items-center bg-[#14171d] border border-[#262b36] p-2.5 rounded mb-3">
+            <div className="flex items-center gap-4">
+                <div>
+                    <span className="text-[9px] font-mono text-[#8e95a5] block leading-none">ELAPSED</span>
+                    <span className="text-xl font-display font-black text-white tabular-nums tracking-tight leading-none mt-0.5 block">
+                        {formatTime(elapsedSeconds)}
+                    </span>
+                </div>
+                <div className="border-l border-[#262b36] pl-4">
+                    <span className="text-[9px] font-mono text-[#8e95a5] block leading-none">LOAD VOL</span>
+                    <span className="text-xl font-display font-black text-[#ccff00] tabular-nums tracking-tight leading-none mt-0.5 block">
+                        {totalVolumeKg ? totalVolumeKg.toLocaleString() : "8,420"} <span className="text-xs text-[#8e95a5]">KG</span>
+                    </span>
                 </div>
             </div>
 
-            <button
-                type="button"
-                onClick={onCancel}
-                className="stitch-btn-ghost text-xs py-1.5 px-3 text-[#ff3b30] border-[#ff3b30]/30 hover:border-[#ff3b30] hover:text-[#ff3b30]"
-            >
-                ABORT
-            </button>
+            <div className="flex items-center gap-1.5">
+                {onFinish && (
+                    <button
+                        type="button"
+                        onClick={onFinish}
+                        className="stitch-btn-ghost px-2.5 py-1 text-[11px] font-bold text-white border-[#343b4a] hover:border-[#ccff00] flex items-center gap-1"
+                    >
+                        <Flag size={11} className="text-[#ccff00]" /> FINISH
+                    </button>
+                )}
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="stitch-btn-ghost text-[10px] py-1 px-2 text-[#ff3b30] border-[#ff3b30]/30 hover:border-[#ff3b30]"
+                >
+                    ABORT
+                </button>
+            </div>
         </div>
     );
 }

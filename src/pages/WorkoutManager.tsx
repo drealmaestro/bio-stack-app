@@ -5,6 +5,8 @@ import { CreateRoutineCard } from "../components/workout/manager/CreateRoutineCa
 import { RoutineList } from "../components/workout/manager/RoutineList";
 import { DiscardConfirmDialog } from "../components/workout/manager/DiscardConfirmDialog";
 import { CustomExerciseCreator } from "../components/CustomExerciseCreator";
+import { VolumeSaturationCard } from "../components/workout/manager/VolumeSaturationCard";
+import { OfflineMuscleLibraryCard } from "../components/workout/manager/OfflineMuscleLibraryCard";
 
 export function WorkoutManager() {
     const {
@@ -75,6 +77,26 @@ export function WorkoutManager() {
                 />
             )}
 
+            {/* Volume Saturation Card (Screen 3 Spec) */}
+            {!isCreating && editingId === null && (
+                <VolumeSaturationCard />
+            )}
+
+            {/* Target Mesocycles Heading */}
+            {!isCreating && editingId === null && (
+                <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#ccff00]" />
+                        <h3 className="text-xs font-mono font-bold tracking-wider text-[#8e95a5] uppercase">
+                            Target Mesocycles
+                        </h3>
+                    </div>
+                    <span className="stitch-badge-neutral font-mono text-[10px]">
+                        {templates.length} Routines Ready
+                    </span>
+                </div>
+            )}
+
             {/* Routine List and Editor */}
             <RoutineList
                 templates={templates}
@@ -111,6 +133,11 @@ export function WorkoutManager() {
                 onOpenCustomCreator={() => setShowCustomCreator(true)}
                 onSaveDraft={saveDraft}
             />
+
+            {/* Offline Muscle Library Card (Screen 3 Spec) */}
+            {!isCreating && editingId === null && (
+                <OfflineMuscleLibraryCard />
+            )}
 
             {/* Unsaved Changes Discard Confirmation Dialog */}
             <DiscardConfirmDialog
