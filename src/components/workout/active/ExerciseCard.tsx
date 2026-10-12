@@ -103,7 +103,8 @@ export function ExerciseCard({
 
             {/* Tactile Cue & Weak-Side Bias Protocol */}
             <TactileProtocolCues
-                tactileCue={exData?.coach_tips || "Retract scapulae, 30° bench incline, 3s eccentric cadence."}
+                tactileCue={exData?.coach_tips}
+                protocolText={exData?.instructions}
             />
 
             {/* Progression Coach */}

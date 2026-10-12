@@ -11,9 +11,12 @@ import { useActiveWorkoutStore } from './useActiveWorkoutStore';
 
 export interface AppState extends UserSlice, RoutineSlice, ExerciseSlice, ActiveWorkoutSlice, NutritionSlice {
     seeded: boolean;
+    protocolVersion?: string;
     seed: () => void;
     resetStore: () => void;
 }
+
+const CURRENT_PROTOCOL_VERSION = 'el-maestro-48-v1';
 
 export const useStore = create<AppState>()(
     persist(
@@ -25,19 +28,24 @@ export const useStore = create<AppState>()(
             ...createNutritionSlice(set, get, api),
 
             seeded: false,
+            protocolVersion: undefined,
 
             seed: () => set((state) => {
                 let updates: Partial<AppState> = {};
+                const needsProtocolUpgrade = state.protocolVersion !== CURRENT_PROTOCOL_VERSION;
 
                 if (!state.seeded) {
                     updates.exercises = INITIAL_EXERCISES;
                     updates.templates = INITIAL_TEMPLATES;
                     updates.seeded = true;
+                    updates.protocolVersion = CURRENT_PROTOCOL_VERSION;
                 } else {
                     const updatedExercises = state.exercises.map(ex => {
                         const initial = INITIAL_EXERCISES.find(ie => ie.id === ex.id);
                         return initial ? { 
                             ...ex, 
+                            name: needsProtocolUpgrade ? initial.name : ex.name,
+                            instructions: needsProtocolUpgrade ? initial.instructions : ex.instructions,
                             intensity_level: ex.intensity_level || initial.intensity_level, 
                             tempo: ex.tempo || initial.tempo, 
                             coach_tips: ex.coach_tips || initial.coach_tips 
@@ -50,7 +58,11 @@ export const useStore = create<AppState>()(
 
                     const updatedTemplates = state.templates.map(t => {
                         const initial = INITIAL_TEMPLATES.find(it => it.id === t.id);
-                        return initial ? {
+                        if (!initial) return t;
+                        if (needsProtocolUpgrade) {
+                            return { ...initial };
+                        }
+                        return {
                             ...t,
                             description: t.description || initial.description,
                             coach_notes: t.coach_notes || initial.coach_notes,
@@ -58,12 +70,15 @@ export const useStore = create<AppState>()(
                             target_duration: t.target_duration || initial.target_duration,
                             focus_goal: t.focus_goal || initial.focus_goal,
                             scheduled_days: t.scheduled_days?.length ? t.scheduled_days : initial.scheduled_days
-                        } : t;
+                        };
                     });
 
                     const existingTmplIds = new Set(state.templates.map(t => t.id));
                     const missingTemplates = INITIAL_TEMPLATES.filter(t => !existingTmplIds.has(t.id));
                     updates.templates = missingTemplates.length > 0 ? [...updatedTemplates, ...missingTemplates] : updatedTemplates;
+                    if (needsProtocolUpgrade) {
+                        updates.protocolVersion = CURRENT_PROTOCOL_VERSION;
+                    }
                 }
 
                 if (Object.keys(updates).length === 0) return state;

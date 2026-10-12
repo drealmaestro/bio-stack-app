@@ -13,44 +13,44 @@ interface ExerciseItem {
 
 const FEATURED_LIBRARY: ExerciseItem[] = [
     {
-        id: "ex_incline_db_press_unilateral",
-        name: "Incline Dumbbell Press (Left Lead)",
+        id: "ex_shoulder_lockin_rotations",
+        name: "Left-Shoulder Lock-In (Rotations + Face Pull)",
+        muscle: "Shoulders",
+        equipment: "Cable / Band",
+        isAsymmetry: true,
+        description: "Doctor Protocol: Wakes up left rotator cuff so left arm doesn't fade mid-set."
+    },
+    {
+        id: "ex_incline_db_left_lead",
+        name: "30° Incline Dumbbell Press (Left Lead + Offset)",
         muscle: "Chest",
         equipment: "Dumbbell",
         isAsymmetry: true,
-        description: "Unilateral start on non-dominant arm. Fixes clavicular head deficit."
+        description: "Left arm sets rep ceiling + 20s rest-pause mini-set (4-5 reps) on left side."
+    },
+    {
+        id: "ex_cross_body_tri_left_lead",
+        name: "Single-Arm Cross-Body Tricep Extension (Left Lead)",
+        muscle: "Triceps",
+        equipment: "Cable",
+        isAsymmetry: true,
+        description: "Zero elbow pain. Builds left-tricep lockout stamina for stronger pressing."
     },
     {
         id: "ex_bayesian_cable_curl",
-        name: "Bayesian Cable Curl (Unilateral)",
+        name: "Single-Arm Bayesian Cable Curl (Left Lead)",
         muscle: "Biceps",
         equipment: "Cable",
         isAsymmetry: true,
         description: "Long head bias at maximum stretch. Rep capped on right arm."
     },
     {
-        id: "ex_cross_body_triceps_ext",
-        name: "Cross-Body Triceps Extension",
-        muscle: "Triceps",
-        equipment: "Cable",
-        isAsymmetry: false,
-        description: "Medial & lateral head isolation with minimal elbow strain."
-    },
-    {
-        id: "ex_preacher_curl_single_arm",
-        name: "Single-Arm Dumbbell Preacher Curl",
-        muscle: "Biceps",
-        equipment: "Dumbbell",
-        isAsymmetry: true,
-        description: "Strict unilateral tension at short muscle lengths with paused peak."
-    },
-    {
-        id: "ex_incline_barbell_press",
-        name: "Incline Barbell Bench Press",
+        id: "ex_band_single_arm_press",
+        name: "At-Home Stretch-Band Single-Arm Chest Press",
         muscle: "Chest",
-        equipment: "Barbell",
-        isAsymmetry: false,
-        description: "Heavy compound overload for upper chest clavicular recruitment."
+        equipment: "Stretch Band",
+        isAsymmetry: true,
+        description: "Accommodating band resistance fixes mid-rep left-arm endurance wall."
     }
 ];
 
